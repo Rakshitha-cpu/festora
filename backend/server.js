@@ -42,7 +42,7 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(=========================================);
-    console.log(Festora Server running on port );
-    console.log(=========================================);
+    console.log('=========================================');
+    console.log('Festora Server running on port ' + PORT);
+    console.log('=========================================');
 });
