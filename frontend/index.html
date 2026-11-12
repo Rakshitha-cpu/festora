@@ -411,13 +411,13 @@ function pick(id){cur=id;applyTheme(id);CH=[['b',id=='ganesh'?'Namaste! Ask me a
 /* --- routing overrides --- */
 const _draw=draw,_render=render;
 render=function(p){if(cur=='ganesh'&&p!='Festivals')return _render(p);page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
-draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Choose a festival';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=VF();return}
+draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'?window.VF():VF());return}
  if(cur=='ganesh'){_draw();hd.textContent='🪔 Festora · Ganesh Chaturthi';return}
  hd.textContent='🍑 Festora · ' + (cur=='diwali' ? 'Diwali' : (G$[cur]?G$[cur].name:'Festival'));document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
  nav.innerHTML=['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':p}</button>`).join('');
  const viewFn = (V2[page] || (typeof GP!=='undefined'&&GP[page]) || V[page] || V2.Overview);
  document.getElementById('app').innerHTML=viewFn();saveProgress()};
-function VF(){return`<div class="hero" style="background:linear-gradient(160deg,#f7c948,#e2812a 55%,#b5179e)"><h1>Choose a festival</h1><p>Each festival has its own look, games and home.</p></div><div class="grid" style="margin-top:14px">${FEST.map(f=>`<div class="card" style="border-top:6px solid ${f.c};text-align:center;${f.live?'':'opacity:.55'}"><div class="big" style="font-size:3rem">${f.e}</div><b>${f.name}</b><br>${f.live?`<button onclick="pick('${f.id}')">Explore</button>`:'<small>Coming soon</small>'}</div>`).join('')}</div>`}
+function VF(){ if (typeof window.VF === 'function') return window.VF(); return ''; }
 /* --- Diwali pages --- */
 const tl=(e,h)=>`<div class="tile" style="height:${h||150}px;background:${window.TG||'linear-gradient(135deg,#ff9f1c,#7b2cbf)'}"><span class="fk">${e}</span></div>`;
 const V2={Gallery:()=>{return `<h2>Diwali Gallery</h2><div class="note">Scroll to see beautiful generated photos of Diwali celebrations.</div><div class="grid">${[['PEOPLE','Celebration','people celebrating Diwali festival traditional clothes India'],['FOOD','Feast','traditional food sweets for Diwali festival India'],['DECORATION','Decorations','beautiful diyas decorations for Diwali festival India'],['PUJA','Rituals','rituals and prayers for Diwali festival'],['PEOPLE','Community','crowd celebrating Diwali festival'],['ALL','Vibe','grand celebration of Diwali festival night view fireworks']].map((x,i)=>'<div class="tile" style="position:relative; overflow:hidden; border:2px solid #ff9f1c; height:200px;"><span style="position:absolute; bottom:8px; left:8px; z-index:1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: white; font-weight:bold; font-size:1.2rem; line-height:1.2;">'+x[1]+'</span></div>').join('')}</div>`},
@@ -3931,6 +3931,10 @@ if (G$['durga']) {
     }
   };
 
+  // Auto-launch Curated 50 Festivals Hub on root or #Festivals
+  if (typeof window.go === 'function' && (!location.hash || location.hash === '#Festivals' || location.hash === '#' || location.hash === '#Choose')) {
+    window.go('Festivals');
+  }
 })();
 /* ===== END FESTORA CURATED MASTER FESTIVALS & HIGH-DEFINITION VIDEO HUB ===== */
 
