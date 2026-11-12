@@ -1,0 +1,14 @@
+{
+  "name": "festora",
+  "version": "1.0.0",
+  "description": "Festora - Discover Untold Stories of Indian Festivals",
+  "main": "backend/server.js",
+  "scripts": {
+    "build": "npm --prefix backend install",
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}

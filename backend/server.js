@@ -8,41 +8,41 @@ app.use(cors());
 app.use(express.json());
 
 // ==========================================
-// COLLEGE PROJECT: REST API ENDPOINTS
+// REST API ENDPOINTS
 // ==========================================
 
 // 1. GET Request to verify connection
 app.get('/api/status', (req, res) => {
-    console.log("GET /api/status - Frontend connected!");
+    console.log('GET /api/status - Frontend connected!');
     res.json({
-        status: "success",
-        message: "Backend is fully connected and running!",
+        status: 'success',
+        message: 'Festora Backend is fully connected and running!',
         timestamp: new Date()
     });
 });
 
 // 2. POST Request to save user progress
 app.post('/api/save-progress', (req, res) => {
-    console.log("-----------------------------------------");
-    console.log("POST /api/save-progress - Saving data...");
-    console.log("User Coins:", req.body.coins);
-    console.log("User Trophies/Achievements:", Object.keys(req.body.ach || {}).length);
-    console.log("-----------------------------------------");
-    
-    // In a real database, you'd do: db.collection('users').updateOne(...)
-    res.json({ success: true, message: "Progress saved to backend database!" });
+    console.log('POST /api/save-progress:', req.body);
+    res.json({ success: true, message: 'Progress saved successfully!' });
 });
 
 // ==========================================
 // FRONTEND SERVING
 // ==========================================
-// Serve the frontend static files
+// Serve static assets from frontend and root
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '..')));
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`=========================================`);
-    console.log(`Festora Backend Server Running`);
-    console.log(`App is live at: http://localhost:${PORT}`);
-    console.log(`=========================================`);
+// Fallback to index.html for SPA routing
+app.get('*', (req, res) => {
+    const indexPath = path.join(__dirname, '../index.html');
+    res.sendFile(indexPath);
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(=========================================);
+    console.log(Festora Server running on port );
+    console.log(=========================================);
 });
