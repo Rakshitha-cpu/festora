@@ -1,0 +1,26 @@
+{
+  "rag_questions": [
+    {"question": "What is the significance of Yakshagana?", "expected_entity_id": "yakshagana"},
+    {"question": "What is Theyyam?", "expected_entity_id": "theyyam"},
+    {"question": "Tell me about the Golden Temple.", "expected_entity_id": "golden-temple"},
+    {"question": "What happens during Bihu?", "expected_entity_id": "bihu"},
+    {"question": "What is Jallikattu?", "expected_entity_id": "jallikattu"},
+    {"question": "What is the Kumbh Mela?", "expected_entity_id": "kumbh-mela"},
+    {"question": "Describe the Hornbill Festival.", "expected_entity_id": "hornbill-festival"},
+    {"question": "What is Cham Dance?", "expected_entity_id": "cham-dance"},
+    {"question": "What is Bathukamma?", "expected_entity_id": "bathukamma"},
+    {"question": "Tell me about Chhau Dance.", "expected_entity_id": "chhau-dance"}
+  ],
+  "verification_claims": [
+    {"claim": "Yakshagana is a traditional dance-drama from Karnataka.", "entity_id": "yakshagana", "expected_label": "SUPPORTED"},
+    {"claim": "Yakshagana originated in the 20th century in Punjab.", "entity_id": "yakshagana", "expected_label": "CONTRADICTED"},
+    {"claim": "Durga Puja is recognized by UNESCO.", "entity_id": "durga-puja", "expected_label": "SUPPORTED"},
+    {"claim": "The Taj Mahal was built in the 21st century.", "entity_id": "taj-mahal", "expected_label": "CONTRADICTED"},
+    {"claim": "Bhangra is traditionally performed during Baisakhi.", "entity_id": "bhangra", "expected_label": "SUPPORTED"}
+  ],
+  "recommendation_scenarios": [
+    {"seed_entity_id": "yakshagana", "expected_in_top_5": ["bhoota-kola", "dollu-kunitha", "karnataka"]},
+    {"seed_entity_id": "kathakali", "expected_in_top_5": ["theyyam", "kerala"]},
+    {"seed_entity_id": "bhangra", "expected_in_top_5": ["baisakhi", "punjab"]}
+  ]
+}

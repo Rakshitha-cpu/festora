@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>FESTORA V2 - Heritage Platform</title>
+    <style>
+        :root {
+            --primary: #c9931a;
+            --bg: #fdfaf6;
+            --card: #ffffff;
+            --text: #333333;
+            --border: #e0d5c1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: var(--card);
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 { margin: 0; font-size: 1.5rem; color: #b5653a; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); }
+        .emoji { font-size: 3rem; margin-bottom: 10px; }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        button:hover { filter: brightness(1.1); }
+        .game-area {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hidden { display: none; }
+        .score-board {
+            position: absolute;
+            top: 10px; right: 10px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 onclick="goHome()" style="cursor:pointer">🪔 FESTORA V2</h1>
+    <div id="stats">XP: <span id="xp">0</span> | Stars: <span id="stars">0</span></div>
+</header>
+
+<div class="container" id="app">
+    <!-- Dynamic Content -->
+</div>
+
+<script>
+/* =========================================
+   FESTORA V2 - GAME ENGINE ARCHITECTURE
+   ========================================= */
+
+let XP = 0;
+let STARS = 0;
+
+// Reusable Engines
+const Engines = {
+    water_strategy: (game, festival) => {
+        return `
+            <h3>${game.title}</h3>
+            <p>${game.objective}</p>
+            <div class="game-area" style="background:#e0f6ff">
+                <div class="emoji" style="font-size:5rem">${festival.emoji}</div>
+                <p><i>(Water Management Engine running)</i></p>
+                <div class="score-board">Water Flow: 100%</div>
+                <button onclick="winGame('${festival.id}', '${game.id}')" style="width:200px">Complete Task</button>
+            </div>
+        `;
+    },
+    collection: (game, festival) => {
+        return `
+            <h3>${game.title}</h3>
+            <p>${game.objective}</p>
+            <div class="game-area" style="background:#fdf5e6">
+                <div class="emoji" style="font-size:5rem">🧺</div>
+                <p><i>(Collection Engine running)</i></p>
+                <div class="score-board">Collected: 0/10</div>
+                <button onclick="winGame('${festival.id}', '${game.id}')" style="width:200px">Complete Task</button>
+            </div>
+        `;
+    },
+    cooking: (game, festival) => {
+        return `
+            <h3>${game.title}</h3>
+            <p>${game.objective}</p>
+            <div class="game-area" style="background:#fff3e0">
+                <div class="emoji" style="font-size:5rem">🍲</div>
+                <p><i>(Cooking Engine running)</i></p>
+                <div class="score-board">Heat: Medium</div>
+                <button onclick="winGame('${festival.id}', '${game.id}')" style="width:200px">Complete Task</button>
+            </div>
+        `;
+    },
+    exploration: (game, festival) => {
+        return `
+            <h3>${game.title}</h3>
+            <p>${game.objective}</p>
+            <div class="game-area" style="background:#e8f5e9">
+                <div class="emoji" style="font-size:5rem">🗺️</div>
+                <p><i>(Exploration Engine running)</i></p>
+                <button onclick="winGame('${festival.id}', '${game.id}')" style="width:200px">Complete Task</button>
+            </div>
+        `;
+    }
+};
+
+/* =========================================
+   FESTIVAL CONFIGURATIONS
+   ========================================= */
+const Festivals = {
+    'aadi-perukku': {
+        id: 'aadi-perukku',
+        name: 'Aadi Perukku',
+        region: 'Tamil Nadu',
+        category: 'Monsoon/Water Festival',
+        emoji: '🌊',
+        description: 'A monsoon festival celebrated on the 18th day of the Tamil month of Aadi, honoring the life-sustaining properties of water.',
+        games: [
+            { id: 'river-blessing', title: 'River Blessing', engine: 'water_strategy', objective: 'Direct water through the channels to keep the crops healthy.' },
+            { id: 'harvest-basket', title: 'Harvest Basket', engine: 'collection', objective: 'Collect and sort crops associated with the harvest.' }
+        ]
+    },
+    'ambubachi-mela': {
+        id: 'ambubachi-mela',
+        name: 'Ambubachi Mela',
+        region: 'Assam',
+        category: 'Temple Festival',
+        emoji: '🛕',
+        description: 'An annual Hindu mela held at Kamakhya Temple in Guwahati, celebrating the annual menstruation course of goddess Kamakhya.',
+        games: [
+            { id: 'kamakhya-journey', title: 'Kamakhya Temple Journey', engine: 'exploration', objective: 'Explore the cultural environment and discover historical landmarks.' },
+            { id: 'sacred-trail', title: 'Sacred Trail', engine: 'exploration', objective: 'Follow clues to identify cultural symbols.' }
+        ]
+    },
+    'attukal-pongala': {
+        id: 'attukal-pongala',
+        name: 'Attukal Pongala',
+        region: 'Kerala',
+        category: 'Women\\'s Festival',
+        emoji: '🍲',
+        description: 'The largest congregation of women for a festival in the world, preparing a sweet offering for the Goddess.',
+        games: [
+            { id: 'pongala-kitchen', title: 'Pongala Kitchen', engine: 'cooking', objective: 'Select ingredients and maintain the cooking sequence without burning the dish.' },
+            { id: 'fire-pot', title: 'Fire & Pot', engine: 'cooking', objective: 'Maintain the cooking fire heat and monitor timing.' }
+        ]
+    }
+};
+
+/* =========================================
+   NAVIGATION & UI
+   ========================================= */
+const app = document.getElementById('app');
+
+function renderHome() {
+    let html = `<h2>Select a Festival</h2><p>Welcome to FESTORA V2. The architecture has been rebuilt to support decoupled engines.</p><div class="grid">`;
+    for(const key in Festivals) {
+        const f = Festivals[key];
+        html += `<div class="card">
+            <div class="emoji">${f.emoji}</div>
+            <h3>${f.name}</h3>
+            <p style="color:#666; font-size:0.9rem">${f.region}</p>
+            <button onclick="renderFestival('${f.id}')">Explore</button>
+        </div>`;
+    }
+    html += `</div>`;
+    app.innerHTML = html;
+}
+
+function renderFestival(id) {
+    const f = Festivals[id];
+    let html = `
+        <button onclick="renderHome()" style="width:auto; margin-bottom:20px; background:#888">⬅ Back</button>
+        <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid var(--border)">
+            <h2 style="margin-top:0">${f.emoji} ${f.name}</h2>
+            <p><b>Region:</b> ${f.region} | <b>Category:</b> ${f.category}</p>
+            <p>${f.description}</p>
+        </div>
+        <h3 style="margin-top:30px">Games</h3>
+        <div class="grid">
+    `;
+    f.games.forEach(g => {
+        html += `
+        <div class="card">
+            <h4>${g.title}</h4>
+            <p style="font-size:0.9rem; color:#555">${g.objective}</p>
+            <span style="font-size:0.8rem; background:#eee; padding:3px 8px; border-radius:10px">Engine: ${g.engine}</span>
+            <button onclick="renderGame('${f.id}', '${g.id}')">Play Game</button>
+        </div>`;
+    });
+    html += `</div>`;
+    app.innerHTML = html;
+}
+
+function renderGame(festId, gameId) {
+    const f = Festivals[festId];
+    const g = f.games.find(x => x.id === gameId);
+    
+    let html = `<button onclick="renderFestival('${festId}')" style="width:auto; margin-bottom:20px; background:#888">⬅ Quit Game</button>`;
+    
+    if (Engines[g.engine]) {
+        html += Engines[g.engine](g, f);
+    } else {
+        html += `<p>Error: Engine '${g.engine}' not found.</p>`;
+    }
+    
+    app.innerHTML = html;
+}
+
+function winGame(festId, gameId) {
+    const f = Festivals[festId];
+    XP += 100;
+    STARS += 3;
+    document.getElementById('xp').innerText = XP;
+    document.getElementById('stars').innerText = STARS;
+    
+    app.innerHTML = `
+        <div class="card" style="margin-top:40px; text-align:center">
+            <h1 style="font-size:4rem; margin:0">🎉</h1>
+            <h2>Festival Challenge Complete!</h2>
+            <p>Score: 100 | ⭐⭐⭐</p>
+            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:20px 0; text-align:left">
+                <h4>🏆 FESTORA CARD</h4>
+                <p><b>${f.name}</b></p>
+                <p>Region: ${f.region}</p>
+                <p><i>Unlocked by completing ${gameId.replace('-',' ')}!</i></p>
+            </div>
+            <button onclick="renderFestival('${festId}')">Back to Festival</button>
+        </div>
+    `;
+}
+
+function goHome() { renderHome(); }
+
+// Init
+renderHome();
+</script>
+</body>
+</html>

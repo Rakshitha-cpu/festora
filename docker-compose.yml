@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: festora_postgres
+    environment:
+      POSTGRES_USER: festora
+      POSTGRES_PASSWORD: festora123
+      POSTGRES_DB: festora
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: festora_neo4j
+    environment:
+      NEO4J_AUTH: neo4j/festora123
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4jdata:/data
+
+  backend:
+    build: ./backend
+    container_name: festora_backend
+    env_file: .env
+    depends_on:
+      - postgres
+      - neo4j
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+
+volumes:
+  pgdata:
+  neo4jdata:

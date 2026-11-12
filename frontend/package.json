@@ -1,0 +1,9 @@
+{
+  "name": "festora-frontend",
+  "version": "1.0.0",
+  "description": "Festora Frontend App",
+  "scripts": {
+    "start": "npx serve . -p 8080",
+    "dev": "npx serve . -p 8080"
+  }
+}
