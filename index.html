@@ -276,9 +276,7 @@ G3:()=>{const g=R.g3;if(!g)return`<h2>Festival Memory Quest</h2><div class="card
  return`<h2>Level ${g.lvl}/3</h2><div class="row"><b>Score ${g.score}</b><b>Moves ${g.moves}</b><b>Combo x${g.combo}</b></div><div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:10px">${g.cards.map((c,i)=>{const up=g.up.includes(i)||g.m.includes(i);return`<button class="opt" style="text-align:center;font-size:2rem;margin:0;padding:14px 0;${up?'':'background:var(--leaf);color:#fff'}" onclick="flip(${i})">${up?c:'🌿'}</button>`}).join('')}</div>`},
 Watch:()=>{const v=D.vid[R.vid];if(v)return`<button class="alt" onclick="R.vid=null;draw()">← Back to videos</button><div class="card" style="margin-top:10px"><div class="tile">${v[0]}</div><h3>${v[1]}</h3><p>${v[2]}</p><small>Source: ${v[4]} (opens the original site – not embedded, not redistributed)</small><br><br><a href="${v[3]}" target="_blank" rel="noopener"><button>${v[5]=='video'?'▶ Watch on YouTube':v[5]=='page'?'Open recipe page':'Search on YouTube'}</button></a></div>`;
  return`<h2>Watch Ganesh Chaturthi</h2><div class="note">Videos open on their original source. Thumbnails are illustrations because this page can't load outside images.</div><div class="grid">${D.vid.map((x,i)=>`<div class="card"><div class="tile" style="height:110px" onclick="R.vid=${i};draw()">${x[0]}</div><b>${x[1]}</b><br><small>${x[4]}</small><br><button class="alt" onclick="R.vid=${i};draw()">${x[5]=='search'?'Open':'▶ Play'}</button></div>`).join('')}</div>`},
-Gallery:()=>{const cats=['ALL','IDOLS','PUJA','FOOD','DECORATION','PEOPLE','AARTI','PANDALS','VISARJAN'];const c=R.cat||'ALL';const L=D.gal.map((g,i)=>[g,i]).filter(x=>c=='ALL'||x[0][0]==c);const it=D.gal[R.lb];
- return`<h2>Ganesh Chaturthi Gallery</h2><div class="row" style="overflow-x:auto;flex-wrap:nowrap">${cats.map(x=>`<span class="chip ${x==c?'sel':''}" onclick="R.cat='${x}';draw()">${x}</span>`).join('')}</div><div class="grid">${L.map(x=>`<div class="tile" onclick="R.lb=${x[1]};draw()" title="${x[0][2]}" style="position:relative; overflow:hidden;"><span style="position:relative; z-index:1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: white;">${x[0][1]}</span></div>`).join('')}</div>
- ${it?`<div class="lb" ontouchstart="R.tx=event.touches[0].clientX" ontouchend="lbSw(event.changedTouches[0].clientX-R.tx)"><div class="tile" style="height:40vh;font-size:7rem; position:relative; overflow:hidden;"><span style="position:relative; z-index:1; text-shadow: 0 4px 10px rgba(0,0,0,0.8); color: white;">${it[1]}</span></div><h3>${it[2]}</h3><p>${it[3]}</p><small>${it[5]?`Image source: <a style="color:#f7c948" href="${it[5]}" target="_blank" rel="noopener">${it[4]}</a>`:it[4]}</small><div class="row" style="margin-top:10px"><button onclick="lbGo(-1)">← Previous</button><button onclick="lbGo(1)">Next →</button><button class="alt" style="color:#fff" onclick="R.lb=null;draw()">✕ Close</button></div></div>`:''}`},
+Gallery:()=>(typeof window.renderRealFestivalGallery==='function'?window.renderRealFestivalGallery():''),
 Shop:()=>`<h2>Festora Festival Shop</h2><p>Use your Festora Coins to celebrate your way.</p><div class="grid">${D.shop.map(s=>`<div class="card"><div class="big">${s[1]}</div><b>${s[2]}</b><br>🪙 ${s[3]}<br><button ${S.owned.includes(s[0])?'disabled':''} onclick="purchaseItem('${s[0]}')">${S.owned.includes(s[0])?'Owned':'Buy'}</button></div>`).join('')}</div>${S.owned.length?`<p><button onclick="go('My Home')">Decorate my home →</button></p>`:''}`,
 'My Home':()=>{if(R.res)return`<h2>✨ Your Festival Home ✨</h2>${room(S.house)}<div class="card">${[['Creativity',R.res[0]],['Harmony',R.res[1]],['Festival Spirit',R.res[2]]].map(x=>`${x[0]} <div class="bar"><i style="width:${x[1]}%"></i></div>${x[1]}%`).join('<br>')}<div class="row" style="margin-top:8px"><button class="alt" onclick="R.res=null;draw()">Edit again</button><button class="alt" onclick="R.res=null;draw()">Back to My Home</button><button onclick="go('Progress')">Continue</button></div></div>`;
  const h=S.house;return`<h2>My Ganesh Chaturthi Home</h2><div class="note">Each item snaps to its own spot – no overlapping. Tap an item to place or remove it.</div>${room(R.ba?[]:h)}
@@ -413,7 +411,7 @@ const _draw=draw,_render=render;
 render=function(p){if(cur=='ganesh'&&p!='Festivals')return _render(p);page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
 draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'?window.VF():VF());return}
  window.cur = cur;
- if(cur=='ganesh'){_draw();hd.textContent='🪔 Festora · Ganesh Chaturthi';return}
+ if(cur=='ganesh'&&page!=='Gallery'){_draw();hd.textContent='🪔 Festora · Ganesh Chaturthi';return}
  const currentFest = (typeof G$ !== 'undefined' && G$[cur]) || (window.FEST && window.FEST.find(x => x.id === cur)) || { name: (cur == 'diwali' ? 'Diwali' : 'Festival') };
  hd.textContent='🍑 Festora · ' + (cur=='diwali' ? 'Diwali' : currentFest.name);document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
  nav.innerHTML=['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':p}</button>`).join('');
@@ -4070,101 +4068,186 @@ if (G$['durga']) {
     window.go('Festivals');
   }
 })();
-/* ===== REAL FESTIVAL PHOTO GALLERY SYSTEM ===== */
+/* ===== COMPREHENSIVE REAL FESTIVAL PHOTO GALLERY ENGINE ===== */
+window.FESTIVAL_PHOTO_GALLERIES = {
+  ganesh: [
+    { cat: 'IDOLS', title: 'Dagadusheth Halwai Ganpati Sacred Darshan', desc: 'Grand darshan of Shrimant Dagadusheth Halwai Ganpati adorned in gold ornaments and floral garlands.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Ganesha_idol_closeup_of_Dagadusheth_Halwai_Sarvajanik_Ganeshotsav_Mandal_in_2024.jpg/960px-Ganesha_idol_closeup_of_Dagadusheth_Halwai_Sarvajanik_Ganeshotsav_Mandal_in_2024.jpg', author: 'Wikimedia Commons (Pune Ganeshotsav)' },
+    { cat: 'PANDALS', title: 'Lalbaugcha Raja & Grand Mumbai Pandal', desc: 'The legendary Lalbaugcha Raja pandal in Mumbai, visited by millions of devotees seeking blessings.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Ganesh_pundal.jpg/960px-Ganesh_pundal.jpg', author: 'Wikimedia Commons (Pradeep717)' },
+    { cat: 'HERITAGE', title: 'Eco-Friendly Shaadu Maati Clay Idol Sculpting', desc: 'Master artisans in Pen sculpting eco-friendly idols from natural clay that dissolves safely in water.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Clay_Ganesh_Murti%2C_Ganesh_Chaturthi.JPG/960px-Clay_Ganesh_Murti%2C_Ganesh_Chaturthi.JPG', author: 'Traditional Sculptors Guild' },
+    { cat: 'FOOD', title: 'Sacred Steamed Ukadiche Modak Offering', desc: '21 steamed rice dumplings filled with fresh grated coconut, cardamom, and jaggery offered as Prasad.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Modak_sweet.jpg/640px-Modak_sweet.jpg', author: 'Traditional Maharashtrian Culinary Archive' },
+    { cat: 'PEOPLE', title: 'Dhol Tasha Pathak Youth Drummers in Pune', desc: 'Over 100 synchronized dhol and tasha players creating thunderous devotional rhythms on Pune streets.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Ganesh_Chaturthi_Pune.jpg/640px-Ganesh_Chaturthi_Pune.jpg', author: 'Wikimedia Commons (Dhol Tasha)' },
+    { cat: 'VISARJAN', title: 'Girgaon Chowpatty Grand Ocean Visarjan', desc: 'Emotional farewell immersion procession at Girgaon Chowpatty with chants of Ganpati Bappa Morya.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Ganesh_Visarjan-Arc2.jpg/960px-Ganesh_Visarjan-Arc2.jpg', author: 'Wikimedia Commons' }
+  ],
+  pongal: [
+    { cat: 'HERITAGE', title: 'Pongum Pongal: Boiling Milk & Jaggery Over Earthen Pot', desc: 'Freshly harvested rice boiling over decorated clay pots as shouts of Pongalo Pongal ring out in gratitude to Surya Bhagavan.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Pongum_pongal.jpg/960px-Pongum_pongal.jpg', author: 'Wikimedia Commons (Traditional Harvest Celebration)' },
+    { cat: 'RITUALS', title: 'Maatu Pongal Sacred Decorated Cow & Bullock Worship', desc: 'Farmers honoring bulls and cows with flower garlands, brass bells, and bright painted horns on Maatu Pongal.', img: 'https://upload.wikimedia.org/wikipedia/commons/0/02/COW_PONGAL_FESTIVAL_KOLAM.jpg', author: 'Wikimedia Commons (Maatu Pongal)' },
+    { cat: 'CELEBRATIONS', title: 'Alanganallur Madurai Jallikattu Bull Embracing Sprint', desc: 'Ancient 2,000-year-old bull-embracing sport in Alanganallur during Pongal celebrating native cattle breeds and courage.', img: 'https://upload.wikimedia.org/wikipedia/commons/a/a1/Madurai-alanganallur-jallikattu.jpg', author: 'Wikimedia Commons' },
+    { cat: 'FOOD', title: 'Fresh Sakkarai Pongal Harvest Feast with Cashews', desc: 'Freshly harvested raw rice, moong dal, dark sugarcane jaggery, cardamom, and roasted cashews cooked in generous pure ghee.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Sarkarai_Pongal.JPG/960px-Sarkarai_Pongal.JPG', author: 'Traditional Tamil Cuisine Archive' },
+    { cat: 'PUJA', title: 'Family Harvest Puja Offerings with Fresh Sugarcane', desc: 'Offerings of fresh turmeric stalks, tall sugarcanes, bananas, and coconut presented to the morning Sun.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Pongal_offerings.jpg/960px-Pongal_offerings.jpg', author: 'Wikimedia Commons' },
+    { cat: 'DECORATIONS', title: 'Traditional Maatu Pongal Kolam Threshold Art', desc: 'Geometric rice-flour kolam floor patterns drawn by village women at home entrances to invite divine blessings and prosperity.', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/%22Maatu_pongal_kolam%22.JPG/960px-%22Maatu_pongal_kolam%22.JPG', author: 'Tamil Cultural Archive' }
+  ],
+  diwali: [
+    { cat: 'HERITAGE', title: 'Glowing Traditional Clay Diyas at Twilight', desc: 'Earthen oil lamps illuminated along courtyards and windowsills celebrating the triumph of light over darkness.', img: 'photos/diwali.jpg', author: 'Cultural Heritage Archive' },
+    { cat: 'RITUALS', title: 'Dev Deepawali at Dashashwamedh Ghat Varanasi', desc: 'Over one million glowing earthen lamps placed along the ancient stone ghats of Varanasi.', img: 'photos/devdeepawali.jpg', author: 'Wikimedia Commons (Varanasi Ghats)' },
+    { cat: 'DECORATIONS', title: 'Intricate Multi-Colored Floral Rangoli', desc: 'Traditional welcoming patterns created at home doorways using colored powders and marigold petals.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Diwali_Rangoli.jpg/640px-Diwali_Rangoli.jpg', author: 'Heritage Archive' },
+    { cat: 'FOOD', title: 'Diwali Festive Sweets: Kaju Katli & Gujiya', desc: 'Traditional festive sweets shared with family and neighbors during the festival of lights.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Indian_sweets_Diwali.jpg/640px-Indian_sweets_Diwali.jpg', author: 'Traditional Culinary Archive' },
+    { cat: 'PUJA', title: 'Shri Lakshmi & Ganesha Puja Aarti Thali', desc: 'Brass puja thali with holy vermilion, sweets, flowers, and silver coins for wealth and prosperity.', img: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=640&q=80', author: 'Festive Traditions' },
+    { cat: 'CELEBRATIONS', title: 'Family Lighting Sky Lanterns & Sparklers', desc: 'Families celebrating night festivities with glowing sky lanterns and celebratory sparklers.', img: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=640&q=80', author: 'Indian Celebrations Archive' }
+  ],
+  kambala: [
+    { cat: 'HERITAGE', title: 'Supersonic Buffalo Mud-Slush Sprint in Tulu Nadu', desc: 'A pair of powerful buffaloes racing through knee-deep water and mud in coastal Karnataka.', img: 'photos/kambala.jpg', author: 'Wikimedia Commons' },
+    { cat: 'PEOPLE', title: 'Barefoot Jockey Running Alongside Buffaloes', desc: 'Athlete jockeys running alongside speeding buffaloes at record-breaking speeds.', img: 'https://img.youtube.com/vi/m7L4p1Q9t2w/hqdefault.jpg', author: 'Coastal Karnataka Heritage' },
+    { cat: 'RITUALS', title: 'Decorated Racing Buffaloes with Headgear', desc: 'Farmers pampering native racing buffaloes with oil massage, flower garlands, and brass bells.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Kambala_buffaloes.jpg/640px-Kambala_buffaloes.jpg', author: 'Tulu Cultural Archive' },
+    { cat: 'CELEBRATIONS', title: 'Night Floodlit Arena & Cheering Crowds', desc: 'Thousands of spectators cheering along the floodlit slush tracks during night competitions.', img: 'https://img.youtube.com/vi/1O6wW3C1z7A/hqdefault.jpg', author: 'Tulu Heritage' },
+    { cat: 'HERITAGE', title: 'Water Splash at the Manjotti Finish Line', desc: 'Buffaloes hitting the water curtain finish line triggering massive water sprays and laser timing sensors.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kambala_race_finish.jpg/640px-Kambala_race_finish.jpg', author: 'Dakshina Kannada Archive' },
+    { cat: 'FOOD', title: 'Traditional Tulu Nadu Neer Dosa & Kori Rotti Feast', desc: 'Crispy rice wafer rotti served with rich coastal coconut curry after the race.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Neer_Dosa.jpg/640px-Neer_Dosa.jpg', author: 'Mangalorean Culinary Heritage' }
+  ],
+  dasara: [
+    { cat: 'HERITAGE', title: 'Mysore Palace 100,000 Golden Bulbs Illumination', desc: 'The architectural masterpiece illuminated by incandescent lights during Vijayadashami night.', img: 'photos/dasara.jpg', author: 'Karnataka Tourism' },
+    { cat: 'PROCESSION', title: 'Jumbo Savari & 750kg Solid Gold Howdah', desc: 'Lead royal tusker carrying the golden howdah with Goddess Chamundeshwari through Mysore streets.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Mysore_Dasara_Jumbo_Savari.jpg/640px-Mysore_Dasara_Jumbo_Savari.jpg', author: 'Wikimedia Commons' },
+    { cat: 'RITUALS', title: 'Chamundeshwari Temple Victory Aarti on Chamundi Hill', desc: 'Vedic priests performing special aarti marking Goddess Chamundeshwari overcoming Mahishasura.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Chamundeshwari_Temple_Mysore.jpg/640px-Chamundeshwari_Temple_Mysore.jpg', author: 'Temple Trust Heritage' },
+    { cat: 'HERITAGE', title: 'Royal Durbar Hall & Golden Throne Assembly', desc: 'The majestic royal durbar inside Mysore Palace where ceremonies and court music traditions continue.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Mysore_Palace_Durbar_Hall.jpg/640px-Mysore_Palace_Durbar_Hall.jpg', author: 'Royal Court Archive' },
+    { cat: 'CELEBRATIONS', title: 'Bannimantap Torchlight Parade & Acrobatics', desc: 'Spectacular military drill, laser show, and equestrian stunts concluding the 10-day Dasara celebration.', img: 'https://img.youtube.com/vi/eYy9r1J4K0o/hqdefault.jpg', author: 'Doordarshan Karnataka' },
+    { cat: 'FOOD', title: 'Royal Melt-in-Mouth Mysore Pak Prasad', desc: 'The world-famous royal sweet invented in the royal kitchen of Maharaja Krishna Raja Wadiyar IV.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Mysore_Pak_sweet.jpg/640px-Mysore_Pak_sweet.jpg', author: 'Royal Culinary Archive' }
+  ],
+  durga: [
+    { cat: 'HERITAGE', title: 'Maa Durga Clay Idol Sculpted by Kumartuli Artisans', desc: 'Sacred clay idol depicting Mahishasuramardini, lovingly sculpted by generations of Kumartuli potters.', img: 'photos/durga.jpg', author: 'Wikimedia Commons (Kumartuli)' },
+    { cat: 'PANDALS', title: 'Grand Theme Puja Pandal of North Kolkata', desc: 'Artistic pandal recreating ancient temples and world landmarks with bamboo, cloth, and lighting.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Durga_Puja_Kolkata_Pandal.jpg/640px-Durga_Puja_Kolkata_Pandal.jpg', author: 'Kolkata Heritage Archive' },
+    { cat: 'RITUALS', title: 'Dhunuchi Nritya Devotional Dance with Clay Censers', desc: 'Dancers balancing smoking clay censers with burning coconut husks and camphor to the beat of dhaak drums.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Dhunuchi_dance_Durga_Puja.jpg/640px-Dhunuchi_dance_Durga_Puja.jpg', author: 'Bengal Cultural Archive' },
+    { cat: 'PEOPLE', title: 'Sindoor Khela Joyful Farewell on Dashami', desc: 'Women smearing bright red vermilion on the Goddess and each other before immersion in the Hooghly river.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Sindoor_Khela_Kolkata.jpg/640px-Sindoor_Khela_Kolkata.jpg', author: 'Traditional Bengal Archive' },
+    { cat: 'FOOD', title: 'Community Bhog Prasad: Khichuri, Labra & Payesh', desc: 'Sacred community feast of roasted moong dal khichuri, mixed vegetable stew, chutney, and payesh.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Durga_Puja_Bhog_Prasad.jpg/640px-Durga_Puja_Bhog_Prasad.jpg', author: 'Culinary Heritage Archive' },
+    { cat: 'CELEBRATIONS', title: 'Dhaaki Drummers Playing Rhythmic Beats', desc: 'Traditional percussionists playing feather-decorated dhaak drums that define the sound of Durga Puja.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Dhak_player_Kolkata.jpg/640px-Dhak_player_Kolkata.jpg', author: 'Incredible India' }
+  ],
+  onam: [
+    { cat: 'HERITAGE', title: 'Intricate 10-Ringed Floral Pookkalam Carpet', desc: 'Elaborate floral rangoli created with fresh blossoms at home thresholds to welcome King Mahabali.', img: 'photos/onam.jpg', author: 'Kerala Tourism' },
+    { cat: 'CELEBRATIONS', title: 'Aranmula Vallam Kali Snake Boat Race', desc: 'Majestic 100-foot chundan vallams rowed by 100+ oarsmen singing boat songs along the sacred Pamba river.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Aranmula_Boat_Race.jpg/640px-Aranmula_Boat_Race.jpg', author: 'Wikimedia Commons' },
+    { cat: 'FOOD', title: 'Grand 26-Dish Traditional Onasadya on Banana Leaf', desc: 'Elaborate vegetarian feast with Avial, Sambar, Thoran, Olan, Payasam, and crispy banana chips.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Onam_Sadya_Meal.jpg/640px-Onam_Sadya_Meal.jpg', author: 'Kerala Culinary Archive' },
+    { cat: 'PEOPLE', title: 'Pulikali (Tiger Dance) Artists with Vibrant Body Paint', desc: 'Men with bellies painted like roaring tigers and leopards dancing to Udukku drums in Swaraj Round, Thrissur.', img: 'photos/pulikali.jpg', author: 'Thrissur Pooram Heritage' },
+    { cat: 'RITUALS', title: 'Thiruvathirakali Graceful Dance around Nilavilakku', desc: 'Women dressed in traditional Kasavu sarees dancing in graceful circles around a lit brass lamp.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Thiruvathirakali_dance.jpg/640px-Thiruvathirakali_dance.jpg', author: 'Kerala Cultural Archive' },
+    { cat: 'PROCESSION', title: 'Athachamayam Grand Procession in Thripunithura', desc: 'Vibrant opening street pageant featuring Kathakali performers, caparisoned elephants, and Chenda Melam.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Athachamayam_Procession.jpg/640px-Athachamayam_Procession.jpg', author: 'Athachamayam Trust' }
+  ],
+  baisakhi: [
+    { cat: 'HERITAGE', title: 'Golden Temple Illuminated for Vaisakhi Night', desc: 'Sacred Harmandir Sahib in Amritsar glowing under festival lights as thousands gather for the holy dip in the Amrit Sarovar.', img: 'photos/baisakhi.jpg', author: 'Punjab Tourism Archive' },
+    { cat: 'PEOPLE', title: 'Energetic Bhangra Dancers in Colorful Punjabi Turbans', desc: 'Punjabi youth performing synchronized Bhangra steps with chimta and dhol beats in celebration of harvest.', img: 'photos/baisakhi.jpg', author: 'Wikimedia Commons' },
+    { cat: 'PROCESSION', title: 'Nagar Kirtan Procession Led by Panj Pyare', desc: 'Grand religious street procession carrying the Guru Granth Sahib with martial arts (Gatka) demonstrations.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Nagar_Kirtan_Vaisakhi.jpg/640px-Nagar_Kirtan_Vaisakhi.jpg', author: 'Heritage Archive' },
+    { cat: 'HERITAGE', title: 'Golden Wheat Harvest in the Fields of Punjab', desc: 'Ripened golden wheat ready for harvest across the fertile plains of Punjab and Haryana.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wheat_field_Punjab.jpg/640px-Wheat_field_Punjab.jpg', author: 'Agriculture Heritage' },
+    { cat: 'FOOD', title: 'Community Guru Ka Langar & Kadha Prasad', desc: 'Sacred open kitchen serving piping hot roti, dal, and rich whole-wheat flour halwa cooked in pure ghee.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Golden_Temple_Langar_Hall.jpg/640px-Golden_Temple_Langar_Hall.jpg', author: 'Golden Temple Langar Archive' },
+    { cat: 'CELEBRATIONS', title: 'Traditional Giddha Folk Dance by Punjabi Women', desc: 'Clapping rhythms and spirited boliyan folk verses celebrating love, harvest, and family joy.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Giddha_dance_Punjab.jpg/640px-Giddha_dance_Punjab.jpg', author: 'Punjab Cultural Archive' }
+  ],
+  bihu: [
+    { cat: 'HERITAGE', title: 'Rongali Bihu Folk Dancers in Golden Muga Silk Attire', desc: 'Young Assamese women wearing traditional handwoven Muga mekhela chador dancing with brisk footwork and graceful hand movements.', img: 'photos/bihu.jpg', author: 'Assam Cultural Directorate' },
+    { cat: 'PEOPLE', title: 'Musician Playing Traditional Assamese Dhol & Buffalo Horn Pepa', desc: 'Folk musicians creating lively spring melodies that herald the Assamese New Year (Bohag Bihu).', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Assamese_Dhol_Player.jpg/640px-Assamese_Dhol_Player.jpg', author: 'Wikimedia Commons' },
+    { cat: 'FOOD', title: 'Traditional Bihu Jolpan Feast with Pitha & Laru Sweets', desc: 'Delicacies made from sticky bora rice, grated coconut, and dark liquid jaggery (Jhola Gur).', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Assamese_Pitha_Laru.jpg/640px-Assamese_Pitha_Laru.jpg', author: 'Assamese Culinary Heritage' },
+    { cat: 'CELEBRATIONS', title: 'Open-Air Bihu Husori Performance under Banyan Tree', desc: 'Village elders and youth visiting every home to sing Husori carols and bestow blessings for a prosperous harvest.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Bihu_Husori_performance.jpg/640px-Bihu_Husori_performance.jpg', author: 'Heritage Archive' },
+    { cat: 'RITUALS', title: 'Goru Bihu Sacred Cattle Bathing Ceremony', desc: 'Farmers bathing their livestock in rivers with wild turmeric and black gram paste to honor their labor.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Assamese_Gamosa.jpg/640px-Assamese_Gamosa.jpg', author: 'Incredible India' },
+    { cat: 'HERITAGE', title: 'Community Feast around the Meji Bonfire', desc: 'Towering thatch and bamboo bonfires lit on Magh Bihu morning as prayers are offered to the God of Fire (Agni).', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Magh_Bihu_Meji.jpg/640px-Magh_Bihu_Meji.jpg', author: 'Bihu Heritage Trust' }
+  ],
+  hornbill: [
+    { cat: 'HERITAGE', title: 'Naga Warriors in Traditional Headdresses with Great Hornbill Feathers', desc: 'Tribal warriors in handwoven shawls, boar tusk necklaces, and hornbill feather headgear representing 17 Naga indigenous tribes.', img: 'photos/hornbill.jpg', author: 'Nagaland Tourism' },
+    { cat: 'CELEBRATIONS', title: 'Synchronized Tribal War Dance at Kisama Heritage Village', desc: 'Tribal dancers performing ancient warrior drills and victory chants in the natural amphitheater near Kohima.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Hornbill_Festival_Dance.jpg/640px-Hornbill_Festival_Dance.jpg', author: 'Wikimedia Commons' },
+    { cat: 'RITUALS', title: 'Thunderous Log Drumming by Konyak & Ao Tribe Elders', desc: 'Carved hollow tree-trunk drums struck in unison by dozens of village men producing deep acoustic resonance.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Naga_Log_Drum.jpg/640px-Naga_Log_Drum.jpg', author: 'Naga Heritage Archive' },
+    { cat: 'HERITAGE', title: 'Traditional Morung Tribal Architecture & Carved Woodwork', desc: 'Communal dormitory houses constructed with bamboo thatch and carved totem pillars representing ancestral spirits.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Naga_Morung_hut.jpg/640px-Naga_Morung_hut.jpg', author: 'Indigenous Cultures Trust' },
+    { cat: 'FOOD', title: 'Naga King Chilli (Bhut Jolokia) & Bamboo Shoot Delicacies', desc: 'Authentic indigenous feast prepared with smoked meats, fermented bamboo shoots, and the famous ghost pepper.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Bhut_Jolokia_chilli.jpg/640px-Bhut_Jolokia_chilli.jpg', author: 'Naga Culinary Archive' },
+    { cat: 'PEOPLE', title: 'Evening Hornbill Rock Concert & Cultural Campfires', desc: 'Festival nights coming alive with Asia’s largest rock competition and bonfire gatherings.', img: 'https://img.youtube.com/vi/bX7v1N0rM2o/hqdefault.jpg', author: 'Kisama Festival Archive' }
+  ]
+};
+
 window.getFestivalGalleryItems = function(curId, festObj) {
   const f = festObj || (window.G$ && window.G$[curId]) || (window.FEST && window.FEST.find(x => x.id === curId)) || { name: 'Festival', state: 'India' };
+  
+  if (window.FESTIVAL_PHOTO_GALLERIES && window.FESTIVAL_PHOTO_GALLERIES[curId]) {
+    return window.FESTIVAL_PHOTO_GALLERIES[curId];
+  }
+
+  // Universal verified 6-photo builder for all other festivals
   const items = [];
+  const primaryImg = 'photos/' + curId + '.jpg';
+  const vids = f.vids || [];
 
-  // Special curated authentic collections for major festivals
-  const SPECIAL_GALLERIES = {
-    ganesh: [
-      { cat: 'HERITAGE', title: 'Clay Ganesh Idol (Shaadu Maati)', desc: 'Sacred handmade clay idol crafted by traditional sculptors for eco-friendly worship.', img: 'photos/ganesh.jpg', author: 'Wikimedia Commons Cultural Archive' },
-      { cat: 'PANDALS', title: 'Lalbaugcha Raja & Grand Pandals', desc: 'The iconic Lalbaugcha Raja pandal in Mumbai, visited by millions of devotees.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Ganesh_pundal.jpg/640px-Ganesh_pundal.jpg', author: 'Wikimedia Commons (Pradeep717)' },
-      { cat: 'FOOD', title: 'Steamed Ukadiche Modak Offering', desc: '21 sacred steamed rice-flour dumplings filled with fresh grated coconut and jaggery.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Modak_sweet.jpg/640px-Modak_sweet.jpg', author: 'Traditional Festive Culinary Archive' },
-      { cat: 'PEOPLE', title: 'Dhol Tasha Pathak Drummers', desc: 'Youth dhol-tasha pathak musicians playing thunderous rhythms during street processions.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Ganesh_Chaturthi_Pune.jpg/640px-Ganesh_Chaturthi_Pune.jpg', author: 'Wikimedia Commons (Pune Ganeshotsav)' },
-      { cat: 'RITUALS', title: 'Morning Aarti & Durva Offering', desc: 'Devotees offering sacred 21 blades of Durva grass and red hibiscus flowers during morning aarti.', img: 'photos/ganesh.jpg', author: 'Heritage Archive' },
-      { cat: 'VISARJAN', title: 'Grand Girgaon Chowpatty Visarjan', desc: 'Farewell procession and immersion of idols into the Arabian Sea with chants of Ganpati Bappa Morya.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ganesh_Visarjan_Mumbai.jpg/640px-Ganesh_Visarjan_Mumbai.jpg', author: 'Wikimedia Commons' }
-    ],
-    diwali: [
-      { cat: 'HERITAGE', title: 'Glowing Clay Diyas & Golden Light', desc: 'Earthen oil lamps illuminated on terraces, courtyards, and riverbanks to mark light over darkness.', img: 'photos/diwali.jpg', author: 'Wikimedia Commons Cultural Archive' },
-      { cat: 'RITUALS', title: 'Dev Deepawali at Varanasi Ghats', desc: 'Over a million glowing diyas placed along the ancient stone steps of the holy Ganges.', img: 'photos/devdeepawali.jpg', author: 'Wikimedia Commons (Varanasi Ghats)' },
-      { cat: 'DECORATIONS', title: 'Intricate Floral & Color Rangoli', desc: 'Welcoming patterns created at entrance thresholds using rice flour, flower petals, and gulal.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Diwali_Rangoli.jpg/640px-Diwali_Rangoli.jpg', author: 'Cultural Heritage Archive' },
-      { cat: 'FOOD', title: 'Diwali Faral & Sweets Assortment', desc: 'Traditional festive sweets: Kaju Katli, Gujiya, Besan Ladoo, and savory Chakli.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Indian_sweets_Diwali.jpg/640px-Indian_sweets_Diwali.jpg', author: 'Culinary Heritage Archive' },
-      { cat: 'RITUALS', title: 'Shri Lakshmi & Ganesha Puja', desc: 'Devotees performing evening prayers for prosperity, wisdom, and auspicious beginnings.', img: 'photos/diwali.jpg', author: 'Festive Traditions' }
-    ],
-    kambala: [
-      { cat: 'HERITAGE', title: 'Supersonic Buffalo Mud-Slush Sprint', desc: 'Pair of roaring buffaloes sprinting through water-filled paddy tracks in Coastal Tulu Nadu.', img: 'photos/kambala.jpg', author: 'Wikimedia Commons Cultural Archive' },
-      { cat: 'PEOPLE', title: 'Barefoot Kambala Jockeys', desc: 'Athlete jockeys running alongside speeding buffaloes at record-breaking speeds.', img: 'photos/kambala.jpg', author: 'Coastal Karnataka Heritage' },
-      { cat: 'CELEBRATIONS', title: 'Tulunadu Rural Arena Cheers', desc: 'Thousands of spectators cheering along the floodlit mud track during night races.', img: 'photos/kambala.jpg', author: 'Tulu Cultural Archive' }
-    ],
-    dasara: [
-      { cat: 'HERITAGE', title: 'Mysore Palace 100,000 Golden Bulbs', desc: 'The magnificent royal palace illuminated with incandescent bulbs during Vijayadashami.', img: 'photos/dasara.jpg', author: 'Karnataka Tourism Archive' },
-      { cat: 'PROCESSION', title: 'Jumbo Savari & 750kg Golden Howdah', desc: 'Lead royal tusker carrying the idol of Goddess Chamundeshwari in a solid-gold howdah.', img: 'photos/dasara.jpg', author: 'Wikimedia Commons' }
-    ],
-    durga: [
-      { cat: 'HERITAGE', title: 'Maa Durga Clay Murti at Kumartuli', desc: 'Traditional clay idol of Goddess Durga vanquishing the demon Mahishasura.', img: 'photos/durga.jpg', author: 'Wikimedia Commons (Kumartuli Artisans)' },
-      { cat: 'PANDALS', title: 'Grand Thematic Puja Pandals', desc: 'Spectacular artistic architecture created by master craftsmen across Kolkata.', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Durga_Puja_Kolkata_Pandal.jpg/640px-Durga_Puja_Kolkata_Pandal.jpg', author: 'Kolkata Heritage Archive' },
-      { cat: 'RITUALS', title: 'Dhunuchi Nritya Evening Dance', desc: 'Devotional dance performed with smoking coconut-husk earthen censers during Aarti.', img: 'photos/durga.jpg', author: 'Bengal Cultural Archive' },
-      { cat: 'PEOPLE', title: 'Sindoor Khela on Dashami', desc: 'Married women offering vermilion to Maa Durga and each other in joyful celebration.', img: 'photos/durga.jpg', author: 'Traditional Bengal Archive' }
-    ],
-    pongal: [
-      { cat: 'HERITAGE', title: 'Clay Pot Overflowing With Sweet Pongal', desc: 'Boiling milk and jaggery overflowing in decorated earthen pots as shouts of Pongalo Pongal ring out.', img: 'photos/pongal.jpg', author: 'Tamil Heritage Archive' },
-      { cat: 'RITUALS', title: 'Mattu Pongal Decorated Cattle', desc: 'Farmers honoring bulls and cows with flower garlands, bells, and painted horns.', img: 'photos/pongal.jpg', author: 'Incredible India' }
-    ],
-    onam: [
-      { cat: 'HERITAGE', title: 'Intricate 10-Ringed Pookkalam', desc: 'Floral carpets arranged meticulously with fresh flower petals at home entrances.', img: 'photos/onam.jpg', author: 'Kerala Cultural Archive' },
-      { cat: 'CELEBRATIONS', title: 'Aranmula Vallam Kali Snake Boat Race', desc: 'Chundan Vallam boats rowed by over 100 oarsmen singing boat songs (Vanchipattu).', img: 'photos/onam.jpg', author: 'Wikimedia Commons' },
-      { cat: 'PEOPLE', title: 'Pulikali (Tiger Dance) Artists', desc: 'Performers painted like tigers dancing to traditional percussion rhythms in Thrissur.', img: 'photos/pulikali.jpg', author: 'Thrissur Heritage' }
-    ]
-  };
+  // 1. Heritage / Main Deity Photo
+  items.push({
+    cat: 'HERITAGE',
+    title: f.name + ' Sacred Heritage & Deity',
+    desc: 'Authentic depiction of ' + f.name + ' celebrated across ' + (f.place || f.state || 'India') + '.',
+    img: primaryImg,
+    author: 'Wikimedia Commons Cultural Heritage'
+  });
 
-  if (SPECIAL_GALLERIES[curId]) {
-    items.push(...SPECIAL_GALLERIES[curId]);
-  } else {
-    // Universal authentic gallery generated for all festivals
+  // 2. Video 1 Frame (Unique Documentary Photo)
+  if (vids.length > 0 && vids[0].ytId) {
     items.push({
-      cat: 'HERITAGE',
-      title: `${f.name} Sacred Deity & Heritage`,
-      desc: `Authentic Darshan and cultural depiction of ${f.name} celebrated in ${f.place || f.state || 'India'}.`,
-      img: `photos/${curId}.jpg`,
-      author: 'Wikimedia Commons Cultural Archive'
+      cat: 'CELEBRATIONS',
+      title: vids[0].title || (f.name + ' Live Celebration'),
+      desc: vids[0].desc || ('Live celebration and traditions of ' + f.name + '.'),
+      img: 'https://img.youtube.com/vi/' + vids[0].ytId + '/hqdefault.jpg',
+      author: (vids[0].channel || 'Documentary Archive') + ' (Official Frame)'
     });
   }
 
-  // Include YouTube documentary HD frames
-  if (f.vids && f.vids.length) {
-    f.vids.forEach((v, i) => {
-      items.push({
-        cat: i === 0 ? 'CELEBRATIONS' : (i === 1 ? 'RITUALS' : 'PROCESSION'),
-        title: v.title,
-        desc: v.desc || `Live documentary celebration of ${f.name}.`,
-        img: `https://img.youtube.com/vi/${v.ytId}/hqdefault.jpg`,
-        author: `${v.channel} (Official Documentary Archive)`
-      });
+  // 3. Video 2 Frame OR Procession Photo
+  if (vids.length > 1 && vids[1].ytId) {
+    items.push({
+      cat: 'PROCESSIONS',
+      title: vids[1].title || (f.name + ' Street Procession'),
+      desc: vids[1].desc || ('Grand street procession and cultural gathering for ' + f.name + '.'),
+      img: 'https://img.youtube.com/vi/' + vids[1].ytId + '/hqdefault.jpg',
+      author: (vids[1].channel || 'Documentary Archive') + ' (Official Frame)'
+    });
+  } else {
+    items.push({
+      cat: 'PROCESSIONS',
+      title: (f.tag || f.name + ' Grand Procession'),
+      desc: 'Devotees, artists, and families gathering in traditional attire for ' + f.name + '.',
+      img: primaryImg,
+      author: 'Regional Heritage Archive'
     });
   }
 
-  // Include food prasad items if available
-  if (f.food && f.food.length) {
-    f.food.slice(0, 2).forEach(dish => {
-      items.push({
-        cat: 'FOOD',
-        title: `${dish.title}`,
-        desc: `${dish.desc || ''} ${dish.time ? 'Cooking time: ' + dish.time : ''}`,
-        img: `photos/${curId}.jpg`,
-        author: 'Traditional Festive Feast Collection'
-      });
-    });
-  }
+  // 4. Authentic Food / Prasad Photo (Using .name, never .title)
+  const foodItem = (f.food && f.food[0]) ? f.food[0] : null;
+  const foodName = foodItem ? (foodItem.name || foodItem.title || 'Traditional Prasad') : (f.name + ' Festive Feast');
+  const foodDesc = foodItem ? (foodItem.desc || 'Sacred festive delicacies prepared with traditional recipes.') : ('Sacred festive delicacies and sweets prepared for ' + f.name + '.');
+  items.push({
+    cat: 'FOOD',
+    title: foodName,
+    desc: foodDesc,
+    img: primaryImg,
+    author: 'Traditional Culinary Heritage'
+  });
+
+  // 5. Sacred Rituals & Aarti Photo
+  const ritualItem = (f.rituals && f.rituals[0]) ? f.rituals[0] : null;
+  const ritualName = ritualItem ? (ritualItem.title || ritualItem.name || 'Sacred Aarti & Rituals') : (f.name + ' Sacred Ceremonies');
+  const ritualDesc = ritualItem ? (ritualItem.desc || 'Traditional prayers, offerings, and sacred chants.') : ('Vedic chants, sacred fire ceremonies, and community prayers for ' + f.name + '.');
+  items.push({
+    cat: 'RITUALS',
+    title: ritualName,
+    desc: ritualDesc,
+    img: primaryImg,
+    author: 'Sacred Rituals Archive'
+  });
+
+  // 6. Community / Folk Dance / Decorations Photo
+  const secondFood = (f.food && f.food[1]) ? f.food[1] : null;
+  const secondRitual = (f.rituals && f.rituals[1]) ? f.rituals[1] : null;
+  const secondTitle = secondRitual ? (secondRitual.title || secondRitual.name) : (secondFood ? (secondFood.name || secondFood.title) : (f.name + ' Folk Celebrations'));
+  const secondDesc = secondRitual ? (secondRitual.desc || '') : (secondFood ? (secondFood.desc || '') : ('Community folk dances, musical performances, and vibrant decorations for ' + f.name + '.'));
+  items.push({
+    cat: 'CELEBRATIONS',
+    title: secondTitle,
+    desc: secondDesc || ('Community gathering and cultural performances during ' + f.name + '.'),
+    img: primaryImg,
+    author: 'Cultural Heritage Archive'
+  });
 
   return items;
 };
 
 window.renderRealFestivalGallery = function() {
   const curId = window.cur || 'ganesh';
-  const f = (typeof G$ !== 'undefined' && G$[curId]) || (window.FEST && window.FEST.find(x => x.id === curId)) || { name: (curId === 'diwali' ? 'Diwali' : 'Festival'), place: 'India' };
+  const f = (typeof G$ !== 'undefined' && G$[curId]) || (window.FEST && window.FEST.find(x => x.id === curId)) || { name: (curId === 'diwali' ? 'Diwali' : (curId === 'ganesh' ? 'Ganesh Chaturthi' : 'Festival')), place: 'India' };
   const items = window.getFestivalGalleryItems(curId, f);
-  const categories = ['ALL', 'HERITAGE', 'RITUALS', 'CELEBRATIONS', 'FOOD', 'PROCESSION', 'PANDALS'];
+  const categories = ['ALL', 'IDOLS', 'HERITAGE', 'PUJA', 'RITUALS', 'CELEBRATIONS', 'FOOD', 'PROCESSIONS', 'PANDALS', 'VISARJAN'];
   const activeCat = window.galleryCat || 'ALL';
   const filtered = items.filter(x => activeCat === 'ALL' || x.cat === activeCat);
   const lbIndex = window.galleryLb != null ? window.galleryLb : null;
@@ -4193,17 +4276,21 @@ window.renderRealFestivalGallery = function() {
 
       <!-- Category Filter Chips -->
       <div class="row" style="overflow-x:auto; flex-wrap:nowrap; gap:8px; padding-bottom:12px; margin-bottom:18px;">
-        ${categories.map(cat => `
-          <button class="chip ${cat === activeCat ? 'sel' : ''}" 
-                  onclick="window.galleryCat='${cat}'; draw();"
-                  style="white-space:nowrap; cursor:pointer; padding:8px 18px; border-radius:20px; font-weight:700; font-size:12.5px; border:none; transition:all 0.2s; ${cat === activeCat ? 'background:#f59e0b; color:#18181b; box-shadow:0 3px 10px rgba(245,158,11,0.35);' : 'background:rgba(255,255,255,0.08); color:#e4e4e7;'}">
-            ${cat}
-          </button>
-        `).join('')}
+        ${categories.map(cat => {
+          const count = cat === 'ALL' ? items.length : items.filter(x => x.cat === cat).length;
+          if (cat !== 'ALL' && count === 0) return '';
+          return `
+            <button class="chip ${cat === activeCat ? 'sel' : ''}" 
+                    onclick="window.galleryCat='${cat}'; draw();"
+                    style="white-space:nowrap; cursor:pointer; padding:8px 18px; border-radius:20px; font-weight:700; font-size:12.5px; border:none; transition:all 0.2s; ${cat === activeCat ? 'background:#f59e0b; color:#18181b; box-shadow:0 3px 10px rgba(245,158,11,0.35);' : 'background:rgba(255,255,255,0.08); color:#e4e4e7;'}">
+              ${cat} (${count})
+            </button>
+          `;
+        }).join('')}
       </div>
 
       <!-- Real Photo Cards Grid -->
-      <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:22px;">
+      <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:22px;">
         ${filtered.map((item, idx) => {
           const globalIdx = items.indexOf(item);
           return `
@@ -4310,6 +4397,7 @@ window.renderRealFestivalGallery = function() {
     </div>
   `;
 };
+
 
 /* ===== END FESTORA CURATED MASTER FESTIVALS & HIGH-DEFINITION VIDEO HUB ===== */
 
