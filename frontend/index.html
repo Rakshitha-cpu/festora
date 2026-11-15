@@ -403,19 +403,37 @@ kb:[[['what is','about','festival of lights','fact'],'Diwali is the festival of 
 function dwReply(q){q=q.toLowerCase();let b=null,s=0;DW.kb.forEach(k=>{const n=k[0].filter(w=>q.includes(w)).length;if(n>s){s=n;b=k}});return b?b[1]:"I don't have reliable information about that yet. Try asking about rangoli, diyas, Lakshmi puja or food."}
 const _rp=reply;reply=q=>cur=='ganesh'?_rp(q):dwReply(q);
 /* --- state helpers --- */
-function F(){S.f=S.f||{};return S.f.diwali=S.f.diwali||{done:{},quiz:{best:-1,paid:0},g1:{best:-1,paid:0},g2:{best:-1,paid:0},h:{best:-1,paid:0},owned:[],house:[]}}
+function F(){S.f=S.f||{};const k=(cur||'diwali');return S.f[k]=S.f[k]||{done:{},quiz:{best:-1,paid:0},g1:{best:-1,paid:0},g2:{best:-1,paid:0},h:{best:-1,paid:0},owned:[],house:[]}}
 function rwF(k,sc,co,l){const g=F()[k];if(sc>g.best)g.best=sc;const x=co-g.paid;F().done[k]=1;if(x>0){g.paid=co;addCoins(x,l)}else toast('Score saved. Beat your best for more coins!');saveProgress()}
 const DSEC=[['exp','Story'],['food','Food'],['reg','Regions'],['quiz','Quiz'],['g1','Diya game'],['g2','Rangoli game'],['shop','Shop'],['h','Home']];
 const pct2=()=>Math.round(DSEC.filter(s=>F().done[s[0]]).length/DSEC.length*100);
-function pick(id){cur=id;applyTheme(id);CH=[['b',id=='ganesh'?'Namaste! Ask me about Ganesh Chaturthi. 🪔':'Namaste! Ask me about Diwali. 🪔']];go('Overview')}
+function pick(id){cur=id;window.cur=id;applyTheme(id);const fn=(typeof G$!=='undefined'&&G$[id]?G$[id].name:(id=='ganesh'?'Ganesh Chaturthi':'Festival'));CH=[['b','Namaste! Welcome to '+fn+'. 🪔']];go('Overview')}
 /* --- routing overrides --- */
 const _draw=draw,_render=render;
 render=function(p){if(cur=='ganesh'&&p!='Festivals')return _render(p);page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
 draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'?window.VF():VF());return}
+ window.cur = cur;
  if(cur=='ganesh'){_draw();hd.textContent='🪔 Festora · Ganesh Chaturthi';return}
- hd.textContent='🍑 Festora · ' + (cur=='diwali' ? 'Diwali' : (G$[cur]?G$[cur].name:'Festival'));document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
+ const currentFest = (typeof G$ !== 'undefined' && G$[cur]) || (window.FEST && window.FEST.find(x => x.id === cur)) || { name: (cur == 'diwali' ? 'Diwali' : 'Festival') };
+ hd.textContent='🍑 Festora · ' + (cur=='diwali' ? 'Diwali' : currentFest.name);document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
  nav.innerHTML=['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':p}</button>`).join('');
- const viewFn = (V2[page] || (typeof GP!=='undefined'&&GP[page]) || V[page] || V2.Overview);
+ 
+ let viewFn;
+ if (window.V && window.V[page]) {
+   viewFn = window.V[page];
+ } else if (cur === 'diwali') {
+   viewFn = (typeof V2 !== 'undefined' && V2[page]) ? V2[page] : ((typeof GP !== 'undefined' && GP[page]) ? GP[page] : V2.Overview);
+ } else if (typeof GP !== 'undefined' && GP[page]) {
+   viewFn = GP[page];
+ } else if (cur === 'ganesh' && typeof V !== 'undefined' && V[page]) {
+   viewFn = V[page];
+ } else if (typeof GP !== 'undefined' && GP.Overview) {
+   viewFn = GP.Overview;
+ } else if (cur === 'diwali' && typeof V2 !== 'undefined' && V2.Overview) {
+   viewFn = V2.Overview;
+ } else {
+   viewFn = V.Overview;
+ }
  document.getElementById('app').innerHTML=viewFn();saveProgress()};
 function VF(){ if (typeof window.VF === 'function') return window.VF(); return ''; }
 /* --- Diwali pages --- */
