@@ -300,8 +300,8 @@ function check(){const h=S.house;if(S.done.house&&h.length)unlockAchievement('fi
  if(pct()==100)unlockAchievement('explorer')}
 const tier=s=>s>=80?100:s>=60?70:s>=40?40:20;
 function rewardBest(k,score,coins,label){const g=S[k];if(score>g.best)g.best=score;const extra=coins-g.paid;if(extra>0){g.paid=coins;mark(k);check();saveProgress();addCoins(extra,label)}else{mark(k);check();saveProgress();toast('Score saved. Beat your best to earn more coins!')}}
-function render(p){if(typeof window.render==='function'){return window.render(p);}if(!V[p])p='Overview';page=p;R=window._r||{};window._r=null;clearInterval(window._t);const m={Learn:'intro',Celebrate:'traditions',Puja:'puja',Food:'food',Watch:'gallery',Gallery:'gallery',Shop:'shop'};if(m[p])mark(m[p]);check();draw();window.scrollTo(0,0)}
-window.go = function(p,r){window._r=r;try{history.pushState({p},'','#'+encodeURIComponent(p))}catch(e){}if(typeof window.render==='function'){return window.render(p);}render(p);}; function go(p,r){window.go(p,r);}
+function render(p){if(!V[p])p='Overview';page=p;R=window._r||{};window._r=null;clearInterval(window._t);const m={Learn:'intro',Celebrate:'traditions',Puja:'puja',Food:'food',Watch:'gallery',Gallery:'gallery',Shop:'shop'};if(m[p])mark(m[p]);check();draw();window.scrollTo(0,0)}
+window.go = function(p,r){window._r=r;try{history.pushState({p},'','#'+encodeURIComponent(p))}catch(e){}render(p);}; function go(p,r){window.go(p,r);}
 window.onpopstate=()=>render(decodeURIComponent(location.hash.slice(1))||'Overview');
 function bar(){if(page=='Overview')return'';const t=/^G\d$/.test(page)?'Games':'Overview';return`<div class="row" style="margin-bottom:8px"><button class="alt" onclick="go('${t}')">← Back to ${t=='Games'?'Play Zone':'Ganesh Chaturthi'}</button><small style="color:var(--mut)">Home / Ganesh Chaturthi / ${page.replace(/^G(\d)$/,'Game $1')}</small></div>`}
 function foot(){if(!/^G\d$/.test(page))return'';const n=+page[1];return`<div class="row" style="margin-top:16px"><button class="alt" onclick="go('Games')">Back to Play Zone</button><button onclick="go('${n<3?'G'+(n+1):'Shop'}')">${n<3?'Next game →':'Open Shop →'}</button><button class="alt" onclick="go('Progress')">View rewards</button></div>`}
@@ -504,9 +504,9 @@ const pct2=()=>Math.round(DSEC.filter(s=>F().done[s[0]]).length/DSEC.length*100)
 function pick(id){cur=id;window.cur=id;applyTheme(id);const fn=(typeof G$!=='undefined'&&G$[id]?G$[id].name:(id=='ganesh'?'Ganesh Chaturthi':'Festival'));CH=[['b','Namaste! Welcome to '+fn+'. 🪔']];go('Overview')}
 /* --- routing overrides --- */
 const _draw=draw,_render=render;
-render=function(p){if(typeof window.render==='function'){return window.render(p);}
+render=function(p){
 page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
-draw=function(){if(typeof window.draw==='function'){return window.draw();}const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'?window.VF():VF());return}
+draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'&&window.VF!==VF?window.VF():'');return}
  window.cur = cur;
  // Unified draw for all 61 festivals
 
@@ -537,7 +537,7 @@ draw=function(){if(typeof window.draw==='function'){return window.draw();}const 
    viewFn = (typeof GP !== 'undefined' && GP.Overview) ? GP.Overview : (window.V && window.V.Overview ? window.V.Overview : V.Overview);
  }
  document.getElementById('app').innerHTML=viewFn();saveProgress()};
-function VF(){ if (typeof window.VF === 'function') return window.VF(); return ''; }
+function VF(){ if (typeof window.VF === 'function' && window.VF !== VF) return window.VF(); return ''; }
 /* --- Diwali pages --- */
 const tl=(e,h)=>`<div class="tile" style="height:${h||150}px;background:${window.TG||'linear-gradient(135deg,#ff9f1c,#7b2cbf)'}"><span class="fk">${e}</span></div>`;
 const V2={Gallery:()=>{return `<h2>Diwali Gallery</h2><div class="note">Scroll to see beautiful generated photos of Diwali celebrations.</div><div class="grid">${[['PEOPLE','Celebration','people celebrating Diwali festival traditional clothes India'],['FOOD','Feast','traditional food sweets for Diwali festival India'],['DECORATION','Decorations','beautiful diyas decorations for Diwali festival India'],['PUJA','Rituals','rituals and prayers for Diwali festival'],['PEOPLE','Community','crowd celebrating Diwali festival'],['ALL','Vibe','grand celebration of Diwali festival night view fireworks']].map((x,i)=>'<div class="tile" style="position:relative; overflow:hidden; border:2px solid #ff9f1c; height:200px;"><span style="position:absolute; bottom:8px; left:8px; z-index:1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: white; font-weight:bold; font-size:1.2rem; line-height:1.2;">'+x[1]+'</span></div>').join('')}</div>`},
