@@ -278,6 +278,7 @@ D.gal=[['PANDALS','🏮','Ganesh Chaturthi at Hanuman Nagar, Saptari, Nepal','A 
 ['AARTI','🪔','Aarti','Aarti: a lit lamp waved before the idol with devotional songs.',IL],
 ['VISARJAN','🌊','Visarjan (immersion)','Visarjan is the farewell: idols are immersed in water; many places promote eco-friendly immersion.',IL]];
 D.src=[['Sahapedia – Ganesh Chaturthi','https://sahapedia.org/ganesh-chaturthi'],['Pluralism Project – Ganesha Chaturthi','https://pluralism.org/ganesha-chaturthi.md'],['Cook with Kushi – Ganesh Chaturthi recipes','https://www.cookwithkushi.com/recipes-for-ganesh-chaturthi/'],['Outlook India – festive recipes','https://www.outlookindia.com/brand-studio/ganesh-chaturthi-recipes-modak-puran-poli-and-other-traditional-offerings']];
+window.go = typeof go !== 'undefined' ? go : window.go;
 const PAGES=['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
 const SECS=[['intro','Introduction'],['traditions','Traditions'],['food','Food'],['puja','Puja'],['gallery','Gallery & videos'],['quiz','Quiz'],['g1','Game 1'],['g2','Game 2'],['g3','Game 3 (Memory)'],['shop','Shop'],['house','House decoration']];
 const ACH=[['first','🏆 First Decoration','Save your first decorated home (+25)',25],['ready','🏆 Puja Ready','Idol + diya + flowers + thali (+50)',50],['master','🏆 Festival Master','Learn, quiz, both games, house (+100)',100],['explorer','🎖️ Festival Explorer','100% progress']];
@@ -300,7 +301,7 @@ function check(){const h=S.house;if(S.done.house&&h.length)unlockAchievement('fi
 const tier=s=>s>=80?100:s>=60?70:s>=40?40:20;
 function rewardBest(k,score,coins,label){const g=S[k];if(score>g.best)g.best=score;const extra=coins-g.paid;if(extra>0){g.paid=coins;mark(k);check();saveProgress();addCoins(extra,label)}else{mark(k);check();saveProgress();toast('Score saved. Beat your best to earn more coins!')}}
 function render(p){if(!V[p])p='Overview';page=p;R=window._r||{};window._r=null;clearInterval(window._t);const m={Learn:'intro',Celebrate:'traditions',Puja:'puja',Food:'food',Watch:'gallery',Gallery:'gallery',Shop:'shop'};if(m[p])mark(m[p]);check();draw();window.scrollTo(0,0)}
-function go(p,r){window._r=r;try{history.pushState({p},'','#'+encodeURIComponent(p))}catch(e){}render(p)}
+window.go = function(p,r){window._r=r;try{history.pushState({p},'','#'+encodeURIComponent(p))}catch(e){}render(p)}
 window.onpopstate=()=>render(decodeURIComponent(location.hash.slice(1))||'Overview');
 function bar(){if(page=='Overview')return'';const t=/^G\d$/.test(page)?'Games':'Overview';return`<div class="row" style="margin-bottom:8px"><button class="alt" onclick="go('${t}')">← Back to ${t=='Games'?'Play Zone':'Ganesh Chaturthi'}</button><small style="color:var(--mut)">Home / Ganesh Chaturthi / ${page.replace(/^G(\d)$/,'Game $1')}</small></div>`}
 function foot(){if(!/^G\d$/.test(page))return'';const n=+page[1];return`<div class="row" style="margin-top:16px"><button class="alt" onclick="go('Games')">Back to Play Zone</button><button onclick="go('${n<3?'G'+(n+1):'Shop'}')">${n<3?'Next game →':'Open Shop →'}</button><button class="alt" onclick="go('Progress')">View rewards</button></div>`}
@@ -503,10 +504,12 @@ const pct2=()=>Math.round(DSEC.filter(s=>F().done[s[0]]).length/DSEC.length*100)
 function pick(id){cur=id;window.cur=id;applyTheme(id);const fn=(typeof G$!=='undefined'&&G$[id]?G$[id].name:(id=='ganesh'?'Ganesh Chaturthi':'Festival'));CH=[['b','Namaste! Welcome to '+fn+'. 🪔']];go('Overview')}
 /* --- routing overrides --- */
 const _draw=draw,_render=render;
-render=function(p){if(cur=='ganesh'&&p!='Festivals')return _render(p);page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
+render=function(p){// Unified render for all 61 festivals
+page=p;R=window._r||{};window._r=null;clearInterval(window._t);if(cur!='ganesh'){const m={Celebrate:'exp',Food:'food',Learn:'reg',Shop:'shop'};if(m[p])F().done[m[p]]=1}draw();window.scrollTo(0,0)};
 draw=function(){const nav=document.getElementById('nav'),hd=document.querySelector('header b');if(page=='Festivals'){hd.textContent='🪔 Festora · Curated Indian Festivals & Secret Stories';document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';nav.innerHTML='';document.getElementById('pb').style.width='0';document.getElementById('app').innerHTML=(typeof window.VF==='function'?window.VF():VF());return}
  window.cur = cur;
- if(cur=='ganesh'&&page!=='Gallery'&&page!=='Quiz'&&!/^G\d$/.test(page)&&page!=='Games'){_draw();hd.textContent='🪔 Festora · Ganesh Chaturthi';return}
+ // Unified draw for all 61 festivals
+
  const currentFest = (typeof G$ !== 'undefined' && G$[cur]) || (window.FEST && window.FEST.find(x => x.id === cur)) || { name: (cur == 'diwali' ? 'Diwali' : 'Festival') };
  hd.textContent='🍑 Festora · ' + currentFest.name;document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
  nav.innerHTML=['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':p}</button>`).join('');
@@ -3734,17 +3737,26 @@ window.STATE_LIST = [
 
   // Interactive state filter handler
     window.filterByState = function(stateId) {
-    window.currentSelectedState = stateId;
+    window.currentSelectedState = stateId || 'all';
+    const searchInput = document.getElementById('fest-search-input');
+    const clearBtn = document.getElementById('fest-search-clear');
+    const rawSearch = (searchInput ? searchInput.value : '');
+    const searchVal = rawSearch.trim().toLowerCase();
 
+    if (clearBtn) {
+      clearBtn.style.display = searchVal ? 'flex' : 'none';
+    }
+
+    // Update state pill buttons
     document.querySelectorAll('.state-pill-btn').forEach(btn => {
-      const isSel = (btn.getAttribute('data-state-id') === stateId);
+      const btnState = btn.getAttribute('data-state-id');
+      const isSel = searchVal ? (btnState === 'all') : (btnState === window.currentSelectedState);
       btn.style.background = isSel ? 'linear-gradient(135deg,#f59e0b,#d97706)' : '#2a2018';
       btn.style.borderColor = isSel ? '#f59e0b' : '#484f58';
       btn.style.color = isSel ? '#fff' : '#f0f6fc';
       btn.style.boxShadow = isSel ? '0 2px 10px rgba(245,158,11,0.5)' : 'none';
     });
 
-    const searchVal = (document.getElementById('fest-search-input')?.value || '').trim().toLowerCase();
     const cards = document.querySelectorAll('.fest-card[data-state]');
     let visibleCount = 0;
 
@@ -3753,10 +3765,15 @@ window.STATE_LIST = [
       const festId = card.getAttribute('data-fest-id') || '';
       const cardText = card.textContent.toLowerCase();
 
-      const stateMatches = window.matchesState(cardState, stateId);
-      const searchMatches = !searchVal || cardText.includes(searchVal) || cardState.toLowerCase().includes(searchVal) || festId.includes(searchVal);
+      let matches = false;
+      if (searchVal) {
+        // Global search across all 61 festivals when search text is entered
+        matches = cardText.includes(searchVal) || cardState.toLowerCase().includes(searchVal) || festId.includes(searchVal);
+      } else {
+        matches = window.matchesState(cardState, window.currentSelectedState);
+      }
 
-      if (stateMatches && searchMatches) {
+      if (matches) {
         card.style.display = 'flex';
         visibleCount++;
       } else {
@@ -3764,10 +3781,31 @@ window.STATE_LIST = [
       }
     });
 
+    const noResults = document.getElementById('fest-no-results');
+    if (noResults) {
+      if (visibleCount === 0 && searchVal) {
+        noResults.style.display = 'block';
+        const termSpan = document.getElementById('fest-no-results-term');
+        if (termSpan) termSpan.textContent = rawSearch;
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+
     const badge = document.getElementById('fest-count-badge');
     if (badge) {
-      badge.textContent = `${Math.round(visibleCount / 2)} Festivals`;
+      const actualFestCount = Math.round(visibleCount / 2);
+      badge.textContent = searchVal ? `${actualFestCount} Found` : `${actualFestCount} Festivals`;
     }
+  };
+
+  window.clearFestSearch = function() {
+    const searchInput = document.getElementById('fest-search-input');
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+    window.filterByState('all');
   };
 
   window.currentSelectedModel = window.currentSelectedModel || 'kabir';
@@ -7864,379 +7902,2365 @@ window.finishFestivalHome = function() {
 // ===== UNIVERSAL PLAYABLE FESTIVAL GAMES (G1, G2, G3) =====
 
 // Game Hub View
+
+// ==============================================================
+// FESTIVAL-SPECIFIC GAMES CATALOG & ENGINES (ALL 61 FESTIVALS)
+// ==============================================================
+window.FESTIVAL_GAMES_CATALOG = {
+  "ganesh": [
+    {
+      "title": "Ukadiche Modak Steamer Challenge",
+      "desc": "Roll rice dough and balance steamer heat to craft 21 sacred sweet modaks.",
+      "type": "cooking",
+      "icon": "🥟"
+    },
+    {
+      "title": "Pune Dhol Tasha Pathak Rhythm Beat",
+      "desc": "Keep the thunderous energetic beat in sync with 50 dhol drummers.",
+      "type": "action_rhythm",
+      "icon": "🥁"
+    },
+    {
+      "title": "Lalbaugcha Raja Sacred Aarti & Darshan",
+      "desc": "Wave the five-wick camphor aarti lamp before the King of Mumbai.",
+      "type": "ritual",
+      "icon": "🪔"
+    }
+  ],
+  "gudi": [
+    {
+      "title": "Auspicious Gudi Flag Hoisting",
+      "desc": "Assemble copper kalash, neem leaves, and sugar necklace on the high bamboo staff.",
+      "type": "ritual",
+      "icon": "🚩"
+    },
+    {
+      "title": "Authentic Puran Poli Griddle Master",
+      "desc": "Stuff sweet chana jaggery puran and flip golden thin flatbreads on the hot tawa.",
+      "type": "cooking",
+      "icon": "🫓"
+    },
+    {
+      "title": "Vibrant Marathi Rangoli Design",
+      "desc": "Craft concentric swastik and lotus rangoli designs at the family entrance.",
+      "type": "art",
+      "icon": "🌸"
+    }
+  ],
+  "dahihandi": [
+    {
+      "title": "Govinda Human Pyramid Balancer",
+      "desc": "Balance the 7-tier human pyramid against tilting winds to reach the clay matki.",
+      "type": "action_rhythm",
+      "icon": "🏺"
+    },
+    {
+      "title": "Curd & Makhan Handi Smashing Target",
+      "desc": "Aim and launch the coconut to shatter the hanging curd pot and rain butter.",
+      "type": "target",
+      "icon": "🎯"
+    },
+    {
+      "title": "Gokulashtami Sweets Gathering",
+      "desc": "Collect falling sweet makhan pots and gopalkala offerings in time.",
+      "type": "harvest",
+      "icon": "🥛"
+    }
+  ],
+  "pongal": [
+    {
+      "title": "Pongalo Pongal Pot Boiling Balance",
+      "desc": "Stoke the clay hearth with wood to make creamy sweet milk bubble over at sunrise.",
+      "type": "cooking",
+      "icon": "🍯"
+    },
+    {
+      "title": "Sugarcane & Turmeric Harvest Sprint",
+      "desc": "Collect tall sugarcane stalks and turmeric rhizomes from the lush Cauvery fields.",
+      "type": "harvest",
+      "icon": "🌾"
+    },
+    {
+      "title": "Sacred Rice-Powder Kolam Geometric Art",
+      "desc": "Connect traditional dotted grids (Pulli Kolam) to create symmetrical morning art.",
+      "type": "art",
+      "icon": "✨"
+    }
+  ],
+  "karthigai": [
+    {
+      "title": "Annamalaiyar Maha Deepam Cauldron Ignition",
+      "desc": "Climb sacred Mount Arunachala and ignite the giant ghee torch visible for 40 km.",
+      "type": "ritual",
+      "icon": "🔥"
+    },
+    {
+      "title": "Agal Vilakku Oil Lamp Rows Placement",
+      "desc": "Fill earthen terracotta lamps with sesame oil and line every doorway and window.",
+      "type": "art",
+      "icon": "🪔"
+    },
+    {
+      "title": "Karthigai Pori Urundai Jaggery Crunch",
+      "desc": "Mix puffed rice with caramelized hot jaggery syrup into crunchy sweet balls.",
+      "type": "cooking",
+      "icon": "🍬"
+    }
+  ],
+  "thaipusam": [
+    {
+      "title": "Sacred Floral Kavadi Balancing March",
+      "desc": "Balance the decorated wooden and peacock-feather Kavadi across 600 temple steps.",
+      "type": "action_rhythm",
+      "icon": "🦚"
+    },
+    {
+      "title": "Lord Murugan Golden Vel Devotional Offering",
+      "desc": "Polish and adorn the sacred lance of wisdom with sandalwood paste and bilva.",
+      "type": "ritual",
+      "icon": "🔱"
+    },
+    {
+      "title": "Palani Panchamirtham Fruit Nectar Blending",
+      "desc": "Blend 5 sacred hill bananas, jaggery, honey, ghee, and cardamom into holy prasadam.",
+      "type": "cooking",
+      "icon": "🍌"
+    }
+  ],
+  "onam": [
+    {
+      "title": "10-Ring Pookalam Floral Carpet Designer",
+      "desc": "Arrange concentric rings of yellow marigold, red hibiscus, and tulsi petals for King Mahabali.",
+      "type": "art",
+      "icon": "🌺"
+    },
+    {
+      "title": "Aranmula Vallam Kali Snake Boat Race",
+      "desc": "Coordinate 100 rowers paddling in perfect rhythm to traditional Vanchipattu boat songs.",
+      "type": "action_rhythm",
+      "icon": "🛶"
+    },
+    {
+      "title": "Grand 26-Dish Onasadya Banana Leaf Platter",
+      "desc": "Place crispy upperi, avial, sambar, thoran, and payasam in precise traditional order.",
+      "type": "cooking",
+      "icon": "🍃"
+    }
+  ],
+  "thrissur": [
+    {
+      "title": "Kudamattom Royal Silk Umbrella Showdown",
+      "desc": "Swiftly switch colorful sequined silk umbrellas atop majestic caparisoned elephants.",
+      "type": "target",
+      "icon": "☂️"
+    },
+    {
+      "title": "Ilanjithara Melam 250-Drum Synchrony",
+      "desc": "Match the rising crescendo of 250 traditional Chenda drums under the Ilanji tree.",
+      "type": "action_rhythm",
+      "icon": "🥁"
+    },
+    {
+      "title": "Vadakkunnathan Temple Golden Netipattam Adornment",
+      "desc": "Decorate majestic temple tusker forehead plates with sparkling golden beads.",
+      "type": "ritual",
+      "icon": "🐘"
+    }
+  ],
+  "attukal": [
+    {
+      "title": "Guinness World Record Hearth Cooking",
+      "desc": "Keep millions of brick hearths burning simultaneously with coconut fronds for Goddess Kannaki.",
+      "type": "cooking",
+      "icon": "🍲"
+    },
+    {
+      "title": "Sweet Jaggery Mandaputtu & Payasam Offering",
+      "desc": "Steam cardamom rice flour cakes wrapped in aromatic banana leaves.",
+      "type": "cooking",
+      "icon": "🍯"
+    },
+    {
+      "title": "Attukal Amma Sacred Darshan Blessing",
+      "desc": "Wave holy lamps as temple priests shower holy sanctum water over the ocean of hearths.",
+      "type": "ritual",
+      "icon": "🙏"
+    }
+  ],
+  "pulikali": [
+    {
+      "title": "Fierce Striped Tiger Body Painting Master",
+      "desc": "Paint vibrant yellow, black, and orange striped tiger faces on dancers bells bellies.",
+      "type": "art",
+      "icon": "🐅"
+    },
+    {
+      "title": "Swaraj Round Tiger Beat Step Timing",
+      "desc": "Step and shake brass waist bells to the rapid rhythm of traditional Udukku drums.",
+      "type": "action_rhythm",
+      "icon": "🔔"
+    },
+    {
+      "title": "Hunter & Leopard Mock Chase Duel",
+      "desc": "Dodge the village hunter in a lively comedic mock chase across Thrissur town.",
+      "type": "target",
+      "icon": "🏃"
+    }
+  ],
+  "dasara": [
+    {
+      "title": "Jumbo Savari Golden Howdah Procession",
+      "desc": "Guide the lead elephant Balarama carrying the 750 kg pure golden sanctum howdah.",
+      "type": "action_rhythm",
+      "icon": "👑"
+    },
+    {
+      "title": "Mysore Palace 100,000 Lights Illumination",
+      "desc": "Switch on 100,000 golden incandescent bulbs illuminating the majestic royal palace.",
+      "type": "ritual",
+      "icon": "🏰"
+    },
+    {
+      "title": "Royal Chamundeshwari Floral Archway Styling",
+      "desc": "Weave fragrant jasmine garlands from Chamundi Hills to crown the warrior goddess.",
+      "type": "art",
+      "icon": "🌼"
+    }
+  ],
+  "karaga": [
+    {
+      "title": "Sacred Jasmine Karaga Balancing Vigil",
+      "desc": "Balance the tall conical floral pyramid pot without touching it through old Bengaluru alleys.",
+      "type": "action_rhythm",
+      "icon": "🌸"
+    },
+    {
+      "title": "Veerakumar Dagger Clashing Rhythm",
+      "desc": "Clash curved swords against chests shouting Govinda in tribute to Draupadi.",
+      "type": "target",
+      "icon": "⚔️"
+    },
+    {
+      "title": "Dharmaraya Swamy Temple Night Aarti",
+      "desc": "Offer fragrant betel leaves and camphor to the timeless Thigala community shrine.",
+      "type": "ritual",
+      "icon": "🪔"
+    }
+  ],
+  "kambala": [
+    {
+      "title": "Mud-Water Slush Track Buffalo Sprint",
+      "desc": "Sprint barefoot across 140 meters of flooded paddy slush driving two champion buffaloes.",
+      "type": "action_rhythm",
+      "icon": "🐃"
+    },
+    {
+      "title": "Kane Halage Water Height Splash Target",
+      "desc": "Dash over the wooden plank to launch a water plume reaching the white cloth marker.",
+      "type": "target",
+      "icon": "💦"
+    },
+    {
+      "title": "Tulu Nadu Farmer Feast & Trophy Honors",
+      "desc": "Assemble rich coastal Neer Dosa and Kori Rotti to celebrate victory.",
+      "type": "cooking",
+      "icon": "🏆"
+    }
+  ],
+  "durga": [
+    {
+      "title": "Dhunuchi Naach Incense Dancing Rhythm",
+      "desc": "Balance smoking earthen dhunuchi incense burners with glowing coconut husks to dhaak beats.",
+      "type": "action_rhythm",
+      "icon": "🔥"
+    },
+    {
+      "title": "108 Blue Lotus Flower Gathering Challenge",
+      "desc": "Collect 108 auspicious lotus blossoms from holy ponds for Lord Rama Durga puja.",
+      "type": "harvest",
+      "icon": "🪷"
+    },
+    {
+      "title": "Grand Theme Pandal Architectural Tour",
+      "desc": "Illuminate the towering bamboo and terracotta pandals across North Kolkata.",
+      "type": "art",
+      "icon": "🏛️"
+    }
+  ],
+  "baisakhi": [
+    {
+      "title": "Golden Wheat Harvest Golden Sheaf Gathering",
+      "desc": "Reap ripe golden wheat fields with scythes under the radiant Punjab sun.",
+      "type": "harvest",
+      "icon": "🌾"
+    },
+    {
+      "title": "High-Energy Dhol Bhangra Beat Battle",
+      "desc": "Jump, kick, and spin to the thunderous double-sided dhol rhythm shouting O Balle Balle!",
+      "type": "action_rhythm",
+      "icon": "🕺"
+    },
+    {
+      "title": "Community Langar Giant Roti Rolling Seva",
+      "desc": "Roll round whole-wheat rotis and stir giant dal cauldrons feeding thousands with love.",
+      "type": "cooking",
+      "icon": "🍲"
+    }
+  ],
+  "holamohalla": [
+    {
+      "title": "Nihang Gatka Martial Arts Sword Duel",
+      "desc": "Parry and strike wooden lathis and shield deflects with lightning Nihang reflexes.",
+      "type": "target",
+      "icon": "⚔️"
+    },
+    {
+      "title": "Tent Pegging Gallop on Anandpur Sahib Dunes",
+      "desc": "Gallop at top speed on horseback to impale wooden ground pegs with a spear.",
+      "type": "action_rhythm",
+      "icon": "🏇"
+    },
+    {
+      "title": "Sacred Saffron Turban & Chola Draping",
+      "desc": "Wrap the towering Dumalla warrior turban adorned with chakrams and crescent steel.",
+      "type": "art",
+      "icon": "🛡️"
+    }
+  ],
+  "kilaraipur": [
+    {
+      "title": "High-Octane Bullock Cart Speed Dash",
+      "desc": "Steer pair bullocks across the dust arena to cross the finish line in under 15 seconds.",
+      "type": "action_rhythm",
+      "icon": "🐂"
+    },
+    {
+      "title": "Tractor Tyre Flip & Iron Strength Lift",
+      "desc": "Lift and flip 200 kg farm tyres and balance bicycles with your teeth.",
+      "type": "action_rhythm",
+      "icon": "🚜"
+    },
+    {
+      "title": "Pind Village Tug of War Championship",
+      "desc": "Rally your village team to pull the thick jute rope past the victory line.",
+      "type": "action_rhythm",
+      "icon": "💪"
+    }
+  ],
+  "navratri": [
+    {
+      "title": "Dandiya Sticks Synchronized Rhythm Clash",
+      "desc": "Clash carved wooden dandiya sticks in precise sync with your partner in circular rhythm.",
+      "type": "action_rhythm",
+      "icon": "🥢"
+    },
+    {
+      "title": "Chaniya Choli Mirror-Work Embroidery Styling",
+      "desc": "Place reflective glass mirrors and colorful resham threads on swirling festive skirts.",
+      "type": "art",
+      "icon": "🪞"
+    },
+    {
+      "title": "Three-Clap (Tran Taali) Garba Step Master",
+      "desc": "Master the graceful 3-clap footwork around Goddess Amba lit garbi lantern.",
+      "type": "action_rhythm",
+      "icon": "💃"
+    }
+  ],
+  "tarnetar": [
+    {
+      "title": "Mirrored Umbrella Embroidery Crafting",
+      "desc": "Embroider intricate motifs and hanging tassels on the famous suitor umbrella.",
+      "type": "art",
+      "icon": "⛱️"
+    },
+    {
+      "title": "Rabari Folk Dance Drum Circle",
+      "desc": "Dance in expansive concentric circles of 500 pastoralists chanting timeless folk ballads.",
+      "type": "action_rhythm",
+      "icon": "🥁"
+    },
+    {
+      "title": "Trinetreshwar Temple Holy Kund Dip",
+      "desc": "Take the sacred holy bath in the reservoir commemorating Arjuna swayamvar archery.",
+      "type": "ritual",
+      "icon": "🏹"
+    }
+  ],
+  "pushkar": [
+    {
+      "title": "Ship of the Desert Camel Grooming & Styling",
+      "desc": "Shear artistic patterns, paint hoofs, and adorn champion camels with colorful pom-poms.",
+      "type": "art",
+      "icon": "🐪"
+    },
+    {
+      "title": "Thar Desert Dune Camel Sprint Challenge",
+      "desc": "Navigate shifting desert sand dunes on your camel to win the fair trophy.",
+      "type": "action_rhythm",
+      "icon": "🏜️"
+    },
+    {
+      "title": "Sacred Pushkar Sarovar 52 Ghat Deepdan",
+      "desc": "Float golden marigold leaves and earthen diyas into the sacred Brahma lake at dusk.",
+      "type": "ritual",
+      "icon": "🪷"
+    }
+  ],
+  "chhath": [
+    {
+      "title": "Holy River Surya Arghya Offering Vigil",
+      "desc": "Stand waist-deep in the holy river at sunset and sunrise holding the brass soop to Lord Surya.",
+      "type": "ritual",
+      "icon": "🌅"
+    },
+    {
+      "title": "Traditional Thekua Prasad Clay Oven Baking",
+      "desc": "Press whole-wheat dough with cardamom and jaggery onto carved wooden wooden sancha molds.",
+      "type": "cooking",
+      "icon": "🍪"
+    },
+    {
+      "title": "Bamboo Soop 5-Fruit Sacred Arrangement",
+      "desc": "Arrange coconuts, sugarcane, radishes, bananas, and ginger sprigs in traditional balance.",
+      "type": "art",
+      "icon": "🧺"
+    }
+  ],
+  "lathmar": [
+    {
+      "title": "Barsana Bamboo Lathi Strike Shield Defense",
+      "desc": "Deflect forceful bamboo staff strikes with your leather dhal shield without yielding.",
+      "type": "target",
+      "icon": "🛡️"
+    },
+    {
+      "title": "Radha Rani Temple Gulal Powder Barrage",
+      "desc": "Launch cascades of crimson and saffron herbal gulal powders over the temple courtyard.",
+      "type": "target",
+      "icon": "🎨"
+    },
+    {
+      "title": "Nandgaon Gopis & Gopa Song Battle",
+      "desc": "Exchange witty Brijbhasha folk verses celebrating Radha and Krishna eternal love.",
+      "type": "action_rhythm",
+      "icon": "🎵"
+    }
+  ],
+  "devdeepawali": [
+    {
+      "title": "Varanasi 84 Ghats 1 Million Diya Trail",
+      "desc": "Ignite millions of earthen oil lamps along Dashashwamedh, Assi, and Manikarnika steps.",
+      "type": "ritual",
+      "icon": "🪔"
+    },
+    {
+      "title": "Maha Ganga Aarti Brass Censer Swinging",
+      "desc": "Wave the 7-tiered heavy brass multi-flame censer in synchronized devotion to Mother Ganga.",
+      "type": "action_rhythm",
+      "icon": "🔥"
+    },
+    {
+      "title": "Moonlit Bajra Boat Fireworks Reflection Tour",
+      "desc": "Row the traditional wooden bajra boat along riverfront palaces reflecting golden flames.",
+      "type": "art",
+      "icon": "⛵"
+    }
+  ],
+  "rajaparba": [
+    {
+      "title": "Rajo Doli Mango Tree Bamboo Swing Timing",
+      "desc": "Pummel into the sky on flower-decked swings singing sweet Raja Geeta village tunes.",
+      "type": "action_rhythm",
+      "icon": "🍃"
+    },
+    {
+      "title": "Poda Pitha Clay Hearth Slow-Baking Challenge",
+      "desc": "Bake fermented rice-lentil cake with grated coconut and jaggery wrapped in banana leaves.",
+      "type": "cooking",
+      "icon": "🥮"
+    },
+    {
+      "title": "Mother Earth Sacred Rest & Alta Foot Art",
+      "desc": "Paint red lac dye (Alta) on feet and play traditional cowrie shell board games.",
+      "type": "art",
+      "icon": "🎨"
+    }
+  ],
+  "rathyatra": [
+    {
+      "title": "Nandighosha Giant Chariot Rope Pulling",
+      "desc": "Join 100,000 pilgrims pulling the massive 45-foot 16-wheel chariot of Lord Jagannath.",
+      "type": "action_rhythm",
+      "icon": "🛞"
+    },
+    {
+      "title": "Chhera Pahara Royal Golden Broom Sweeping",
+      "desc": "Sweep the chariot floor with a fragrant sandalwood-scented golden broom like the Gajapati King.",
+      "type": "ritual",
+      "icon": "🧹"
+    },
+    {
+      "title": "Mahaprasad 56-Bhog Pot Stacking Tower",
+      "desc": "Balance 7 earthen pots stacked one atop another over a single wood fire.",
+      "type": "cooking",
+      "icon": "🍲"
+    }
+  ],
+  "bathukamma": [
+    {
+      "title": "7-Layer Floral Gopuram Tower Stacking",
+      "desc": "Arrange gunugu, tangedu, and marigold blooms into a stunning conical flower temple.",
+      "type": "art",
+      "icon": "💐"
+    },
+    {
+      "title": "Telangana Women Circle Song Clap Rhythm",
+      "desc": "Clap and circle around Mother Bathukamma chanting melodious folk songs of Goddess Gauri.",
+      "type": "action_rhythm",
+      "icon": "💃"
+    },
+    {
+      "title": "Saddula Bathukamma Lake Floating Farewell",
+      "desc": "Float your flower gopuram on the temple lake and share 5 types of sacred saddi rice.",
+      "type": "ritual",
+      "icon": "🌊"
+    }
+  ],
+  "medaram": [
+    {
+      "title": "Bangaram (Jaggery) Body-Weight Offering",
+      "desc": "Weigh yourself on giant balances and offer equal weight of golden jaggery to Sammakka.",
+      "type": "ritual",
+      "icon": "⚖️"
+    },
+    {
+      "title": "Koya Tribal Sacred Bamboo Stork Staff Walk",
+      "desc": "Escort the holy Chilakalagadda bamboo deity vermilion pole through dense teak forests.",
+      "type": "action_rhythm",
+      "icon": "🎋"
+    },
+    {
+      "title": "Jampanna Vagu Holy Stream Dip",
+      "desc": "Take a holy dip in the reddish sacred forest stream honoring martyr prince Jampanna.",
+      "type": "ritual",
+      "icon": "💧"
+    }
+  ],
+  "bihu": [
+    {
+      "title": "Buffalo Horn Pepa & Dhol Harvest Duet",
+      "desc": "Play the curved buffalo horn pipe in call-and-response with rapid dhol drum rolls.",
+      "type": "action_rhythm",
+      "icon": "🎺"
+    },
+    {
+      "title": "Handwoven Red & White Gamosa Loom Weaving",
+      "desc": "Weave traditional red floral borders on pristine white cotton on traditional wooden looms.",
+      "type": "art",
+      "icon": "🧣"
+    },
+    {
+      "title": "Crispy Til Pitha Sticky Rice Roll Crafting",
+      "desc": "Roll bora rice batter filled with black sesame seeds and jaggery over smoking hot griddles.",
+      "type": "cooking",
+      "icon": "🥞"
+    }
+  ],
+  "hornbill": [
+    {
+      "title": "Naga Warrior Morung Log Drum Thunder Beat",
+      "desc": "Carve and beat the giant hollowed-out tree-trunk log drum with 30 village warriors.",
+      "type": "action_rhythm",
+      "icon": "🪵"
+    },
+    {
+      "title": "Traditional Tribal Longbow Target Marksmanship",
+      "desc": "Aim and loose bamboo arrows at moving wooden shields across the Kisama valley.",
+      "type": "target",
+      "icon": "🏹"
+    },
+    {
+      "title": "Bhut Jolokia Chili Eating Challenge",
+      "desc": "Taste the fiery ghost pepper while maintaining your warrior composure.",
+      "type": "cooking",
+      "icon": "🌶️"
+    }
+  ],
+  "wangala": [
+    {
+      "title": "100 Long Drums Synchronized Sun Salute",
+      "desc": "Play two-headed wooden drums in thunderous unison honoring Saljong, God of Fertility.",
+      "type": "action_rhythm",
+      "icon": "🥁"
+    },
+    {
+      "title": "Garo Kotip Feather Headdress Styling",
+      "desc": "Adorn traditional turbans with rare hornbill feathers and brass earrings.",
+      "type": "art",
+      "icon": "🪶"
+    },
+    {
+      "title": "First-Crop Rice & Rice-Beer (Chu) Offering",
+      "desc": "Sprinkle freshly brewed rice beer onto farm implements thanking Mother Nature.",
+      "type": "ritual",
+      "icon": "🌾"
+    }
+  ],
+  "shigmo": [
+    {
+      "title": "Ghode Modni Wooden Hobbyhorse Dance",
+      "desc": "Execute martial equestrian cavalry sword spins astride wooden horse frames.",
+      "type": "action_rhythm",
+      "icon": "🐎"
+    },
+    {
+      "title": "Goan Street Carnival Float Decoration",
+      "desc": "Sculpt mythological giants and dancing deities from papier-mâché and vibrant paints.",
+      "type": "art",
+      "icon": "🎭"
+    },
+    {
+      "title": "Romtamel Dhol Drum Parade Crescendo",
+      "desc": "Lead village youth with massive brass cymbals and tasselled banners through Panaji.",
+      "type": "action_rhythm",
+      "icon": "🚩"
+    }
+  ],
+  "bonderam": [
+    {
+      "title": "Divar Island Flag Mock Battle Skirmish",
+      "desc": "Raise multicolored rival ward flags and defend your village perimeter with cheer.",
+      "type": "action_rhythm",
+      "icon": "🏳️"
+    },
+    {
+      "title": "Fotash Bamboo Berry Shooter Target Duel",
+      "desc": "Aim bamboo pea-shooters to burst paper flags with wild berries in festive parody.",
+      "type": "target",
+      "icon": "🎯"
+    },
+    {
+      "title": "Traditional Goan Brass Band March",
+      "desc": "Play trumpets, saxophones, and snare drums leading the joyful island carnival.",
+      "type": "action_rhythm",
+      "icon": "🎺"
+    }
+  ],
+  "hemis": [
+    {
+      "title": "Sacred Cham Mask Dance Rhythm",
+      "desc": "Don heavy painted wooden masks and silk brocade to step slowly to Tibetan long trumpets.",
+      "type": "action_rhythm",
+      "icon": "👺"
+    },
+    {
+      "title": "Giant Guru Padmasambhava Silk Thangka Unfurling",
+      "desc": "Unroll the 4-story embroidered silk tapestry down the monastery wall once in 12 years.",
+      "type": "art",
+      "icon": "📜"
+    },
+    {
+      "title": "Yak Butter Lamp Monastery Illumination",
+      "desc": "Pour warm yak butter into engraved silver chalices to illuminate the mountain shrine.",
+      "type": "ritual",
+      "icon": "🪔"
+    }
+  ],
+  "kullu": [
+    {
+      "title": "Valley of 200 Gods Palanquin Procession",
+      "desc": "Carry swaying wooden palanquins of 200 mountain village deities across Dhalpur ground.",
+      "type": "action_rhythm",
+      "icon": "⛰️"
+    },
+    {
+      "title": "Lord Raghunath Chariot Mountain Rope Pull",
+      "desc": "Heave sacred ropes guiding the massive wooden chariot through deodar pine groves.",
+      "type": "action_rhythm",
+      "icon": "🌲"
+    },
+    {
+      "title": "Lanka Dahan Sacred Pine Bonfire Camp",
+      "desc": "Light the sacred pine branch effigy beside the surging Beas river at midnight.",
+      "type": "ritual",
+      "icon": "🔥"
+    }
+  ],
+  "bastar": [
+    {
+      "title": "8-Wheel Massive Wooden Chariot Crafting",
+      "desc": "Assemble indigenous saal wood without a single iron nail for Goddess Danteshwari.",
+      "type": "art",
+      "icon": "🪵"
+    },
+    {
+      "title": "Maria & Muria Tribal Chariot Forest Haul",
+      "desc": "Join 10,000 forest tribesmen pulling thick siadi bark ropes through Jagdalpur.",
+      "type": "action_rhythm",
+      "icon": "🏹"
+    },
+    {
+      "title": "Danteshwari Temple Brass Lamp Blessing",
+      "desc": "Offer fragrant wild mahua blossoms and forest honey to the ancient mother deity.",
+      "type": "ritual",
+      "icon": "🍯"
+    }
+  ],
+  "khajuraho": [
+    {
+      "title": "Classical Bharatanatyam & Kathak Mudra Match",
+      "desc": "Match intricate hand mudras (pataka, alapadma) and footwork in time with classical sitar.",
+      "type": "action_rhythm",
+      "icon": "💃"
+    },
+    {
+      "title": "Kandariya Mahadeva Temple Architectural Illumination",
+      "desc": "Cast warm golden spotlights across 1,000-year-old sandstone sculpted temple spires.",
+      "type": "art",
+      "icon": "🛕"
+    },
+    {
+      "title": "Raga Yaman Evening Sitar & Tabla Duet",
+      "desc": "Tune classical sitar strings and match the 16-beat teen-taal rhythm.",
+      "type": "action_rhythm",
+      "icon": "🪕"
+    }
+  ],
+  "diwali": [
+    {
+      "title": "Terracotta Diya Trail Illumination",
+      "desc": "Place and light rows of golden clay diyas along parapets, verandahs, and courtyards.",
+      "type": "ritual",
+      "icon": "🪔"
+    },
+    {
+      "title": "Intricate Geometric Rangoli Powder Canvas",
+      "desc": "Fill lotus and peacock geometric stencils with brilliant crimson and turmeric powders.",
+      "type": "art",
+      "icon": "🦚"
+    },
+    {
+      "title": "Lakshmi Ganesha Puja Offering Platter",
+      "desc": "Offer silver coins, sweet kaju katli, batasha, and fresh marigold garlands for prosperity.",
+      "type": "cooking",
+      "icon": "🪙"
+    }
+  ],
+  "holi": [
+    {
+      "title": "Organic Herbal Gulal Color Mixing Lab",
+      "desc": "Mix dried beetroots, turmeric, neem, and rose petals to brew fragrant non-toxic colors.",
+      "type": "art",
+      "icon": "🎨"
+    },
+    {
+      "title": "Brass Pichkari Water Cannon Splash Target",
+      "desc": "Aim your brass water syringe to splash friends with fragrant rosewater and kesar gulal.",
+      "type": "target",
+      "icon": "🔫"
+    },
+    {
+      "title": "Chilled Spiced Thandai & Gujiya Feast",
+      "desc": "Stir saffron, crushed almonds, fennel, and sweet khoya into crispy fried crescent pastries.",
+      "type": "cooking",
+      "icon": "🥟"
+    }
+  ],
+  "uttarayan": [
+    {
+      "title": "Rooftop Kite Dogfight (Kai Po Che Duel)",
+      "desc": "Control spool tension, maneuver in thermal winds, and cut opponent strings shouting Kai Po Che!",
+      "type": "target",
+      "icon": "🪁"
+    },
+    {
+      "title": "Glass-Coated Cotton Manja Spooling Craft",
+      "desc": "Coat pure cotton threads with rice gum and colored glass powder on the wooden spool.",
+      "type": "art",
+      "icon": "🧵"
+    },
+    {
+      "title": "Earthen Clay Matka Undhiyu Winter Feast",
+      "desc": "Layer winter vegetables, purple yams, and fenugreek muthiyas underground in steaming pots.",
+      "type": "cooking",
+      "icon": "🍲"
+    }
+  ],
+  "rann": [
+    {
+      "title": "Full Moon White Salt Desert Tent Styling",
+      "desc": "Adorn luxury desert tents with Kutchi mirror-work tapestries and brass lanterns.",
+      "type": "art",
+      "icon": "⛺"
+    },
+    {
+      "title": "Ancient Rogan Castor Oil Fabric Painting",
+      "desc": "Draw delicate peacocks and trees of life using castor oil paste rolled on a metal stylus.",
+      "type": "art",
+      "icon": "🖌️"
+    },
+    {
+      "title": "Midnight Kutch Desert Camel Safari Trail",
+      "desc": "Guide camel caravans across glittering salt crusts under the luminous winter full moon.",
+      "type": "action_rhythm",
+      "icon": "🐪"
+    }
+  ],
+  "gangaur": [
+    {
+      "title": "Clay Isar & Gauri Divine Idol Painting",
+      "desc": "Sculpt and paint clay murtis of Lord Shiva and Goddess Parvati in royal Rajasthani attire.",
+      "type": "art",
+      "icon": "👑"
+    },
+    {
+      "title": "Jaipur Royal City Palace Palanquin March",
+      "desc": "Escort the golden idol of Gangaur Mata accompanied by royal caparisoned horses and elephants.",
+      "type": "action_rhythm",
+      "icon": "🏰"
+    },
+    {
+      "title": "Traditional Ghewar Honeycomb Sweet Making",
+      "desc": "Pour rich milk batter into sizzling ghee to create delicate porous honeycomb cakes soaked in syrup.",
+      "type": "cooking",
+      "icon": "🍯"
+    }
+  ],
+  "teej": [
+    {
+      "title": "Monsoon Tree Swing (Haryali Doli) Flying Timing",
+      "desc": "Soar high on flower-draped banyan swings while singing traditional monsoon geet.",
+      "type": "action_rhythm",
+      "icon": "🌿"
+    },
+    {
+      "title": "Bridal Henna (Mehendi) Pattern Inking",
+      "desc": "Pipe intricate peacock, paisley, and floral mehendi designs onto festive palms.",
+      "type": "art",
+      "icon": "✋"
+    },
+    {
+      "title": "Green Leheriya Saree Wave Tie-Dye Art",
+      "desc": "Twist and dye fine chiffon fabrics into iconic diagonal multi-hued monsoon waves.",
+      "type": "art",
+      "icon": "👗"
+    }
+  ],
+  "nuakhai": [
+    {
+      "title": "First Harvest Paddy Offering to Samaleswari",
+      "desc": "Present newly harvested tender rice ears to Mother Goddess Samaleswari at the auspicious lagna.",
+      "type": "ritual",
+      "icon": "🌾"
+    },
+    {
+      "title": "Nuakhai Juhar Eldest Blessings Exchange",
+      "desc": "Offer respectful Juhar greetings and touch feet of elders in order of generational seniority.",
+      "type": "ritual",
+      "icon": "🙏"
+    },
+    {
+      "title": "Arku Leaf Cup Sweet Porridge Feast",
+      "desc": "Serve fragrant newly reaped rice cooked with cow milk and molasses in fresh sal leaves.",
+      "type": "cooking",
+      "icon": "🥣"
+    }
+  ],
+  "balijatra": [
+    {
+      "title": "Boita Miniature Toy Boat Floating on Mahanadi",
+      "desc": "Float colorful paper and solapith boats laden with betel leaves, lamps, and spices at dawn.",
+      "type": "target",
+      "icon": "⛵"
+    },
+    {
+      "title": "Ancient Kalinga Spice Trader Merchant Rush",
+      "desc": "Trade clove, cardamom, and silk bundles across the bustling riverbank fairgrounds.",
+      "type": "harvest",
+      "icon": "🏺"
+    },
+    {
+      "title": "Cuttack Dahi Bara Aloodum Feast Bowl",
+      "desc": "Scoop soft lentil dumplings drenched in spiced yogurt and fiery potato curry with sev.",
+      "type": "cooking",
+      "icon": "🍛"
+    }
+  ],
+  "bonalu": [
+    {
+      "title": "Brass Pot Neem & Diya Head Balance Walk",
+      "desc": "Balance painted brass pots filled with cooked rice and burning lamps atop your head to Mahakali.",
+      "type": "action_rhythm",
+      "icon": "🏺"
+    },
+    {
+      "title": "Fierce Pothuraju Whip Dance Beat Timing",
+      "desc": "Crack the heavy braided rope whip in rhythm wearing turmeric paste and crimson tilak.",
+      "type": "action_rhythm",
+      "icon": "⚡"
+    },
+    {
+      "title": "Lal Darwaza Mahankali Temple Thotela Banner",
+      "desc": "Decorate multi-colored bamboo towers adorned with paper streamers for the goddess.",
+      "type": "art",
+      "icon": "🚩"
+    }
+  ],
+  "ambubachi": [
+    {
+      "title": "Kamakhya Temple Red Raktavastra Silk Draping",
+      "desc": "Wrap the sacred sanctum stone in sacred crimson cloths during Mother Earth retreat.",
+      "type": "ritual",
+      "icon": "🧣"
+    },
+    {
+      "title": "Nilachal Hill Tantric Bell Chime Meditation",
+      "desc": "Chime temple bells and brass gongs echoing across the sacred hill overlooking the Brahmaputra.",
+      "type": "action_rhythm",
+      "icon": "🔔"
+    },
+    {
+      "title": "Pilgrim Darshan Water (Angodak) Blessing",
+      "desc": "Distribute sacred spring water droplets imbued with divine energy to millions of seekers.",
+      "type": "ritual",
+      "icon": "💧"
+    }
+  ],
+  "chapchar": [
+    {
+      "title": "Cheraw Fast Bamboo Dance Step Timing",
+      "desc": "Step between clapping bamboo poles without getting trapped as the tempo accelerates.",
+      "type": "action_rhythm",
+      "icon": "🎋"
+    },
+    {
+      "title": "Vakiria Traditional Feather Crown Dressing",
+      "desc": "Arrange iridescent parrot plumes, beetle wings, and brass bands into royal tribal headwear.",
+      "type": "art",
+      "icon": "👑"
+    },
+    {
+      "title": "Jhum Harvest Cleared Hillside Festival Song",
+      "desc": "Celebrate cleared forest hilltops singing sweet Mizo harvest melodies accompanied by gongs.",
+      "type": "action_rhythm",
+      "icon": "🎵"
+    }
+  ],
+  "sangai": [
+    {
+      "title": "Brow-Antlered Deer (Sangai) Floating Marsh Path",
+      "desc": "Leap across the floating circular phumdi islands of Loktak Lake without plunging in.",
+      "type": "action_rhythm",
+      "icon": "🦌"
+    },
+    {
+      "title": "Thang-Ta Martial Arts Spear & Shield Kata",
+      "desc": "Execute swift acrobatic sword thrusts and shield spins of ancient Meitei warriors.",
+      "type": "target",
+      "icon": "🗡️"
+    },
+    {
+      "title": "Manipuri Classical Raas Leela Garland Dance",
+      "desc": "Perform the ethereal cylindrical skirt Raas Leela dance honoring Radha and Krishna.",
+      "type": "action_rhythm",
+      "icon": "🌸"
+    }
+  ],
+  "rakhi": [
+    {
+      "title": "Silken Sacred Rakhi Thread Weaving",
+      "desc": "Weave colorful golden threads, rudraksha beads, and silk flowers into loving protective amulets.",
+      "type": "art",
+      "icon": "🧶"
+    },
+    {
+      "title": "Aarti Thali & Sibling Blessing Ceremony",
+      "desc": "Wave the illuminated diya thali, apply sacred saffron tilak, and offer sweet motichoor laddoos.",
+      "type": "ritual",
+      "icon": "🪔"
+    },
+    {
+      "title": "Surprise Festive Gift Box Unwrapping",
+      "desc": "Unwrap heartfelt gifts of books, chocolates, and keepsakes sealing the eternal bond.",
+      "type": "harvest",
+      "icon": "🎁"
+    }
+  ],
+  "eid": [
+    {
+      "title": "Crescent Moon (Hilal) Sky Telescope Search",
+      "desc": "Scan the evening horizon with telescopes to spot the auspicious silver crescent moon.",
+      "type": "target",
+      "icon": "🌙"
+    },
+    {
+      "title": "Rich Sheer Khurma Milk & Vermicelli Simmer",
+      "desc": "Simmer roasted vermicelli, whole milk, dates, pistachios, and saffron into festive elixir.",
+      "type": "cooking",
+      "icon": "🍲"
+    },
+    {
+      "title": "Zakat al-Fitr Charity & Eidi Giving",
+      "desc": "Distribute coins and grain packets to neighbors ensuring every family shares in joy.",
+      "type": "harvest",
+      "icon": "🪙"
+    }
+  ],
+  "gurpurab": [
+    {
+      "title": "Golden Temple Floating Deepam Illumination",
+      "desc": "Light and float brass lamps across the Amrit Sarovar sacred holy pool reflecting golden arches.",
+      "type": "ritual",
+      "icon": "🪔"
+    },
+    {
+      "title": "Langar Community Roti & Daal Seva Master",
+      "desc": "Serve piping hot daal and fresh buttered rotis in harmonious rows with humility.",
+      "type": "cooking",
+      "icon": "🍲"
+    },
+    {
+      "title": "Prabhat Pheri Dawn Hymn Chanting Walk",
+      "desc": "Walk before sunrise carrying the Nishan Sahib flag singing blissful Gurbani kirtan.",
+      "type": "action_rhythm",
+      "icon": "🚶"
+    }
+  ],
+  "basant": [
+    {
+      "title": "Goddess Saraswati Yellow Veena Adornment",
+      "desc": "Adorn the goddess of arts and knowledge with marigold garlands, white books, and veena.",
+      "type": "ritual",
+      "icon": "🪕"
+    },
+    {
+      "title": "Meethe Chawal (Sweet Saffron Rice) Cooking",
+      "desc": "Infuse basmati rice with fragrant Kashmiri saffron, raisins, cardamom, and clove.",
+      "type": "cooking",
+      "icon": "🍚"
+    },
+    {
+      "title": "Golden Mustard Fields High-Flyer Kite Duel",
+      "desc": "Fly bright yellow paper kites over blooming mustard plains across rural Punjab.",
+      "type": "target",
+      "icon": "🪁"
+    }
+  ],
+  "lohri": [
+    {
+      "title": "Sacred Winter Bonfire Rewri & Popcorn Toss",
+      "desc": "Circle the crackling harvest bonfire tossing popcorn, sesame rewri, and peanuts into flames.",
+      "type": "target",
+      "icon": "🔥"
+    },
+    {
+      "title": "Dulla Bhatti Folk Ballad Singing Beat",
+      "desc": "Chant Sundar Mundariye folk rhymes clapping hands in lively tempo around village flames.",
+      "type": "action_rhythm",
+      "icon": "👏"
+    },
+    {
+      "title": "Sarson Da Saag & Makki Di Roti Winter Platter",
+      "desc": "Churn fresh white butter (makhan) over steaming mustard greens and corn flatbreads.",
+      "type": "cooking",
+      "icon": "🫓"
+    }
+  ],
+  "karwachauth": [
+    {
+      "title": "Channi Sieve Moon Darshan & Water Arghya",
+      "desc": "View the glowing autumn moon through the round brass mesh sieve, then view your spouse.",
+      "type": "ritual",
+      "icon": "🌕"
+    },
+    {
+      "title": "Earthen Clay Karwa Spout Water Pouring",
+      "desc": "Pour holy water from the terracotta spout offering prayers for longevity and love.",
+      "type": "target",
+      "icon": "🏺"
+    },
+    {
+      "title": "Dawn Sargi Sweet Dry Fruit Platter Prep",
+      "desc": "Prepare sweet feni, soaked almonds, pomegranates, and kheer before the morning star rises.",
+      "type": "cooking",
+      "icon": "🍇"
+    }
+  ],
+  "mahavir": [
+    {
+      "title": "Tirthankara Golden Chariot Rath Yatra Guide",
+      "desc": "Guide the sacred golden chariot of Lord Mahavira through flower-showered city avenues.",
+      "type": "action_rhythm",
+      "icon": "🛞"
+    },
+    {
+      "title": "Fragrant Sandalwood & Milk Abhishek",
+      "desc": "Pour sanctified milk, curd, and saffron sandalwood paste over the serene marble idol.",
+      "type": "ritual",
+      "icon": "🥛"
+    },
+    {
+      "title": "Five Great Vows (Ahimsa) Meditative Lanterns",
+      "desc": "Light lamps representing non-violence, truth, non-stealing, celibacy, and non-attachment.",
+      "type": "art",
+      "icon": "🕯️"
+    }
+  ],
+  "chithirai": [
+    {
+      "title": "Meenakshi Sundareswarar Celestial Wedding Garland",
+      "desc": "Exchange grand silk garlands between the Divine Queen of Madurai and Lord Shiva.",
+      "type": "ritual",
+      "icon": "💐"
+    },
+    {
+      "title": "Lord Kallazhagar Golden Horse Vaigai Entry",
+      "desc": "Guide the golden horse steed into the surging Vaigai river as 1 million devotees cheer.",
+      "type": "action_rhythm",
+      "icon": "🐎"
+    },
+    {
+      "title": "Madurai Gopuram Carved Chariot Rope Pulling",
+      "desc": "Haul the towering temple car around the four historic concentric Masi streets.",
+      "type": "action_rhythm",
+      "icon": "🏛️"
+    }
+  ],
+  "shivaratri": [
+    {
+      "title": "Sacred Bilva Leaves Shiva Lingam Abhishek",
+      "desc": "Offer trifoliate holy bilva leaves, milk, honey, and sacred ash (vibhuti) over the Shivalinga.",
+      "type": "ritual",
+      "icon": "🍃"
+    },
+    {
+      "title": "All-Night Jagran Sacred Dhuni Fire Vigil",
+      "desc": "Keep holy flames burning through the dark moonless night chanting Om Namah Shivaya.",
+      "type": "ritual",
+      "icon": "🔥"
+    },
+    {
+      "title": "Cosmic Tandava Dance Drum Rhythm",
+      "desc": "Match the cosmic beats of Lord Shiva damru drum maintaining world equilibrium.",
+      "type": "action_rhythm",
+      "icon": "🥁"
+    }
+  ],
+  "ugadi": [
+    {
+      "title": "Six-Taste Ugadi Pachadi Balancing Challenge",
+      "desc": "Balance neem (bitter), jaggery (sweet), tamarind (sour), chili (hot), salt, and mango (tangy).",
+      "type": "cooking",
+      "icon": "🍲"
+    },
+    {
+      "title": "Fresh Mango Leaf & Neem Toran Door Weaving",
+      "desc": "Knit glossy dark green mango leaves with neem blossoms to protect the festive home.",
+      "type": "art",
+      "icon": "🍃"
+    },
+    {
+      "title": "Panchangam Sravanam Auspicious Year Reading",
+      "desc": "Decode astrological planetary charts and forecast rainfall and prosperity for the New Year.",
+      "type": "ritual",
+      "icon": "📜"
+    }
+  ],
+  "vishu": [
+    {
+      "title": "Auspicious First Sight (Vishukkani) Uruli Arrangement",
+      "desc": "Arrange golden cucumber, betel leaves, coins, holy mirror, and yellow Kani Konna flowers.",
+      "type": "art",
+      "icon": "🪞"
+    },
+    {
+      "title": "Vishu Kaineettam Golden Coin Elder Blessing",
+      "desc": "Distribute auspicious shiny coins and crisp notes to children wishing yearlong wealth.",
+      "type": "harvest",
+      "icon": "🪙"
+    },
+    {
+      "title": "Bursting Vishu Patakkam Firecracker Challenge",
+      "desc": "Ignite colorful sparklers, flowerpots, and ground chakras in the festive courtyard at dawn.",
+      "type": "target",
+      "icon": "🎆"
+    }
+  ],
+  "buddha": [
+    {
+      "title": "Mahabodhi Tree Butter Lamp Peace Ring",
+      "desc": "Light 108 golden brass butter lamps circling the historic Bodhi tree at Bodh Gaya.",
+      "type": "ritual",
+      "icon": "🪔"
+    },
+    {
+      "title": "Bathing the Baby Buddha Scented Water Shower",
+      "desc": "Pour fragrant water scented with jasmine and lotus blossoms over the marble Buddha idol.",
+      "type": "ritual",
+      "icon": "💧"
+    },
+    {
+      "title": "Pure Rice Milk Kheer (Sujata Offering) Simmer",
+      "desc": "Simmer sweet milk and fragrant rice honoring the maiden Sujata gift that restored the Buddha.",
+      "type": "cooking",
+      "icon": "🥣"
+    }
+  ],
+  "xmas": [
+    {
+      "title": "Handcrafted Paper Star Lantern Assembly",
+      "desc": "Fold bamboo ribs and colorful translucent paper to build giant illuminated hanging stars.",
+      "type": "art",
+      "icon": "⭐"
+    },
+    {
+      "title": "Goan Kuswar Festive Sweet Platter Packing",
+      "desc": "Pack crispy kalkals, rose cookies, neurali coconut pastries, and rich plum fruit cake.",
+      "type": "cooking",
+      "icon": "🍪"
+    },
+    {
+      "title": "Midnight Church Bell Carol Harmonies",
+      "desc": "Chime heavy colonial cathedral bronze bells in rhythm with the festive choir singing Silent Night.",
+      "type": "action_rhythm",
+      "icon": "🔔"
+    }
+  ]
+};
+
+window.getFestivalGames = function(festId) {
+  const id = festId || window.cur || 'ganesh';
+  if (window.FESTIVAL_GAMES_CATALOG && window.FESTIVAL_GAMES_CATALOG[id]) {
+    return window.FESTIVAL_GAMES_CATALOG[id];
+  }
+  const f = (window.G$ && window.G$[id]) || (window.FEST && window.FEST.find(x => x.id === id)) || { name: 'Festival' };
+  return [
+    { title: f.name + ' Traditional Feast Master', desc: 'Prepare iconic culinary delicacies and sacred prasad of ' + f.name + '.', type: 'cooking', icon: '🍲' },
+    { title: f.name + ' Sacred Folk Art Designer', desc: 'Craft authentic floral, rangoli, and geometric floor art for ' + f.name + '.', type: 'art', icon: '🎨' },
+    { title: f.name + ' Sacred Illumination & Darshan', desc: 'Ignite ceremonial lamps and present divine offerings for ' + f.name + '.', type: 'ritual', icon: '🪔' }
+  ];
+};
+
 window.renderFestivalGames = function() {
   const g = window.getFestivalData();
+  const fGames = window.getFestivalGames(window.cur);
+  const typeBadges = {
+    cooking: { label: 'Culinary & Feast', color: '#f59e0b', icon: '🍲' },
+    art: { label: 'Sacred Folk Art', color: '#ec4899', icon: '🎨' },
+    action_rhythm: { label: 'Sports & Rhythm', color: '#3b82f6', icon: '⚡' },
+    target: { label: 'Target & Archery', color: '#10b981', icon: '🎯' },
+    ritual: { label: 'Sacred Ritual', color: '#8b5cf6', icon: '🪔' },
+    harvest: { label: 'Harvest Rush', color: '#eab308', icon: '🌾' }
+  };
+
   return `
-    <div style="max-width:960px; margin:0 auto; padding-bottom:30px;">
-      <h2>${g.name} Play &amp; Earn Arcade</h2>
-      <div class="note">
-        Play authentic cultural mini-games to master festive traditions and earn Festora Coins. All games are fully playable for ${g.name}!
+    <div style="max-width:1050px; margin:0 auto; padding-bottom:35px;">
+      <div style="background:linear-gradient(135deg, #1e1a16 0%, #2a221b 100%); border:1px solid rgba(245,158,11,0.25); border-radius:18px; padding:22px 24px; margin-bottom:24px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="font-size:3.5rem; line-height:1; filter:drop-shadow(0 4px 10px rgba(245,158,11,0.3));">${g.e}</div>
+          <div>
+            <h2 style="margin:0; font-size:24px; color:#fff;">${g.name} Cultural Play Zone</h2>
+            <p style="margin:4px 0 0; color:#d1d5db; font-size:13.5px;">
+              Play authentic cultural mini-games based on the real traditions, activities, and celebrations of ${g.name}. Earn Festora Coins!
+            </p>
+          </div>
+        </div>
+        <div style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); color:#f59e0b; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:700;">
+          🎮 3 Distinct Cultural Games
+        </div>
       </div>
-      <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-top:20px;">
-        <!-- Game 1 -->
-        <div class="card" style="text-align:center; padding:24px; border-radius:18px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(245,158,11,0.25);">
-          <div>
-            <div class="big" style="font-size:3.5rem; margin-bottom:12px;">${g.e}</div>
-            <h3 style="margin:0 0 8px 0; font-size:1.3rem;">Game 1: Sacred Altar Decorator</h3>
-            <p style="font-size:0.92rem; color:var(--mut); line-height:1.5;">
-              Arrange sacred diyas, marigold garlands, prasad, and holy offerings to design the ultimate festive altar for ${g.name}.
-            </p>
-          </div>
-          <button onclick="go('G1');" style="margin-top:16px; background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 20px;">
-            🎮 Play Sacred Decorator
-          </button>
-        </div>
 
-        <!-- Game 2 -->
-        <div class="card" style="text-align:center; padding:24px; border-radius:18px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(245,158,11,0.25);">
-          <div>
-            <div class="big" style="font-size:3.5rem; margin-bottom:12px;">⏱️</div>
-            <h3 style="margin:0 0 8px 0; font-size:1.3rem;">Game 2: Speed Symbol Challenge</h3>
-            <p style="font-size:0.92rem; color:var(--mut); line-height:1.5;">
-              30-second rapid reflex challenge! Tap the sacred ${g.name} symbols as fast as possible to build streak combos.
-            </p>
-          </div>
-          <button onclick="go('G2');" style="margin-top:16px; background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 20px;">
-            ⚡ Play Speed Challenge
-          </button>
-        </div>
+      <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:22px;">
+        ${fGames.map((game, idx) => {
+          const badge = typeBadges[game.type] || { label: 'Cultural Activity', color: '#f59e0b', icon: '✨' };
+          const gNum = idx + 1;
+          const bestScore = (typeof S !== 'undefined' && S['g' + gNum] && S['g' + gNum].best >= 0) ? S['g' + gNum].best : 0;
+          return `
+            <div class="card" style="background:#1e1a16; border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:24px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.25s ease; box-shadow:0 6px 20px rgba(0,0,0,0.25);"
+                 onmouseenter="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.transform='translateY(-4px)';"
+                 onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none';">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                  <span style="background:${badge.color}22; color:${badge.color}; border:1px solid ${badge.color}55; padding:4px 10px; border-radius:12px; font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:4px;">
+                    ${badge.icon} ${badge.label}
+                  </span>
+                  <span style="font-size:12px; color:#a1a1aa; font-weight:600;">
+                    Game ${gNum} of 3
+                  </span>
+                </div>
+                <div style="font-size:3.8rem; text-align:center; margin:10px 0 16px;">${game.icon}</div>
+                <h3 style="margin:0 0 10px; font-size:1.25rem; color:#fff; line-height:1.35; text-align:center;">${game.title}</h3>
+                <p style="font-size:13.5px; color:#a1a1aa; line-height:1.55; margin:0 0 18px; text-align:center;">
+                  ${game.desc}
+                </p>
+              </div>
 
-        <!-- Game 3 -->
-        <div class="card" style="text-align:center; padding:24px; border-radius:18px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(245,158,11,0.25);">
-          <div>
-            <div class="big" style="font-size:3.5rem; margin-bottom:12px;">🧠</div>
-            <h3 style="margin:0 0 8px 0; font-size:1.3rem;">Game 3: Cultural Memory Quest</h3>
-            <p style="font-size:0.92rem; color:var(--mut); line-height:1.5;">
-              Match 6 sacred pairs of festive foods, deities, and ritual symbols to achieve cultural memory mastery!
-            </p>
-          </div>
-          <button onclick="go('G3');" style="margin-top:16px; background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 20px;">
-            🎴 Play Memory Quest
-          </button>
-        </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:8px 14px; border-radius:10px; margin-bottom:14px; font-size:12px;">
+                  <span style="color:#d4d4d8;">🪙 Reward: <b>Up to 100 Coins</b></span>
+                  <span style="color:#f59e0b;">🏆 Best: <b>${bestScore}/100</b></span>
+                </div>
+                <button onclick="go('G${gNum}')" style="width:100%; padding:12px; border-radius:24px; font-weight:700; font-size:14px; cursor:pointer; background:linear-gradient(135deg, #f59e0b, #d97706); color:#18181b; border:none; box-shadow:0 4px 14px rgba(245,158,11,0.35); transition:all 0.2s;"
+                        onmouseenter="this.style.filter='brightness(1.1)';" onmouseleave="this.style.filter='none';">
+                  ▶ Play ${game.title.split(' ')[0]} Now
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div style="margin-top:28px; text-align:center;">
+        <button class="alt" onclick="go('Overview')" style="border-radius:20px; padding:8px 20px;">
+          ← Back to ${g.name} Overview
+        </button>
       </div>
     </div>
   `;
 };
 
-// G1: Sacred Altar Decorator Game
-window.renderUniversalG1 = function() {
+// ==============================================================
+// FESTIVAL GAMES INTERACTIVE RUNNER
+// ==============================================================
+window.initFestivalGame = function(gNum) {
+  const fGames = window.getFestivalGames(window.cur);
+  const game = fGames[gNum - 1] || fGames[0];
+  const gType = game.type || 'cooking';
+
+  window._currentGameNumber = gNum;
+  window._currentGameData = game;
+
+  if (gType === 'cooking') {
+    window.R_game = {
+      ty: 'cooking',
+      heat: 50,
+      targetMin: 40,
+      targetMax: 70,
+      timeLeft: 18,
+      ingredients: 0,
+      maxIngredients: 4,
+      score: 0,
+      running: false,
+      end: false,
+      interval: null
+    };
+  } else if (gType === 'art') {
+    window.R_game = {
+      ty: 'art',
+      palette: ['#f59e0b', '#ef4444', '#ec4899', '#10b981', '#8b5cf6', '#ffffff'],
+      curColor: '#f59e0b',
+      sectors: Array(12).fill('#2a2018'),
+      end: false,
+      score: 0
+    };
+  } else if (gType === 'action_rhythm') {
+    window.R_game = {
+      ty: 'action_rhythm',
+      needle: 20,
+      direction: 1,
+      speed: 3.5,
+      combo: 0,
+      distance: 0,
+      targetDistance: 100,
+      timeLeft: 20,
+      score: 0,
+      running: false,
+      end: false,
+      interval: null
+    };
+  } else if (gType === 'target') {
+    window.R_game = {
+      ty: 'target',
+      targets: [
+        { id: 1, x: 20, y: 30, hit: false, icon: '🎯' },
+        { id: 2, x: 50, y: 20, hit: false, icon: '🌺' },
+        { id: 3, x: 80, y: 35, hit: false, icon: '🏺' },
+        { id: 4, x: 35, y: 65, hit: false, icon: '✨' },
+        { id: 5, x: 65, y: 60, hit: false, icon: '🪔' }
+      ],
+      hits: 0,
+      shotsLeft: 10,
+      score: 0,
+      end: false
+    };
+  } else if (gType === 'ritual') {
+    window.R_game = {
+      ty: 'ritual',
+      steps: [
+        { name: 'Pure Water Abhishek', icon: '💧', done: false },
+        { name: 'Sandalwood Paste & Kumkum', icon: '🌸', done: false },
+        { name: 'Fresh Flower Garland', icon: '🌼', done: false },
+        { name: 'Sacred Diya Light', icon: '🪔', done: false },
+        { name: 'Prasad Offering', icon: '🍯', done: false }
+      ],
+      currentStep: 0,
+      aura: 0,
+      score: 0,
+      end: false
+    };
+  } else { // harvest
+    window.R_game = {
+      ty: 'harvest',
+      items: [
+        { id: 1, name: 'Golden Sheaf', icon: '🌾', active: true, x: 25, y: 30 },
+        { id: 2, name: 'Sugarcane Stalk', icon: '🎋', active: true, x: 70, y: 25 },
+        { id: 3, name: 'Sacred Lotus', icon: '🪷', active: true, x: 45, y: 55 },
+        { id: 4, name: 'Golden Coin', icon: '🪙', active: true, x: 80, y: 65 },
+        { id: 5, name: 'Harvest Fruit', icon: '🍎', active: true, x: 15, y: 70 }
+      ],
+      gathered: 0,
+      timeLeft: 18,
+      score: 0,
+      running: false,
+      end: false,
+      interval: null
+    };
+  }
+};
+
+window.renderGameRunner = function(gNum) {
   const g = window.getFestivalData();
-  window.R = window.R || {};
-  const g1State = window.R.g1 || (window.R.g1 = { sel: null, placed: {}, done: false });
+  const fGames = window.getFestivalGames(window.cur);
+  const game = fGames[gNum - 1] || fGames[0];
+  
+  if (!window.R_game || window._currentGameNumber !== gNum) {
+    window.initFestivalGame(gNum);
+  }
+  const gm = window.R_game;
 
-  const foodItem = (g.food && g.food[0] && g.food[0].name) ? g.food[0].name : 'Traditional Prasad';
-  const foodIcon = (g.food && g.food[0] && g.food[0].e) ? g.food[0].e : '🍬';
+  // Completion modal
+  if (gm.end) {
+    const finalScore = gm.score || 85;
+    const coinsEarned = Math.round(finalScore * 0.8) + 20;
+    return `
+      <div style="max-width:680px; margin:20px auto; text-align:center; background:#1e1a16; border:2px solid #f59e0b; border-radius:24px; padding:35px 25px; box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+        <div style="font-size:4.5rem; margin-bottom:10px;">🎉</div>
+        <h2 style="margin:0 0 10px; color:#f59e0b; font-size:2rem;">${game.title} Completed!</h2>
+        <p style="color:#d1d5db; font-size:15px; margin-bottom:20px;">
+          Splendid performance! You honored the traditions of ${g.name} with devotion and mastery.
+        </p>
 
-  const items = [
-    { id: 'idol', name: g.name + ' Icon', icon: g.e },
-    { id: 'diya', name: 'Brass Diya Lamp', icon: '🪔' },
-    { id: 'garland', name: 'Marigold Garland', icon: '🌺' },
-    { id: 'prasad', name: foodItem, icon: foodIcon },
-    { id: 'thali', name: 'Sacred Puja Thali', icon: '🍽️' },
-    { id: 'toran', name: 'Festive Mango Toran', icon: '✨' }
-  ];
+        <div style="display:flex; justify-content:center; gap:20px; margin-bottom:25px;">
+          <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(245,158,11,0.3); border-radius:16px; padding:15px 25px;">
+            <div style="color:#9ca3af; font-size:12px; font-weight:700;">FINAL SCORE</div>
+            <div style="color:#fff; font-size:2.2rem; font-weight:800;">${finalScore}/100</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(245,158,11,0.3); border-radius:16px; padding:15px 25px;">
+            <div style="color:#9ca3af; font-size:12px; font-weight:700;">REWARD EARNED</div>
+            <div style="color:#f59e0b; font-size:2.2rem; font-weight:800;">+${coinsEarned} 🪙</div>
+          </div>
+        </div>
 
-  const slots = [
-    { id: 'slot-top', label: 'Top Arch', icon: g1State.placed['slot-top'] || '＋' },
-    { id: 'slot-center', label: 'Sanctum Center', icon: g1State.placed['slot-center'] || '＋' },
-    { id: 'slot-left', label: 'Left Altar', icon: g1State.placed['slot-left'] || '＋' },
-    { id: 'slot-right', label: 'Right Altar', icon: g1State.placed['slot-right'] || '＋' },
-    { id: 'slot-front1', label: 'Front Offering 1', icon: g1State.placed['slot-front1'] || '＋' },
-    { id: 'slot-front2', label: 'Front Offering 2', icon: g1State.placed['slot-front2'] || '＋' }
-  ];
+        <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+          <button onclick="window.initFestivalGame(${gNum}); draw();" style="padding:12px 24px; border-radius:25px; font-weight:700; background:#333; color:#fff; border:1px solid #555; cursor:pointer;">
+            🔄 Play Again
+          </button>
+          <button onclick="go('Games')" style="padding:12px 24px; border-radius:25px; font-weight:700; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(245,158,11,0.4);">
+            🎮 Next Game in Play Zone
+          </button>
+          <button onclick="go('Shop')" style="padding:12px 24px; border-radius:25px; font-weight:700; background:rgba(255,255,255,0.08); color:#e5e7eb; border:1px solid rgba(255,255,255,0.2); cursor:pointer;">
+            🛍️ Visit Festival Shop
+          </button>
+        </div>
+      </div>
+    `;
+  }
 
-  if (g1State.done) {
-    const placedCount = Object.keys(g1State.placed).length;
-    const score = Math.min(100, placedCount * 18);
-    const coins = score >= 80 ? 100 : score >= 50 ? 60 : 30;
+  // Active game view
+  return `
+    <div style="max-width:850px; margin:0 auto; padding-bottom:30px;">
+      <!-- Breadcrumb Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+        <button class="alt" onclick="go('Games')" style="border-radius:20px; padding:6px 16px; cursor:pointer;">
+          ← Back to Play Zone
+        </button>
+        <div style="color:#f59e0b; font-weight:700; font-size:13.5px;">
+          Game ${gNum} of 3 · ${g.name}
+        </div>
+      </div>
 
-    if (typeof addCoins === 'function' && !g1State.paid) {
-      g1State.paid = true;
-      addCoins(coins, g.name + ' Altar Decoration');
+      <!-- Main Game Card -->
+      <div style="background:#1e1a16; border:1px solid rgba(245,158,11,0.3); border-radius:22px; padding:28px 24px; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+        <div style="text-align:center; margin-bottom:20px;">
+          <div style="font-size:3.5rem; margin-bottom:6px;">${game.icon}</div>
+          <h2 style="margin:0 0 8px; color:#fff; font-size:1.8rem;">${game.title}</h2>
+          <p style="margin:0 auto; max-width:600px; color:#a1a1aa; font-size:14px; line-height:1.5;">
+            ${game.desc}
+          </p>
+        </div>
+
+        ${window.renderSpecificGameType(gm, gNum, game)}
+      </div>
+    </div>
+  `;
+};
+
+window.renderSpecificGameType = function(gm, gNum, game) {
+  // 1. COOKING CHALLENGE
+  if (gm.ty === 'cooking') {
+    const isOptimal = gm.heat >= gm.targetMin && gm.heat <= gm.targetMax;
+    const heatColor = gm.heat > gm.targetMax ? '#ef4444' : (gm.heat < gm.targetMin ? '#3b82f6' : '#10b981');
+    return `
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-size:14px; color:#d1d5db;">⏱️ Time Remaining: <b style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🍯 Ingredients Added: <b style="color:#f59e0b; font-size:17px;">${gm.ingredients}/${gm.maxIngredients}</b></div>
+        </div>
+
+        <!-- Heat Gauge -->
+        <div style="margin:20px 0;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#a1a1aa; margin-bottom:6px;">
+            <span>Too Cold (0%)</span>
+            <span style="color:#10b981; font-weight:700;">★ Sweet Spot (40% - 70%) ★</span>
+            <span>Too Hot (100%)</span>
+          </div>
+          <div style="width:100%; height:26px; background:#2a2018; border-radius:13px; overflow:hidden; border:2px solid #444; position:relative;">
+            <div style="position:absolute; left:40%; width:30%; height:100%; background:rgba(16,185,129,0.25); border-left:1px dashed #10b981; border-right:1px dashed #10b981;"></div>
+            <div style="width:${gm.heat}%; height:100%; background:${heatColor}; transition:width 0.25s ease;"></div>
+          </div>
+          <div style="margin-top:8px; font-weight:700; color:${heatColor}; font-size:14px;">
+            Hearth Temperature: ${gm.heat}% · ${isOptimal ? 'PERFECT TEMPERATURE! Cooking gently...' : (gm.heat < 40 ? 'Too Cold! Add wood!' : 'Too Hot! Simmer down!')}
+          </div>
+        </div>
+
+        <!-- Interactive Controls -->
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:24px;">
+          ${!gm.running ? `
+            <button onclick="window.startCookingTimer(${gNum});" style="padding:14px 32px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(245,158,11,0.4);">
+              🔥 Start Hearth &amp; Cook
+            </button>
+          ` : `
+            <button onclick="window.adjustGameHeat(12);" style="padding:12px 24px; border-radius:22px; font-weight:700; background:#b45309; color:#fff; border:none; cursor:pointer;">
+              🔥 Stoke Fire (+12%)
+            </button>
+            <button onclick="window.adjustGameHeat(-10);" style="padding:12px 24px; border-radius:22px; font-weight:700; background:#374151; color:#e5e7eb; border:none; cursor:pointer;">
+              💨 Reduce Flame (-10%)
+            </button>
+            <button onclick="window.addGameIngredient();" ${gm.ingredients >= gm.maxIngredients ? 'disabled' : ''} style="padding:12px 24px; border-radius:22px; font-weight:700; background:${gm.ingredients >= gm.maxIngredients ? '#4b5563' : '#059669'}; color:#fff; border:none; cursor:pointer;">
+              🍯 Add Sacred Ingredient (${gm.ingredients}/${gm.maxIngredients})
+            </button>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. FOLK ART / RANGOLI / KOLAM / POOKALAM DESIGNER
+  if (gm.ty === 'art') {
+    return `
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="margin-bottom:14px; font-size:14px; color:#d1d5db;">
+          🎨 Select traditional pigment and tap the concentric petals to weave your sacred mandala art!
+        </div>
+
+        <!-- Palette Chips -->
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+          ${gm.palette.map(c => `
+            <button onclick="window.R_game.curColor='${c}'; draw();" 
+                    style="width:38px; height:38px; border-radius:50%; background:${c}; border:${gm.curColor === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.2)'}; cursor:pointer; transform:${gm.curColor === c ? 'scale(1.18)' : 'scale(1)'}; transition:all 0.15s; box-shadow:0 3px 10px rgba(0,0,0,0.3);">
+            </button>
+          `).join('')}
+        </div>
+
+        <!-- Circular Mandala Grid -->
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); max-width:380px; gap:10px; margin:0 auto 22px;">
+          ${gm.sectors.map((color, sIdx) => `
+            <div onclick="window.paintArtSector(${sIdx});" 
+                 style="height:65px; border-radius:14px; background:${color}; border:2px solid rgba(255,255,255,0.15); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.4rem; transition:transform 0.15s;"
+                 onmouseenter="this.style.transform='scale(1.06)';" onmouseleave="this.style.transform='scale(1)';">
+              ✨
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <button onclick="window.autoHarmonizeArt();" style="padding:10px 20px; border-radius:20px; font-weight:700; background:#374151; color:#fff; border:none; cursor:pointer;">
+            ✨ Harmonize Symmetrical Colors
+          </button>
+          <button onclick="window.completeArtGame(${gNum});" style="padding:10px 26px; border-radius:20px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(245,158,11,0.4);">
+            🏆 Consecrate &amp; Score Art
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // 3. ACTION & RHYTHM RACE
+  if (gm.ty === 'action_rhythm') {
+    return `
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="font-size:14px; color:#d1d5db;">🏁 Distance Covered: <b style="color:#f59e0b; font-size:18px;">${gm.distance}/${gm.targetDistance}m</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🔥 Combo Multiplier: <b style="color:#10b981; font-size:18px;">x${Math.max(1, gm.combo)}</b></div>
+        </div>
+
+        <!-- Track Progress Bar -->
+        <div style="width:100%; height:16px; background:#2a2018; border-radius:8px; overflow:hidden; margin-bottom:20px; border:1px solid #444;">
+          <div style="width:${(gm.distance / gm.targetDistance) * 100}%; height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); transition:width 0.2s;"></div>
+        </div>
+
+        <!-- Rhythm Timing Bar -->
+        <div style="margin:24px 0;">
+          <div style="font-size:12px; color:#a1a1aa; margin-bottom:6px;">Tap when the needle enters the GREEN SWEET SPOT!</div>
+          <div style="width:100%; height:32px; background:#18181b; border-radius:16px; position:relative; overflow:hidden; border:2px solid #555;">
+            <!-- Green target zone -->
+            <div style="position:absolute; left:40%; width:20%; height:100%; background:#10b981; opacity:0.85; border-radius:4px;"></div>
+            <!-- Needle -->
+            <div style="position:absolute; left:${gm.needle}%; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff; transform:translateX(-50%);"></div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div style="margin-top:20px;">
+          ${!gm.running ? `
+            <button onclick="window.startRhythmTimer(${gNum});" style="padding:14px 36px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(59,130,246,0.4);">
+              ⚡ Begin Race &amp; Rhythm
+            </button>
+          ` : `
+            <button onclick="window.tapRhythmBeat(${gNum});" style="padding:16px 42px; border-radius:32px; font-weight:900; font-size:18px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; cursor:pointer; box-shadow:0 6px 22px rgba(16,185,129,0.5); transform:scale(1.05);">
+              🥁 ROW / SPRINT / BEAT!
+            </button>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  // 4. TARGET & ARCHERY
+  if (gm.ty === 'target') {
+    return `
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="font-size:14px; color:#d1d5db;">🎯 Direct Hits: <b style="color:#10b981; font-size:18px;">${gm.hits}/${gm.targets.length}</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🏹 Shots Left: <b style="color:#f59e0b; font-size:18px;">${gm.shotsLeft}</b></div>
+        </div>
+
+        <!-- Target Arena -->
+        <div style="position:relative; width:100%; height:260px; background:radial-gradient(circle at 50% 50%, #2a2018 0%, #12100e 100%); border-radius:16px; overflow:hidden; border:2px dashed rgba(245,158,11,0.3); margin-bottom:18px;">
+          ${gm.targets.map(t => `
+            <div onclick="window.hitGameTarget(${t.id}, ${gNum});" 
+                 style="position:absolute; left:${t.x}%; top:${t.y}%; transform:translate(-50%,-50%); font-size:2.8rem; cursor:pointer; opacity:${t.hit ? 0.2 : 1}; filter:${t.hit ? 'grayscale(1)' : 'drop-shadow(0 4px 10px rgba(245,158,11,0.6))'}; transition:all 0.2s;">
+              ${t.hit ? '💥' : t.icon}
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="font-size:13px; color:#a1a1aa;">
+          Tap floating sacred targets to score direct hits and unlock traditional victory!
+        </div>
+      </div>
+    `;
+  }
+
+  // 5. SACRED RITUAL ILLUMINATION
+  if (gm.ty === 'ritual') {
+    return `
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="margin-bottom:14px; font-size:14px; color:#d1d5db;">
+          ✨ Sacred Sanctum Devotional Aura: <b style="color:#8b5cf6; font-size:18px;">${gm.aura}%</b>
+        </div>
+
+        <!-- Aura Glow Bar -->
+        <div style="width:100%; height:16px; background:#2a2018; border-radius:8px; overflow:hidden; margin-bottom:20px; border:1px solid #444;">
+          <div style="width:${gm.aura}%; height:100%; background:linear-gradient(90deg, #8b5cf6, #f59e0b); transition:width 0.3s ease;"></div>
+        </div>
+
+        <!-- Ritual Steps List -->
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+          ${gm.steps.map((step, idx) => `
+            <div onclick="window.performRitualStep(${idx}, ${gNum});" 
+                 style="background:${step.done ? 'rgba(139,92,246,0.25)' : '#2a2018'}; border:1px solid ${step.done ? '#8b5cf6' : '#555'}; border-radius:16px; padding:12px 18px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:all 0.2s;"
+                 onmouseenter="this.style.transform='scale(1.05)';" onmouseleave="this.style.transform='scale(1)';">
+              <span style="font-size:1.8rem;">${step.icon}</span>
+              <div style="text-align:left;">
+                <div style="font-weight:700; color:${step.done ? '#a78bfa' : '#fff'}; font-size:13px;">${step.name}</div>
+                <div style="font-size:11px; color:#9ca3af;">${step.done ? '✅ Consecrated' : 'Tap to Offer'}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // 6. HARVEST SPEED RUSH
+  return `
+    <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="font-size:14px; color:#d1d5db;">⏱️ Time: <b style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
+        <div style="font-size:14px; color:#d1d5db;">🧺 Basket Gathered: <b style="color:#eab308; font-size:18px;">${gm.gathered}/${gm.items.length}</b></div>
+      </div>
+
+      <!-- Harvest Field -->
+      <div style="position:relative; width:100%; height:260px; background:radial-gradient(circle at 50% 50%, #201e14 0%, #100f0a 100%); border-radius:16px; overflow:hidden; border:2px dashed rgba(234,179,8,0.3); margin-bottom:18px;">
+        ${gm.items.map(it => `
+          <div onclick="window.gatherHarvestItem(${it.id}, ${gNum});" 
+               style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%,-50%); font-size:2.8rem; cursor:pointer; opacity:${it.active ? 1 : 0.15}; transition:all 0.2s;">
+            ${it.active ? it.icon : '✨'}
+          </div>
+        `).join('')}
+      </div>
+
+      ${!gm.running ? `
+        <button onclick="window.startHarvestTimer(${gNum});" style="padding:14px 34px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#eab308,#ca8a04); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(234,179,8,0.4);">
+          🌾 Start Harvest Gathering
+        </button>
+      ` : ''}
+    </div>
+  `;
+};
+
+// Dispatchers for universal games
+window.renderUniversalG1 = function() { return window.renderGameRunner(1); };
+window.renderUniversalG2 = function() { return window.renderGameRunner(2); };
+window.renderUniversalG3 = function() { return window.renderGameRunner(3); };
+
+// Handlers for game interactions
+window.startCookingTimer = function(gNum) {
+  const gm = window.R_game;
+  if (!gm || gm.running) return;
+  gm.running = true;
+  gm.interval = setInterval(() => {
+    gm.timeLeft--;
+    gm.heat = Math.max(0, gm.heat - 2);
+    if (gm.timeLeft <= 0) {
+      clearInterval(gm.interval);
+      gm.running = false;
+      gm.end = true;
+      gm.score = Math.min(100, (gm.ingredients * 20) + (gm.heat >= 40 && gm.heat <= 70 ? 20 : 5));
+      if (typeof addCoins === 'function') addCoins(Math.round(gm.score * 0.8) + 20);
+    }
+    if (typeof draw === 'function') draw();
+  }, 1000);
+  if (typeof draw === 'function') draw();
+};
+
+window.adjustGameHeat = function(delta) {
+  if (!window.R_game || !window.R_game.running) return;
+  window.R_game.heat = Math.min(100, Math.max(0, window.R_game.heat + delta));
+  if (typeof draw === 'function') draw();
+};
+
+window.addGameIngredient = function() {
+  if (!window.R_game || !window.R_game.running) return;
+  if (window.R_game.ingredients < window.R_game.maxIngredients) {
+    window.R_game.ingredients++;
+    if (typeof draw === 'function') draw();
+  }
+};
+
+window.paintArtSector = function(idx) {
+  if (!window.R_game) return;
+  window.R_game.sectors[idx] = window.R_game.curColor;
+  const mirrorIdx = (idx + 6) % 12;
+  window.R_game.sectors[mirrorIdx] = window.R_game.curColor;
+  if (typeof draw === 'function') draw();
+};
+
+window.autoHarmonizeArt = function() {
+  if (!window.R_game) return;
+  const p = window.R_game.palette;
+  for (let i = 0; i < 6; i++) {
+    const col = p[i % p.length];
+    window.R_game.sectors[i] = col;
+    window.R_game.sectors[i + 6] = col;
+  }
+  if (typeof draw === 'function') draw();
+};
+
+window.completeArtGame = function(gNum) {
+  if (!window.R_game) return;
+  window.R_game.end = true;
+  window.R_game.score = 95;
+  if (typeof addCoins === 'function') addCoins(95);
+  if (typeof confetti === 'function') confetti();
+  if (typeof draw === 'function') draw();
+};
+
+window.startRhythmTimer = function(gNum) {
+  const gm = window.R_game;
+  if (!gm || gm.running) return;
+  gm.running = true;
+  gm.interval = setInterval(() => {
+    gm.needle += gm.direction * gm.speed;
+    if (gm.needle >= 90) gm.direction = -1;
+    if (gm.needle <= 10) gm.direction = 1;
+
+    if (gm.distance >= gm.targetDistance) {
+      clearInterval(gm.interval);
+      gm.running = false;
+      gm.end = true;
+      gm.score = 100;
+      if (typeof addCoins === 'function') addCoins(100);
       if (typeof confetti === 'function') confetti();
     }
-
-    return `
-      <div style="max-width:700px; margin:0 auto; text-align:center;">
-        <h2>✨ ${g.name} Altar Decoration Complete! ✨</h2>
-        <div class="card" style="padding:30px; border-radius:20px; margin:20px 0; border:2px solid var(--gold);">
-          <div style="font-size:4rem; margin-bottom:10px;">🏆</div>
-          <h3>Altar Sanctity Score: ${score}/100</h3>
-          <p style="font-size:1.1rem; color:var(--mut);">
-            You earned <b>🪙 +${coins} Festora Coins</b>! Devotees admire your sacred aesthetic devotion.
-          </p>
-          <div style="display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap;">
-            <button onclick="window.R.g1={sel:null, placed:{}, done:false}; window.draw();" style="background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 22px;">
-              🔄 Decorate Again
-            </button>
-            <button class="alt" onclick="go('G2');" style="border-radius:20px; padding:10px 22px;">
-              Next: Speed Challenge →
-            </button>
-            <button class="alt" onclick="go('Games');" style="border-radius:20px; padding:10px 22px;">
-              Back to Games
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  return `
-    <div style="max-width:760px; margin:0 auto; padding-bottom:30px;">
-      <h2>Decorate the Sacred ${g.name} Altar</h2>
-      <div class="note">
-        Step 1: Tap a sacred item from your tray. Step 2: Tap an altar slot to place it!
-      </div>
-
-      <!-- Item Selection Tray -->
-      <h4 style="margin:16px 0 8px;">1. Select Sacred Item:</h4>
-      <div class="row" style="gap:8px; flex-wrap:wrap; margin-bottom:20px;">
-        ${items.map(it => {
-          const isSel = (g1State.sel === it.icon);
-          return `
-            <button class="chip ${isSel ? 'sel' : ''}" 
-                    onclick="window.R.g1.sel='${it.icon}'; window.draw();"
-                    style="padding:8px 16px; border-radius:20px; font-size:1rem; cursor:pointer; font-weight:bold; ${isSel ? 'background:#f59e0b; color:#18181b;' : 'background:rgba(255,255,255,0.08); color:#fff;'}">
-              ${it.icon} ${it.name}
-            </button>
-          `;
-        }).join('')}
-      </div>
-
-      <!-- Interactive Altar Canvas Slots -->
-      <h4 style="margin:16px 0 8px;">2. Tap Slot to Place Item:</h4>
-      <div style="background:radial-gradient(circle at 50% 50%, #2a221b 0%, #15110e 100%); border:2px solid var(--gold); border-radius:20px; padding:30px 20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:540px; margin:0 auto;">
-          ${slots.map(s => {
-            const hasItem = (s.icon !== '＋');
-            return `
-              <div onclick="if(window.R.g1.sel){ window.R.g1.placed['${s.id}']=window.R.g1.sel; window.draw(); }"
-                   style="height:110px; border-radius:14px; background:${hasItem ? 'rgba(245,158,11,0.2)' : 'rgba(0,0,0,0.35)'}; border:2px dashed ${hasItem ? '#f59e0b' : 'rgba(255,255,255,0.2)'}; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s;"
-                   onmouseenter="this.style.transform='scale(1.03)';"
-                   onmouseleave="this.style.transform='scale(1)';">
-                <span style="font-size:2.8rem; line-height:1;">${s.icon}</span>
-                <small style="color:var(--mut); font-size:11px; margin-top:6px;">${s.label}</small>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:center; gap:12px; margin-top:24px;">
-        <button class="alt" onclick="window.R.g1.placed={}; window.draw();" style="border-radius:20px; padding:10px 22px;">
-          Reset Altar
-        </button>
-        <button onclick="if(Object.keys(window.R.g1.placed).length >= 2){ window.R.g1.done=true; window.draw(); } else { toast('Please place at least 2 sacred items!'); }" 
-                style="background:#22c55e; color:#fff; font-weight:bold; border-radius:20px; padding:10px 28px; border:none; cursor:pointer;">
-          ✔ Complete Decoration
-        </button>
-      </div>
-    </div>
-  `;
+    if (typeof draw === 'function') draw();
+  }, 50);
+  if (typeof draw === 'function') draw();
 };
 
-// G2: Speed Symbol Tap Challenge Game
-window.renderUniversalG2 = function() {
-  const g = window.getFestivalData();
-  window.R = window.R || {};
-  
-  if (!window.R.g2) {
-    window.R.g2 = { score: 0, time: 30, started: false, done: false, target: g.e };
+window.tapRhythmBeat = function(gNum) {
+  const gm = window.R_game;
+  if (!gm || !gm.running) return;
+  const inSweetSpot = gm.needle >= 38 && gm.needle <= 62;
+  if (inSweetSpot) {
+    gm.combo++;
+    gm.distance = Math.min(gm.targetDistance, gm.distance + 12 * Math.min(3, gm.combo));
+  } else {
+    gm.combo = 0;
+    gm.distance = Math.min(gm.targetDistance, gm.distance + 4);
   }
-  const st = window.R.g2;
+  if (gm.distance >= gm.targetDistance) {
+    clearInterval(gm.interval);
+    gm.running = false;
+    gm.end = true;
+    gm.score = 100;
+    if (typeof addCoins === 'function') addCoins(100);
+    if (typeof confetti === 'function') confetti();
+  }
+  if (typeof draw === 'function') draw();
+};
 
-  // Start game handler
-  window.startG2Timer = function() {
-    st.started = true;
-    st.score = 0;
-    st.time = 30;
-    st.done = false;
-    clearInterval(window._g2Interval);
-    window._g2Interval = setInterval(() => {
-      st.time--;
-      const el = document.getElementById('g2-timer-display');
-      if (el) el.textContent = st.time;
-      if (st.time <= 0) {
-        clearInterval(window._g2Interval);
-        st.done = true;
-        const coins = st.score >= 50 ? 80 : st.score >= 25 ? 50 : 25;
-        if (typeof addCoins === 'function') addCoins(coins, g.name + ' Speed Challenge');
-        if (typeof confetti === 'function') confetti();
-        window.draw();
-      }
-    }, 1000);
-    window.draw();
-  };
+window.hitGameTarget = function(id, gNum) {
+  const gm = window.R_game;
+  if (!gm || gm.end) return;
+  const target = gm.targets.find(t => t.id === id);
+  if (target && !target.hit && gm.shotsLeft > 0) {
+    target.hit = true;
+    gm.hits++;
+    gm.shotsLeft--;
+    if (gm.hits >= gm.targets.length || gm.shotsLeft <= 0) {
+      gm.end = true;
+      gm.score = Math.min(100, gm.hits * 20);
+      if (typeof addCoins === 'function') addCoins(Math.round(gm.score * 0.8) + 20);
+      if (typeof confetti === 'function') confetti();
+    }
+    if (typeof draw === 'function') draw();
+  }
+};
 
-  if (!st.started) {
+window.performRitualStep = function(idx, gNum) {
+  const gm = window.R_game;
+  if (!gm || gm.end) return;
+  const step = gm.steps[idx];
+  if (step && !step.done) {
+    step.done = true;
+    gm.aura = Math.min(100, gm.aura + 20);
+    if (gm.aura >= 100) {
+      gm.end = true;
+      gm.score = 100;
+      if (typeof addCoins === 'function') addCoins(100);
+      if (typeof confetti === 'function') confetti();
+    }
+    if (typeof draw === 'function') draw();
+  }
+};
+
+window.startHarvestTimer = function(gNum) {
+  const gm = window.R_game;
+  if (!gm || gm.running) return;
+  gm.running = true;
+  gm.interval = setInterval(() => {
+    gm.timeLeft--;
+    if (gm.timeLeft <= 0) {
+      clearInterval(gm.interval);
+      gm.running = false;
+      gm.end = true;
+      gm.score = Math.min(100, gm.gathered * 20);
+      if (typeof addCoins === 'function') addCoins(Math.round(gm.score * 0.8) + 20);
+    }
+    if (typeof draw === 'function') draw();
+  }, 1000);
+  if (typeof draw === 'function') draw();
+};
+
+window.gatherHarvestItem = function(id, gNum) {
+  const gm = window.R_game;
+  if (!gm || !gm.running) return;
+  const item = gm.items.find(it => it.id === id);
+  if (item && item.active) {
+    item.active = false;
+    gm.gathered++;
+    if (gm.gathered >= gm.items.length) {
+      clearInterval(gm.interval);
+      gm.running = false;
+      gm.end = true;
+      gm.score = 100;
+      if (typeof addCoins === 'function') addCoins(100);
+      if (typeof confetti === 'function') confetti();
+    }
+    if (typeof draw === 'function') draw();
+  }
+};
+
+// ==============================================================
+// 3. REALISTIC 3D INDIAN LIVING ROOM HOME DECORATION ENGINE
+// ==============================================================
+
+window.HOME_DECOR_CATALOG = {
+  general: [
+    { id: 'diya_brass', name: 'Traditional Brass Diya', icon: '🪔', type: 'lighting', glow: true, defaultScale: 1.0 },
+    { id: 'diya_clay', name: 'Terracotta Clay Diya', icon: '🪔', type: 'lighting', glow: true, defaultScale: 0.9 },
+    { id: 'urli_brass', name: 'Brass Urli with Rose Petals & Floating Candles', icon: '🍲', type: 'table', glow: true, defaultScale: 1.2 },
+    { id: 'rangoli_peacock', name: 'Vibrant Peacock Floor Rangoli', icon: '🦚', type: 'floor', defaultScale: 1.5 },
+    { id: 'toran_marigold', name: 'Marigold & Mango Leaf Door Toran', icon: '🌼', type: 'wall', defaultScale: 1.4 },
+    { id: 'lantern_akash', name: 'Hanging Royal Akash Kandil', icon: '🏮', type: 'hanging', glow: true, defaultScale: 1.3 },
+    { id: 'incense_censer', name: 'Fragrant Brass Dhoop Censer', icon: '💨', type: 'table', defaultScale: 0.9 },
+    { id: 'puja_thali', name: 'Silver Aarti Thali with Prasad', icon: '🪙', type: 'table', defaultScale: 1.1 }
+  ],
+  ganesh: [
+    { id: 'ganesh_murti', name: 'Sacred Clay Ganesha Idol', icon: '🕉️', type: 'altar', defaultScale: 1.4 },
+    { id: 'modak_thali', name: 'Silver Plate of Steamed Modaks', icon: '🥟', type: 'table', defaultScale: 1.1 },
+    { id: 'durva_grass', name: 'Holy Durva Grass & Hibiscus Garland', icon: '🌱', type: 'altar', defaultScale: 1.0 }
+  ],
+  pongal: [
+    { id: 'pongal_pot', name: 'Overflowing Turmeric Clay Pongal Pot', icon: '🍯', type: 'floor', defaultScale: 1.4 },
+    { id: 'sugarcane_stalks', name: 'Fresh Sugarcane Harvest Stalks', icon: '🎋', type: 'wall', defaultScale: 1.5 },
+    { id: 'kolam_white', name: 'Sacred White Rice-Flour Kolam', icon: '✨', type: 'floor', defaultScale: 1.4 }
+  ],
+  onam: [
+    { id: 'pookalam_10ring', name: '10-Ring Vibrant Floral Pookalam', icon: '🌺', type: 'floor', defaultScale: 1.6 },
+    { id: 'nilavilakku_tall', name: 'Tall Traditional Kerala Nilavilakku Lamp', icon: '🪔', type: 'floor', glow: true, defaultScale: 1.5 },
+    { id: 'kathakali_mask', name: 'Kathakali Royal Wall Art Mask', icon: '🎭', type: 'wall', defaultScale: 1.2 }
+  ],
+  diwali: [
+    { id: 'diwali_deepak_row', name: 'Illuminated 7-Diya Golden Altar Row', icon: '🪔', type: 'lighting', glow: true, defaultScale: 1.4 },
+    { id: 'fairy_lights', name: 'Twinkling Golden Fairy Lights String', icon: '✨', type: 'wall', glow: true, defaultScale: 1.5 },
+    { id: 'lakshmi_kalash', name: 'Holy Lakshmi Coconut Kalash', icon: '🥥', type: 'altar', defaultScale: 1.1 }
+  ],
+  holi: [
+    { id: 'gulal_bowls', name: 'Brass Bowls of Organic Herbal Gulal', icon: '🎨', type: 'table', defaultScale: 1.2 },
+    { id: 'silver_pichkari', name: 'Royal Silver Pichkari Sprayer', icon: '🔫', type: 'table', defaultScale: 1.1 }
+  ],
+  ugadi: [
+    { id: 'neem_toran', name: 'Neem Blossom & Mango Leaf Toran', icon: '🍃', type: 'wall', defaultScale: 1.3 },
+    { id: 'pachadi_bowl', name: 'Traditional Six-Taste Ugadi Pachadi Bowl', icon: '🥣', type: 'table', defaultScale: 1.1 }
+  ]
+};
+
+window.getFestivalDecorItems = function() {
+  const curId = window.cur || 'ganesh';
+  const general = window.HOME_DECOR_CATALOG.general || [];
+  const specific = window.HOME_DECOR_CATALOG[curId] || [];
+  return [...specific, ...general];
+};
+
+window.initHomeDecorState = function() {
+  if (!window.homeDecorState) {
+    window.homeDecorState = {
+      lightingMode: 'sunset',
+      selectedItemId: null,
+      history: [],
+      redoStack: [],
+      items: [
+        { uid: 'init_1', id: 'urli_brass', name: 'Brass Urli with Floating Candles', icon: '🍲', x: 50, y: 72, rot: 0, scale: 1.2, zIndex: 10 },
+        { uid: 'init_2', id: 'toran_marigold', name: 'Marigold & Mango Leaf Toran', icon: '🌼', x: 50, y: 14, rot: 0, scale: 1.5, zIndex: 5 },
+        { uid: 'init_3', id: 'diya_brass_1', name: 'Traditional Brass Diya', icon: '🪔', x: 28, y: 68, rot: 0, scale: 1.1, zIndex: 8 },
+        { uid: 'init_4', id: 'diya_brass_2', name: 'Traditional Brass Diya', icon: '🪔', x: 72, y: 68, rot: 0, scale: 1.1, zIndex: 8 }
+      ]
+    };
+  }
+};
+
+window.renderFestivalHome = function() {
+  const g = window.getFestivalData();
+  window.initHomeDecorState();
+  const st = window.homeDecorState;
+  const decorCatalog = window.getFestivalDecorItems();
+
+  // Evaluation results view
+  if (typeof R !== 'undefined' && R.res) {
     return `
-      <div style="max-width:650px; margin:0 auto; text-align:center;">
-        <h2>⏱️ ${g.name} Speed Symbol Challenge</h2>
-        <div class="card" style="padding:32px 24px; border-radius:20px; margin:20px 0; border:1px solid var(--line);">
-          <div style="font-size:4rem; margin-bottom:12px;">${g.e}</div>
-          <h3>Tap ${g.e} (${g.name}) as many times as you can in 30 seconds!</h3>
-          <p style="color:var(--mut); font-size:1.05rem;">
-            Watch the moving grid! Tapping the sacred target ${g.e} gives +5 points, but avoid hitting decoy symbols!
-          </p>
-          <button onclick="window.startG2Timer();" style="background:#f59e0b; color:#18181b; font-weight:800; font-size:1.1rem; border-radius:24px; padding:12px 36px; border:none; cursor:pointer; margin-top:16px;">
-            🚀 Start Challenge!
+      <div style="max-width:760px; margin:20px auto; text-align:center; background:#1e1a16; border:2px solid #f59e0b; border-radius:24px; padding:35px 25px; box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+        <div style="font-size:4.5rem; margin-bottom:10px;">✨ 🪔 ✨</div>
+        <h2 style="margin:0 0 10px; color:#f59e0b; font-size:2rem;">${g.name} Festive Home Altar Evaluation</h2>
+        <p style="color:#d1d5db; font-size:15px; margin-bottom:20px;">
+          Your virtual Indian living room radiates divine grace, cultural authenticity, and warm festive hospitality.
+        </p>
+        
+        <div style="background:rgba(0,0,0,0.4); border-radius:18px; padding:20px; margin-bottom:25px; border:1px solid rgba(255,255,255,0.08);">
+          ${[
+            ['Cultural Authenticity & Traditions', R.res[0] || 92],
+            ['Aesthetic Harmony & Lighting Balance', R.res[1] || 95],
+            ['Festive Grandeur & Atmosphere', R.res[2] || 96]
+          ].map(row => `
+            <div style="margin:12px 0; text-align:left;">
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:#e5e7eb; font-size:13.5px; margin-bottom:5px;">
+                <span>${row[0]}</span>
+                <span style="color:#f59e0b;">${row[1]}%</span>
+              </div>
+              <div style="width:100%; height:12px; background:#2a2018; border-radius:6px; overflow:hidden; border:1px solid #444;">
+                <div style="width:${row[1]}%; height:100%; background:linear-gradient(90deg, #f59e0b, #10b981); transition:width 0.4s;"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+          <button onclick="R.res=null; draw();" style="padding:12px 24px; border-radius:25px; font-weight:700; background:#333; color:#fff; border:1px solid #555; cursor:pointer;">
+            ✏️ Continue Decorating
+          </button>
+          <button onclick="go('Progress')" style="padding:12px 24px; border-radius:25px; font-weight:700; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(245,158,11,0.4);">
+            🏆 View Badges &amp; Rewards
           </button>
         </div>
       </div>
     `;
   }
 
-  if (st.done) {
-    return `
-      <div style="max-width:650px; margin:0 auto; text-align:center;">
-        <h2>🏁 Challenge Finished! 🏁</h2>
-        <div class="card" style="padding:32px 24px; border-radius:20px; margin:20px 0; border:2px solid var(--gold);">
-          <div style="font-size:4rem; margin-bottom:10px;">⚡</div>
-          <h3>Final Score: ${st.score} Points!</h3>
-          <p style="color:var(--mut); font-size:1.1rem;">
-            You earned <b>🪙 +${st.score >= 50 ? 80 : 40} Festora Coins</b>! Amazing swift devotion.
-          </p>
-          <div style="display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap;">
-            <button onclick="window.startG2Timer();" style="background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 22px;">
-              🔄 Play Again
-            </button>
-            <button class="alt" onclick="go('G3');" style="border-radius:20px; padding:10px 22px;">
-              Next: Memory Quest →
-            </button>
-            <button class="alt" onclick="go('Games');" style="border-radius:20px; padding:10px 22px;">
-              Back to Games
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Active game grid: 9 cells, with 3 targets and 6 decoys
-  const decoys = ['🍂', '☁️', '🪨', '⭐', '🍃', '🔔'];
-  const gridItems = [g.e, g.e, g.e, decoys[0], decoys[1], decoys[2], decoys[3], decoys[4], decoys[5]].sort(() => Math.random() - 0.5);
-
-  return `
-    <div style="max-width:650px; margin:0 auto; text-align:center; padding-bottom:30px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <span style="font-weight:bold; font-size:1.2rem;">Target: <span style="font-size:1.6rem;">${g.e}</span></span>
-        <span style="background:rgba(245,158,11,0.2); padding:6px 14px; border-radius:14px; font-weight:bold; color:var(--gold);">
-          ⏱️ <span id="g2-timer-display">${st.time}</span>s
-        </span>
-        <span style="font-weight:bold; font-size:1.2rem; color:#22c55e;">Score: ${st.score}</span>
-      </div>
-
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; max-width:420px; margin:0 auto;">
-        ${gridItems.map((sym, idx) => {
-          const isTarget = (sym === g.e);
-          return `
-            <button onclick="if('${sym}'==='${g.e}'){ window.R.g2.score += 5; } else { window.R.g2.score = Math.max(0, window.R.g2.score - 2); } window.draw();"
-                    style="height:100px; border-radius:16px; font-size:3rem; background:var(--card); border:2px solid rgba(255,255,255,0.1); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.1s;"
-                    onmousedown="this.style.transform='scale(0.92)';"
-                    onmouseup="this.style.transform='scale(1)';">
-              ${sym}
-            </button>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `;
-};
-
-// G3: Cultural Memory Quest Game
-window.renderUniversalG3 = function() {
-  const g = window.getFestivalData();
-  window.R = window.R || {};
-
-  const foodIcon = (g.food && g.food[0] && g.food[0].e) ? g.food[0].e : '🍬';
-  const foodIcon2 = (g.food && g.food[1] && g.food[1].e) ? g.food[1].e : '🍯';
-  const symbol1 = (g.fl && g.fl[0]) ? g.fl[0] : '🌺';
-
-  const pairSymbols = [g.e, foodIcon, symbol1, '🪔', foodIcon2, '✨'];
-
-  if (!window.R.g3) {
-    const deck = [...pairSymbols, ...pairSymbols].sort(() => Math.random() - 0.5);
-    window.R.g3 = { cards: deck, flipped: [], matched: [], moves: 0, done: false };
-  }
-  const mem = window.R.g3;
-
-  window.flipG3Card = function(idx) {
-    if (mem.flipped.length >= 2 || mem.flipped.includes(idx) || mem.matched.includes(idx)) return;
-    mem.flipped.push(idx);
-    window.draw();
-
-    if (mem.flipped.length === 2) {
-      mem.moves++;
-      const [i1, i2] = mem.flipped;
-      if (mem.cards[i1] === mem.cards[i2]) {
-        mem.matched.push(i1, i2);
-        mem.flipped = [];
-        if (mem.matched.length === mem.cards.length) {
-          mem.done = true;
-          if (typeof addCoins === 'function') addCoins(100, g.name + ' Memory Quest');
-          if (typeof confetti === 'function') confetti();
-        }
-        window.draw();
-      } else {
-        setTimeout(() => {
-          mem.flipped = [];
-          window.draw();
-        }, 750);
-      }
+  const lightingThemes = {
+    daylight: {
+      roomBg: 'radial-gradient(ellipse at 50% 30%, #5a4632 0%, #2b1f1d 75%)',
+      wallColor: '#453225',
+      floorBg: 'linear-gradient(180deg, #3a2618 0%, #1f140c 100%)',
+      sunbeam: 'linear-gradient(135deg, rgba(255,245,210,0.18) 0%, rgba(255,245,210,0) 70%)',
+      glowFilter: 'drop-shadow(0 0 10px rgba(245,158,11,0.5))'
+    },
+    sunset: {
+      roomBg: 'radial-gradient(ellipse at 50% 35%, #4a2d1d 0%, #1a100c 80%)',
+      wallColor: '#361e12',
+      floorBg: 'linear-gradient(180deg, #2e1a0f 0%, #140b06 100%)',
+      sunbeam: 'linear-gradient(135deg, rgba(249,115,22,0.22) 0%, rgba(249,115,22,0) 70%)',
+      glowFilter: 'drop-shadow(0 0 14px rgba(249,115,22,0.7))'
+    },
+    night: {
+      roomBg: 'radial-gradient(ellipse at 50% 40%, #1e131d 0%, #0a060a 85%)',
+      wallColor: '#170d17',
+      floorBg: 'linear-gradient(180deg, #160c16 0%, #080308 100%)',
+      sunbeam: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0) 70%)',
+      glowFilter: 'drop-shadow(0 0 20px rgba(245,158,11,0.95)) drop-shadow(0 0 35px rgba(249,115,22,0.6))'
     }
   };
-
-  if (mem.done) {
-    return `
-      <div style="max-width:650px; margin:0 auto; text-align:center;">
-        <h2>🎉 Memory Quest Conquered! 🎉</h2>
-        <div class="card" style="padding:32px 24px; border-radius:20px; margin:20px 0; border:2px solid var(--gold);">
-          <div style="font-size:4rem; margin-bottom:10px;">🌟</div>
-          <h3>All 6 Pairs Matched in ${mem.moves} Moves!</h3>
-          <p style="color:var(--mut); font-size:1.1rem;">
-            Earned <b>🪙 +100 Festora Coins</b> for cultural memory excellence.
-          </p>
-          <div style="display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap;">
-            <button onclick="window.R.g3=null; window.draw();" style="background:#f59e0b; color:#18181b; font-weight:bold; border-radius:20px; padding:10px 22px;">
-              🔄 Play Again
-            </button>
-            <button class="alt" onclick="go('Games');" style="border-radius:20px; padding:10px 22px;">
-              Back to Games
-            </button>
-            <button class="alt" onclick="go('Festivals');" style="border-radius:20px; padding:10px 22px;">
-              🎪 All 61 Festivals
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+  const theme = lightingThemes[st.lightingMode] || lightingThemes.sunset;
+  const selectedItem = st.items.find(it => it.uid === st.selectedItemId);
 
   return `
-    <div style="max-width:680px; margin:0 auto; text-align:center; padding-bottom:30px;">
-      <h2>${g.name} Cultural Memory Quest</h2>
-      <div class="note">Find all 6 matching pairs of sacred ${g.name} symbols!</div>
-      <div style="margin:12px 0 16px; font-weight:bold; color:var(--mut);">
-        Moves: ${mem.moves} · Pairs Found: ${mem.matched.length / 2} / 6
+    <div style="max-width:1080px; margin:0 auto; padding-bottom:35px;">
+      <!-- Title & Ambiance Controls Header -->
+      <div style="background:linear-gradient(135deg, #1e1a16 0%, #2a221b 100%); border:1px solid rgba(245,158,11,0.25); border-radius:18px; padding:20px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <h2 style="margin:0 0 4px; color:#fff; font-size:22px; display:flex; align-items:center; gap:8px;">
+            <span>${g.e}</span> 3D Festive Living Room &amp; Altar Decorator
+          </h2>
+          <p style="margin:0; color:#d1d5db; font-size:13.5px;">
+            Drag, rotate, and style authentic Indian festive decorations in your realistic living room interior.
+          </p>
+        </div>
+
+        <!-- Ambiance Mode Buttons -->
+        <div style="display:flex; gap:6px; background:rgba(0,0,0,0.35); padding:4px; border-radius:22px; border:1px solid rgba(255,255,255,0.1);">
+          <button onclick="window.setDecorLighting('daylight');" style="padding:6px 14px; border-radius:18px; border:none; font-weight:700; font-size:12px; cursor:pointer; ${st.lightingMode === 'daylight' ? 'background:#f59e0b; color:#18181b;' : 'background:transparent; color:#9ca3af;'}">
+            ☀️ Daylight
+          </button>
+          <button onclick="window.setDecorLighting('sunset');" style="padding:6px 14px; border-radius:18px; border:none; font-weight:700; font-size:12px; cursor:pointer; ${st.lightingMode === 'sunset' ? 'background:#f97316; color:#fff;' : 'background:transparent; color:#9ca3af;'}">
+            🌅 Sunset Glow
+          </button>
+          <button onclick="window.setDecorLighting('night');" style="padding:6px 14px; border-radius:18px; border:none; font-weight:700; font-size:12px; cursor:pointer; ${st.lightingMode === 'night' ? 'background:#8b5cf6; color:#fff;' : 'background:transparent; color:#9ca3af;'}">
+            🕯️ Candlelight Night
+          </button>
+        </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; max-width:480px; margin:0 auto;">
-        ${mem.cards.map((sym, idx) => {
-          const isUp = mem.flipped.includes(idx) || mem.matched.includes(idx);
+      <!-- Action Toolbar (Undo/Redo/Reset/Save) -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; gap:8px;">
+          <button onclick="window.undoDecor();" ${st.history.length === 0 ? 'disabled' : ''} style="padding:6px 14px; border-radius:16px; background:#2a2018; color:${st.history.length ? '#fff' : '#666'}; border:1px solid #444; font-size:12.5px; font-weight:700; cursor:pointer;">
+            ↩ Undo
+          </button>
+          <button onclick="window.redoDecor();" ${st.redoStack.length === 0 ? 'disabled' : ''} style="padding:6px 14px; border-radius:16px; background:#2a2018; color:${st.redoStack.length ? '#fff' : '#666'}; border:1px solid #444; font-size:12.5px; font-weight:700; cursor:pointer;">
+            ↪ Redo
+          </button>
+          <button onclick="window.resetDecor();" style="padding:6px 14px; border-radius:16px; background:#2a2018; color:#ef4444; border:1px solid #555; font-size:12.5px; font-weight:700; cursor:pointer;">
+            🔄 Reset Room
+          </button>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="window.finishFestivalHome();" style="padding:8px 22px; border-radius:20px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(245,158,11,0.4);">
+            ✨ Consecrate &amp; Score Altar
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Realistic Living Room Interior Viewport -->
+      <div id="decor-room-canvas" 
+           style="position:relative; width:100%; height:520px; border-radius:22px; overflow:hidden; border:2px solid rgba(245,158,11,0.4); box-shadow:0 14px 45px rgba(0,0,0,0.6); background:${theme.roomBg}; user-select:none;"
+           onclick="if(event.target.id === 'decor-room-canvas') { window.homeDecorState.selectedItemId = null; draw(); }"
+           onmousemove="window.handleDecorDrag(event);"
+           onmouseup="window.endDecorDrag();"
+           ontouchmove="window.handleDecorTouchDrag(event);"
+           ontouchend="window.endDecorDrag();">
+
+        <!-- Left Jharokha Window with Natural Sunbeam -->
+        <div style="position:absolute; top:40px; left:25px; width:110px; height:180px; border:3px solid #6b4423; border-top-left-radius:55px; border-top-right-radius:55px; background:rgba(0,0,0,0.3); box-shadow:inset 0 0 20px rgba(0,0,0,0.8); pointer-events:none;">
+          <div style="width:100%; height:100%; background:repeating-linear-gradient(45deg, rgba(200,150,100,0.2) 0, rgba(200,150,100,0.2) 2px, transparent 0, transparent 14px);"></div>
+        </div>
+        <!-- Projected Angular Sunbeam -->
+        <div style="position:absolute; top:50px; left:60px; width:340px; height:400px; background:${theme.sunbeam}; transform:rotate(28deg); pointer-events:none; filter:blur(10px);"></div>
+
+        <!-- Back Wall Archway (Rajasthani Toran Arch) -->
+        <div style="position:absolute; top:0; left:12%; right:12%; height:90px; border-bottom:4px solid #8b5a2b; border-bottom-left-radius:180px; border-bottom-right-radius:180px; background:linear-gradient(180deg, rgba(139,90,43,0.3) 0%, transparent 100%); pointer-events:none; display:flex; justify-content:space-around; align-items:flex-end; padding-bottom:8px;">
+          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+        </div>
+
+        <!-- Center Mandir Altar Niche -->
+        <div style="position:absolute; top:95px; left:50%; transform:translateX(-50%); width:170px; height:150px; border:3px solid #c9931a; border-top-left-radius:85px; border-top-right-radius:85px; background:radial-gradient(circle at 50% 50%, rgba(245,158,11,0.25) 0%, #150d09 85%); box-shadow:0 0 25px rgba(245,158,11,0.25), inset 0 0 15px #000; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-size:3.2rem; filter:drop-shadow(0 0 12px rgba(245,158,11,0.8));">${g.e}</div>
+          <small style="color:#f59e0b; font-size:11px; font-weight:700; letter-spacing:0.5px;">${g.name.toUpperCase()}</small>
+        </div>
+
+        <!-- Perspective Parquet Floor Base -->
+        <div style="position:absolute; bottom:0; left:0; width:100%; height:230px; background:${theme.floorBg}; border-top:3px solid #5a381e; box-shadow:inset 0 15px 30px rgba(0,0,0,0.6); pointer-events:none;">
+          <div style="width:100%; height:100%; background:repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 40px, rgba(0,0,0,0.25) 40px, rgba(0,0,0,0.25) 42px);"></div>
+        </div>
+
+        <!-- Traditional Carved Furniture Base (Chowki / Coffee Table in Center) -->
+        <div style="position:absolute; bottom:55px; left:50%; transform:translateX(-50%); width:260px; height:70px; background:linear-gradient(180deg, #4a2c16 0%, #29170a 100%); border-radius:12px; border:2px solid #8b5a2b; box-shadow:0 12px 25px rgba(0,0,0,0.7); pointer-events:none;">
+          <div style="position:absolute; top:4px; left:4px; right:4px; bottom:4px; border:1px dashed rgba(245,158,11,0.3); border-radius:8px;"></div>
+        </div>
+
+        <!-- Placed Interactive Draggable Items in Room -->
+        ${st.items.map(it => {
+          const isSelected = (it.uid === st.selectedItemId);
           return `
-            <button onclick="window.flipG3Card(${idx});"
-                    style="height:86px; border-radius:12px; font-size:2.4rem; cursor:pointer; background:${isUp ? 'var(--card)' : 'linear-gradient(135deg, #f59e0b, #d97706)'}; border:2px solid ${isUp ? 'var(--gold)' : '#b45309'}; display:flex; align-items:center; justify-content:center; transition:transform 0.2s;"
-                    onmouseenter="this.style.transform='scale(1.04)';"
-                    onmouseleave="this.style.transform='scale(1)';">
-              ${isUp ? sym : '🪔'}
-            </button>
+            <div id="item-${it.uid}"
+                 style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%, -50%) rotate(${it.rot || 0}deg) scale(${it.scale || 1}); z-index:${it.zIndex || 10}; cursor:move; transition:box-shadow 0.15s; ${isSelected ? 'outline:2px dashed #f59e0b; outline-offset:6px; filter:drop-shadow(0 0 12px #f59e0b);' : ''}"
+                 onmousedown="window.startDecorDrag(event, '${it.uid}');"
+                 ontouchstart="window.startDecorTouchDrag(event, '${it.uid}');"
+                 title="${it.name}">
+              
+              <div style="font-size:3rem; line-height:1; filter:${theme.glowFilter}; user-select:none;">
+                ${it.icon}
+              </div>
+
+              <!-- Selected Item Floating Control Pills -->
+              ${isSelected ? `
+                <div style="position:absolute; top:-38px; left:50%; transform:translateX(-50%); display:flex; gap:5px; background:rgba(0,0,0,0.85); border:1px solid #f59e0b; padding:3px 8px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:99;">
+                  <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', -15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Left">↺</button>
+                  <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', 15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Right">↻</button>
+                  <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', 0.15);" style="border:none; background:none; color:#10b981; font-size:13px; font-weight:800; cursor:pointer;" title="Enlarge">➕</button>
+                  <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', -0.15);" style="border:none; background:none; color:#f59e0b; font-size:13px; font-weight:800; cursor:pointer;" title="Shrink">➖</button>
+                  <button onclick="event.stopPropagation(); window.removeDecorItem('${it.uid}');" style="border:none; background:none; color:#ef4444; font-size:12px; cursor:pointer;" title="Remove">🗑️</button>
+                </div>
+              ` : ''}
+            </div>
           `;
         }).join('')}
+      </div>
+
+      <!-- Add New Festival Decoration Palette -->
+      <div style="margin-top:22px; background:#1e1a16; border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px; box-shadow:0 6px 20px rgba(0,0,0,0.25);">
+        <h3 style="margin:0 0 12px; color:#f59e0b; font-size:16px; display:flex; align-items:center; gap:8px;">
+          <span>📦</span> Available Decorations for ${g.name} (Tap to Place into Living Room)
+        </h3>
+        
+        <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px;">
+          ${decorCatalog.map(it => `
+            <div onclick="window.addDecorItemToRoom('${it.id}');"
+                 style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:12px 14px; min-width:130px; text-align:center; cursor:pointer; transition:all 0.2s;"
+                 onmouseenter="this.style.background='rgba(245,158,11,0.15)'; this.style.borderColor='#f59e0b'; this.style.transform='translateY(-3px)';"
+                 onmouseleave="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none';">
+              <div style="font-size:2.4rem; margin-bottom:6px;">${it.icon}</div>
+              <div style="color:#e5e7eb; font-size:12px; font-weight:700; line-height:1.3;">${it.name}</div>
+              <small style="color:#f59e0b; font-size:11px;">＋ Add</small>
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
 };
+
+window._activeDragUid = null;
+window._dragOffset = { x: 0, y: 0 };
+
+window.setDecorLighting = function(mode) {
+  window.initHomeDecorState();
+  window.homeDecorState.lightingMode = mode;
+  draw();
+};
+
+window.saveDecorHistory = function() {
+  window.initHomeDecorState();
+  const snapshot = JSON.stringify(window.homeDecorState.items);
+  window.homeDecorState.history.push(snapshot);
+  if (window.homeDecorState.history.length > 20) window.homeDecorState.history.shift();
+  window.homeDecorState.redoStack = [];
+};
+
+window.undoDecor = function() {
+  window.initHomeDecorState();
+  if (window.homeDecorState.history.length === 0) return;
+  const currentSnapshot = JSON.stringify(window.homeDecorState.items);
+  window.homeDecorState.redoStack.push(currentSnapshot);
+  const prevSnapshot = window.homeDecorState.history.pop();
+  window.homeDecorState.items = JSON.parse(prevSnapshot);
+  draw();
+};
+
+window.redoDecor = function() {
+  window.initHomeDecorState();
+  if (window.homeDecorState.redoStack.length === 0) return;
+  const currentSnapshot = JSON.stringify(window.homeDecorState.items);
+  window.homeDecorState.history.push(currentSnapshot);
+  const nextSnapshot = window.homeDecorState.redoStack.pop();
+  window.homeDecorState.items = JSON.parse(nextSnapshot);
+  draw();
+};
+
+window.resetDecor = function() {
+  if (confirm('Reset living room to default festive arrangement?')) {
+    window.saveDecorHistory();
+    window.homeDecorState.items = [
+      { uid: 'init_1', id: 'urli_brass', name: 'Brass Urli with Floating Candles', icon: '🍲', x: 50, y: 72, rot: 0, scale: 1.2, zIndex: 10 },
+      { uid: 'init_2', id: 'toran_marigold', name: 'Marigold & Mango Leaf Toran', icon: '🌼', x: 50, y: 14, rot: 0, scale: 1.5, zIndex: 5 }
+    ];
+    window.homeDecorState.selectedItemId = null;
+    draw();
+  }
+};
+
+window.addDecorItemToRoom = function(id) {
+  window.initHomeDecorState();
+  window.saveDecorHistory();
+  const catalog = window.getFestivalDecorItems();
+  const def = catalog.find(x => x.id === id) || { id, name: 'Festive Decoration', icon: '✨', defaultScale: 1.0 };
+  
+  const newItem = {
+    uid: 'item_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+    id: def.id,
+    name: def.name,
+    icon: def.icon,
+    x: 45 + Math.floor(Math.random() * 10),
+    y: 45 + Math.floor(Math.random() * 15),
+    rot: 0,
+    scale: def.defaultScale || 1.0,
+    zIndex: 15
+  };
+
+  window.homeDecorState.items.push(newItem);
+  window.homeDecorState.selectedItemId = newItem.uid;
+  draw();
+};
+
+window.startDecorDrag = function(e, uid) {
+  e.preventDefault();
+  e.stopPropagation();
+  window.initHomeDecorState();
+  window._activeDragUid = uid;
+  window.homeDecorState.selectedItemId = uid;
+  
+  const canvas = document.getElementById('decor-room-canvas');
+  if (canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const item = window.homeDecorState.items.find(x => x.uid === uid);
+    if (item) {
+      const itemPixelX = (item.x / 100) * rect.width;
+      const itemPixelY = (item.y / 100) * rect.height;
+      window._dragOffset = {
+        x: (e.clientX - rect.left) - itemPixelX,
+        y: (e.clientY - rect.top) - itemPixelY
+      };
+    }
+  }
+  draw();
+};
+
+window.startDecorTouchDrag = function(e, uid) {
+  if (e.touches && e.touches[0]) {
+    const touch = e.touches[0];
+    window.startDecorDrag({ clientX: touch.clientX, clientY: touch.clientY, preventDefault: () => {}, stopPropagation: () => {} }, uid);
+  }
+};
+
+window.handleDecorDrag = function(e) {
+  if (!window._activeDragUid) return;
+  const canvas = document.getElementById('decor-room-canvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const item = window.homeDecorState.items.find(x => x.uid === window._activeDragUid);
+  if (!item) return;
+
+  const mouseX = e.clientX - rect.left - (window._dragOffset.x || 0);
+  const mouseY = e.clientY - rect.top - (window._dragOffset.y || 0);
+
+  item.x = Math.max(5, Math.min(95, (mouseX / rect.width) * 100));
+  item.y = Math.max(5, Math.min(95, (mouseY / rect.height) * 100));
+
+  const el = document.getElementById('item-' + item.uid);
+  if (el) {
+    el.style.left = item.x + '%';
+    el.style.top = item.y + '%';
+  }
+};
+
+window.handleDecorTouchDrag = function(e) {
+  if (e.touches && e.touches[0]) {
+    const touch = e.touches[0];
+    window.handleDecorDrag({ clientX: touch.clientX, clientY: touch.clientY });
+  }
+};
+
+window.endDecorDrag = function() {
+  if (window._activeDragUid) {
+    window.saveDecorHistory();
+    window._activeDragUid = null;
+  }
+};
+
+window.rotateDecorItem = function(uid, delta) {
+  window.saveDecorHistory();
+  const item = window.homeDecorState.items.find(x => x.uid === uid);
+  if (item) {
+    item.rot = ((item.rot || 0) + delta) % 360;
+    draw();
+  }
+};
+
+window.scaleDecorItem = function(uid, delta) {
+  window.saveDecorHistory();
+  const item = window.homeDecorState.items.find(x => x.uid === uid);
+  if (item) {
+    item.scale = Math.max(0.6, Math.min(2.2, (item.scale || 1.0) + delta));
+    draw();
+  }
+};
+
+window.removeDecorItem = function(uid) {
+  window.saveDecorHistory();
+  window.homeDecorState.items = window.homeDecorState.items.filter(x => x.uid !== uid);
+  if (window.homeDecorState.selectedItemId === uid) {
+    window.homeDecorState.selectedItemId = null;
+  }
+  draw();
+};
+
+window.finishFestivalHome = function() {
+  window.initHomeDecorState();
+  const count = window.homeDecorState.items.length;
+  if (count < 2) {
+    if (typeof toast === 'function') toast('Place at least 2 festive items in your room first!');
+    else alert('Place at least 2 festive items in your room first!');
+    return;
+  }
+
+  const score1 = Math.min(100, count * 15 + 40);
+  const score2 = Math.min(100, score1 + 3);
+  const score3 = Math.min(100, score1 + 5);
+
+  R.res = [score1, score2, score3];
+  if (typeof addCoins === 'function') addCoins(score1);
+  if (typeof confetti === 'function') confetti();
+  if (typeof mark === 'function') mark('house');
+  draw();
+};
+
 
 window.renderFestivalProgress = function() {
   const g = window.getFestivalData();
