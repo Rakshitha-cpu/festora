@@ -49,10 +49,45 @@ const FALLBACK_KNOWLEDGE = {
   }
 };
 
+// Models are tried in order; if one is unavailable (e.g. retired), the next is used.
+// Check https://ai.google.dev/gemini-api/docs/models for current model names.
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-2.0-flash'];
+
+async function callGemini(prompt, apiKey) {
+  for (const model of GEMINI_MODELS) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey, // key goes in a header, not the URL
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) return text;
+      return null;
+    }
+
+    // Bad or unauthorized key: trying other models will not help
+    if (response.status === 400 || response.status === 401 || response.status === 403) return null;
+    // Otherwise (e.g. 404 model not found) try the next model
+  }
+  return null;
+}
+
 export async function askElderOracle({ characterId = 'oracle', query = '', apiKey = '' }) {
   const char = FALLBACK_KNOWLEDGE[characterId] || FALLBACK_KNOWLEDGE.oracle;
+  const key = (apiKey || '').trim();
 
-  if (apiKey && apiKey.trim().length > 10) {
+  if (key.length > 10) {
     try {
       const prompt = `You are ${char.name}, a persona in the Festora Wisdom OS. Your role is: ${char.role}.
 The user is a modern Gen-Z person struggling with modern life challenges (burnout, isolation, stress, purpose, grief).
@@ -60,19 +95,8 @@ Ground your answer in timeless cultural wisdom, somatic practices, and psycholog
 User question: "${query}"
 Respond in character, 2-4 concise paragraphs with practical depth.`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) return { text, source: 'gemini-ai' };
-      }
+      const text = await callGemini(prompt, key);
+      if (text) return { text, source: 'gemini-ai' };
     } catch (e) {
       console.warn('Gemini API call failed, using high-fidelity local Oracle engine', e);
     }
@@ -80,16 +104,17 @@ Respond in character, 2-4 concise paragraphs with practical depth.`;
 
   // High-fidelity fallback contextual matching
   const q = query.toLowerCase();
+  const hasWord = (w) => new RegExp(`\\b${w}\\b`).test(q); // whole-word match
   let matchedKey = 'default';
-  if (q.includes('sun') || q.includes('morning') || q.includes('dawn') || q.includes('retin')) matchedKey = 'sun';
-  else if (q.includes('burnout') || q.includes('tired') || q.includes('exhaust') || q.includes('rest')) matchedKey = 'burnout';
+  if (hasWord('sun') || q.includes('morning') || q.includes('dawn') || q.includes('retin')) matchedKey = 'sun';
+  else if (q.includes('burnout') || q.includes('tired') || q.includes('exhaust') || hasWord('rest')) matchedKey = 'burnout';
   else if (q.includes('family') || q.includes('friend') || q.includes('lonel') || q.includes('connect')) matchedKey = 'family';
   else if (q.includes('loss') || q.includes('grief') || q.includes('fail') || q.includes('let go')) matchedKey = 'loss';
   else if (q.includes('money') || q.includes('career') || q.includes('wealth') || q.includes('financ')) matchedKey = 'money';
   else if (q.includes('purpose') || q.includes('mean') || q.includes('direct') || q.includes('future')) matchedKey = 'purpose';
   else if (q.includes('anxiet') || q.includes('panic') || q.includes('overwhelm') || q.includes('fear') || q.includes('stress')) matchedKey = 'anxiety';
   else if (q.includes('focus') || q.includes('mind') || q.includes('meditat') || q.includes('breath')) matchedKey = 'focus';
-  else if (q.includes('science') || q.includes('brain') || q.includes('neuro') || q.includes('why')) matchedKey = 'science';
+  else if (q.includes('science') || q.includes('brain') || q.includes('neuro') || hasWord('why')) matchedKey = 'science';
 
   const text = char.responses[matchedKey] || char.responses.default;
   return {
