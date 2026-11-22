@@ -1,9 +1,23 @@
 {
   "name": "festora-frontend",
+  "private": true,
   "version": "1.0.0",
-  "description": "Festora Frontend App",
+  "type": "module",
   "scripts": {
-    "start": "npx serve . -p 8080",
-    "dev": "npx serve . -p 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^1.48.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^4.3.1",
+    "tailwindcss": "^4.3.3",
+    "vite": "^5.4.6"
   }
 }
