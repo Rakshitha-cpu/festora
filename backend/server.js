@@ -30,6 +30,13 @@ app.post('/api/save-progress', (req, res) => {
 // ==========================================
 // FRONTEND SERVING
 // ==========================================
+
+// Keep source, docs and config files from being served publicly
+app.use(
+    ['/backend', '/docs', '/tests', '/graph', '/data', '/docker-compose.yml', '/package.json', '/package-lock.json', '/.env.example'],
+    (req, res) => res.status(404).send('Not found')
+);
+
 // Serve static assets from frontend and root
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use(express.static(path.join(__dirname, '..')));
