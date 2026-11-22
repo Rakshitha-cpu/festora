@@ -10,10 +10,21 @@ app = FastAPI(
     version="2.4.0"
 )
 
-# CORS Middleware to allow React frontend
+# CORS Middleware to allow the React frontend.
+# Add your deployed frontend URL(s) via the ALLOWED_ORIGINS environment
+# variable (comma-separated), e.g. ALLOWED_ORIGINS=https://festora.onrender.com
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,http://localhost:3000",
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
