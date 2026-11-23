@@ -10408,5 +10408,245 @@ window.pick = function(id) {
 
 </script>
 
+<script>
+/* ===== FESTORA SMART FESTIVAL GUIDE: answers about all festivals ===== */
+(function () {
+  'use strict';
+
+  /* ---------- small helpers ---------- */
+  const esc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  // starts-with-word match: "sweet" matches "sweets", but "eat" does NOT match "weather"
+  const has = (q, terms) => terms.some(t => new RegExp('\\b' + esc(t)).test(q));
+  // exact whole-word / whole-phrase match
+  const hasExact = (q, terms) => terms.some(t => new RegExp('\\b' + esc(t) + '\\b').test(q));
+
+  const currentId = () => window.cur || (typeof cur !== 'undefined' ? cur : 'ganesh');
+  const currentPage = () => (typeof page !== 'undefined' ? page : '');
+  const festList = () => window.FEST || [];
+
+  /* ---------- find which festival the user is talking about ---------- */
+  const ALIASES = {
+    deepavali: 'diwali', ganpati: 'ganesh', ganapati: 'ganesh', vinayaka: 'ganesh', vinayagar: 'ganesh',
+    christmas: 'xmas', dasera: 'dasara', garba: 'navratri', dandiya: 'navratri', 'rath yatra': 'rathyatra',
+    'jagannath rath yatra': 'rathyatra', 'raksha bandhan': 'rakhi', 'guru nanak jayanti': 'gurpurab',
+    'eid ul fitr': 'eid', 'eid al fitr': 'eid', 'maha shivratri': 'shivaratri', 'shivratri': 'shivaratri',
+    'kite festival': 'uttarayan', 'makar sankranti': 'uttarayan', 'buddha purnima': 'buddha', vesak: 'buddha',
+    'camel fair': 'pushkar', 'karva chauth': 'karwachauth', 'yugadi': 'ugadi', 'jan ashtami': 'dahihandi'
+  };
+  const AMBIGUOUS = { dussehra: ['dasara', 'kullu', 'bastar'], dusshera: ['dasara', 'kullu', 'bastar'], dasehra: ['dasara', 'kullu', 'bastar'] };
+  const STOP = ['festival', 'puja', 'pooja', 'mela', 'fair', 'jayanti', 'india', 'indian', 'dance', 'race', 'purnima', 'panchami'];
+
+  let keyCache = null;
+  function keys() {
+    if (keyCache && keyCache.n === festList().length) return keyCache.list;
+    const list = [];
+    festList().forEach(f => {
+      const full = norm(f.name);
+      const noParen = norm(String(f.name).replace(/\(.*?\)/g, ''));
+      const inner = (String(f.name).match(/\((.*?)\)/) || [])[1];
+      list.push([full, f.id, 100], [noParen, f.id, 100], [norm(f.id), f.id, 50]);
+      if (inner) list.push([norm(inner), f.id, 60]);
+    });
+    Object.keys(ALIASES).forEach(a => list.push([a, ALIASES[a], 100]));
+    keyCache = { n: festList().length, list };
+    return list;
+  }
+
+  function findFestival(q) {
+    let best = null, bestScore = 0;
+    keys().forEach(k => {
+      if (k[0] && hasExact(q, [k[0]])) {
+        const score = k[0].length + k[2];
+        if (score > bestScore) { best = k[1]; bestScore = score; }
+      }
+    });
+    if (best) return { id: best };
+    for (const word in AMBIGUOUS) if (hasExact(q, [word])) return { ambiguous: AMBIGUOUS[word] };
+    // single distinctive word from a festival name, e.g. "tsechu", "camel", "mysore"
+    const words = q.split(' ').filter(w => w.length >= 5 && STOP.indexOf(w) < 0);
+    for (const w of words) {
+      const hits = festList().filter(f => norm(f.name).split(' ').indexOf(w) >= 0);
+      if (hits.length === 1) return { id: hits[0].id };
+      if (hits.length > 1) return { ambiguous: hits.map(h => h.id) };
+    }
+    return null;
+  }
+
+  // 'Title: description', skipping descriptions that are missing in the data
+  const pair = (a, b) => (b && b !== 'undefined' ? a + ': ' + b : a);
+
+  const nameOf = id => { const f = festList().find(x => x.id === id); return f ? f.name : id; };
+
+  /* ---------- festival data (with an honest check for real content) ---------- */
+  function data(id) {
+    const g = window.getFestivalData(id);
+    const raw = g.raw || {};
+    g.real = {
+      story: !!(raw.story && raw.story.length),
+      food: !!(raw.food && raw.food.length),
+      rituals: !!((raw.rituals && raw.rituals.length) || (raw.reg && raw.reg.length)),
+      fact: !!raw.didYouKnow
+    };
+    return g;
+  }
+
+  const sorry = g => "I don't have verified details about that yet for " + g.name + '. I can tell you its story, food, rituals, where it is celebrated, or a fun fact.';
+
+  const A = {
+    overview(g) {
+      const s = g.story[0];
+      return g.name + ' - ' + g.tag + '. It is celebrated mainly in ' + g.place + '.' + (g.real.story && s ? ' ' + pair(s[1], s[2]) : '');
+    },
+    story(g) {
+      if (!g.real.story) return A.overview(g);
+      return g.story.slice(0, 2).map(s => pair(s[1], s[2])).join(' ');
+    },
+    food(g) {
+      if (!g.real.food) return sorry(g);
+      return 'Traditional food for ' + g.name + ': ' + g.food.slice(0, 3).map(f => f[1] + (f[2] && f[2] !== 'undefined' ? ' (' + f[2] + ')' : '')).join('; ') + '.';
+    },
+    rituals(g) {
+      if (!g.real.rituals) return sorry(g);
+      return 'How ' + g.name + ' is celebrated: ' + g.rituals.slice(0, 3).map(r => pair(r[1], r[2])).join(' ');
+    },
+    where(g) {
+      const st = g.state && !/india/i.test(g.state) && g.place.indexOf(g.state) < 0 ? ' (' + g.state + ')' : '';
+      return g.name + ' is celebrated mainly in ' + g.place + st + '.';
+    },
+    when(g) {
+      return 'Exact dates for ' + g.name + ' change every year because most Indian festivals follow the lunar calendar, and I do not have a verified date in my data. Please check a current festival calendar.';
+    },
+    fact(g) {
+      return g.real.fact ? g.didYouKnow : sorry(g);
+    },
+    videos(g) {
+      const v = g.vid && g.vid[0];
+      return 'Open the Watch tab to see ' + g.vid.length + ' videos about ' + g.name + (v && v[1] ? ', such as "' + v[1] + '"' : '') + '.';
+    },
+    games(g) {
+      return 'You can earn coins for ' + g.name + ' by playing the Games and Quiz tabs, then spend them in the Shop or on decorating My Home.';
+    },
+    blessing(g) {
+      return 'May ' + g.name + ' fill your home with light, good health and togetherness.';
+    },
+    context(g) {
+      const p = currentPage();
+      if (p === 'Food') return A.food(g);
+      if (p === 'Puja' || p === 'Celebrate') return A.rituals(g);
+      if (p === 'Story' || p === 'Overview') return A.story(g);
+      if (p === 'Watch') return A.videos(g);
+      return 'You are exploring ' + g.name + '. ' + g.tag + '. Ask me about its story, food or rituals.';
+    }
+  };
+
+  const FAMILY = [
+    [['father', 'pitaji', 'appa'], 'father'], [['mother', 'mataji', 'amma'], 'mother'],
+    [['children', 'kids', 'child', 'son', 'daughter'], 'children'],
+    [['elder', 'elders', 'grandparent', 'grandparents', 'dadaji', 'dadiji', 'nanaji', 'naniji'], 'elder']
+  ];
+
+  /* ---------- topic words: used to decide if a question is about festivals at all ---------- */
+  const TOPIC = ['festival', 'celebrat', 'ritual', 'puja', 'pooja', 'aarti', 'story', 'legend', 'myth', 'food', 'dish', 'sweet', 'prasad',
+    'tradition', 'custom', 'decorat', 'dress', 'attire', 'wear', 'idol', 'temple', 'god', 'goddess', 'lord', 'rangoli', 'diya', 'lamp',
+    'history', 'origin', 'significan', 'importan', 'meaning', 'region', 'state', 'pandal', 'feast', 'culture', 'worship', 'pray', 'fast',
+    'modak', 'visarjan', 'durva', 'family', 'blessing', 'fact', 'video', 'watch', 'coin', 'game', 'quiz', 'shop'];
+
+  /* ---------- the main brain ---------- */
+  function answer(query) {
+    const q = norm(query);
+    const list = festList();
+    const curId = currentId();
+    const cg = data(curId);
+
+    if (!q) return 'Namaste! Ask me about the story, food or rituals of ' + cg.name + ' or any other festival.';
+
+    // small talk
+    if (/^(hi|hello|hey|namaste|namaskar|good morning|good evening|good afternoon)\b/.test(q) && q.split(' ').length <= 4)
+      return 'Namaste! I am Kabir. Ask me about the story, food, rituals or places of any of the ' + list.length + ' festivals in Festora. You are viewing ' + cg.name + '.';
+    if (/\b(thanks|thank you|thx)\b/.test(q)) return 'You are most welcome! Ask me anything else about festivals.';
+    if (/\bhow are you\b/.test(q)) return 'I am doing well, thank you! Which festival shall we explore?';
+    if (/\b(who are you|what are you|your name)\b|^kabir$/.test(q))
+      return 'I am Kabir, Festora\'s festival guide. I answer from the festival information built into this app: stories, food, rituals and places for ' + list.length + ' Indian festivals.';
+    if (/^(help|menu)$|\bwhat can you\b|\bwhich festivals\b|\blist of festivals\b|\ball festivals\b|\bhow many festivals\b/.test(q)) {
+      const sample = ['diwali', 'holi', 'pongal', 'onam', 'durga', 'navratri', 'lohri', 'eid'].map(nameOf).join(', ');
+      return 'I know about ' + list.length + ' festivals, for example ' + sample + '. Try: "Story of Holi", "Food for Pongal", or "How is Onam celebrated?"';
+    }
+
+    // which festival?
+    const found = findFestival(q);
+    if (found && found.ambiguous)
+      return 'That name is used for more than one festival: ' + found.ambiguous.map(nameOf).join(', ') + '. Which one would you like to know about?';
+    const mentioned = !!found;
+    const id = mentioned ? found.id : curId;
+    const g = id === curId ? cg : data(id);
+
+    // festival-independent topics
+    if (has(q, ['bless'])) return A.blessing(g);
+    if (has(q, ['fun fact', 'did you know', 'secret']) ) return A.fact(g);
+    if (hasExact(q, ['coins', 'coin', 'games', 'game', 'badges', 'badge', 'shop', 'quiz', 'certificate'])) return A.games(g);
+    if (has(q, ['video', 'watch', 'documentary', 'film', 'youtube'])) return A.videos(g);
+
+    // family roles
+    if (hasExact(q, ['family', 'roles', 'role', 'parivar', 'members']) || FAMILY.some(f => hasExact(q, f[0]))) {
+      const generic = 'In Indian festivals the whole family celebrates together! The father leads the prayers, the mother prepares sacred prasad, the children ring bells and decorate with diyas, and the grandparents bless everyone and share sacred stories.';
+      if (id === 'ganesh' && typeof KB_EXTRA !== 'undefined') {
+        const hit = KB_EXTRA.find(k => k[0].some(w => hasExact(q, [w])) && k[0].indexOf('kabir') < 0);
+        if (hit) return hit[1];
+      }
+      return generic;
+    }
+
+    // "what am I seeing?" style questions about the open page
+    if (!mentioned && /what am i seeing|^what is this$|about this item|why is this used|this (food|tradition|ritual|item)/.test(q)) {
+      if (id === 'ganesh' && typeof ctxAns === 'function') {
+        return ctxAns() || 'Open an item (a puja item, food, gallery photo, video or celebration step) and ask again, and I will explain what is on screen.';
+      }
+      return A.context(g);
+    }
+
+    // is this question about festivals at all?
+    const topical = mentioned || has(q, TOPIC) || (/\b(it|this|its|they)\b/.test(q) && /\b(when|why|where|how|what|who)\b/.test(q));
+    if (!topical)
+      return 'I can only help with Indian festivals: their story, food, rituals, places and fun facts. Try asking "What is ' + cg.name + '?" or "Food for ' + cg.name + '".';
+
+    // Ganesh Chaturthi has extra hand-written answers: use them first
+    if (id === 'ganesh' && typeof KB !== 'undefined') {
+      let best = null, bestN = 0;
+      KB.forEach(k => {
+        const n = k[0].filter(w => new RegExp('\\b' + esc(w)).test(q)).length;
+        if (n > bestN) { bestN = n; best = k; }
+      });
+      if (best) return best[1];
+    }
+
+    // all festivals: pick the topic
+    if (has(q, ['food', 'dish', 'sweet', 'eat', 'cook', 'recipe', 'prasad', 'feast', 'snack', 'menu', 'delicac', 'bhog', 'naivedya'])) return A.food(g);
+    if (has(q, ['where', 'which state', 'region', 'place', 'located', 'city'])) return A.where(g);
+    if (has(q, ['when', 'date', 'which day', 'what day', 'month'])) return A.when(g);
+    if (has(q, ['ritual', 'puja', 'pooja', 'aarti', 'worship', 'pray', 'custom', 'tradition', 'celebrat', 'observe', 'perform', 'how is', 'how do', 'how are', 'how to', 'steps', 'decorat'])) return A.rituals(g);
+    if (has(q, ['story', 'legend', 'myth', 'history', 'origin', 'why', 'reason', 'meaning', 'significan', 'importan', 'about', 'what is', 'whats', 'tell me', 'explain', 'who']))
+      return has(q, ['story', 'legend', 'myth', 'history', 'origin', 'why', 'reason', 'significan', 'importan', 'meaning']) ? A.story(g) : A.overview(g);
+    if (has(q, ['fact', 'interesting', 'surprise'])) return A.fact(g);
+
+    // a festival name with no question: give a short intro
+    if (mentioned) return A.overview(g);
+    return sorry(g);
+  }
+
+  /* ---------- plug it into the existing chat ---------- */
+  window.getFestivalAiReply = answer;
+  window.kabirReply = answer;
+  window.festoraGuideReply = answer; // handy for testing in the browser console
+
+  // friendlier first message (the old one only mentioned Ganesh Chaturthi)
+  try {
+    if (typeof CH !== 'undefined' && CH.length === 1 && /Ask me about Ganesh/.test(String(CH[0][1]))) {
+      CH[0][1] = 'Namaste! I am Kabir. Ask me about the story, food or rituals of any festival. 🪔';
+    }
+  } catch (e) { /* ignore */ }
+})();
+</script>
+
 </body>
 </html>
