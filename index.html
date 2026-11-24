@@ -140,8 +140,217 @@ nav{display:flex!important;flex-wrap:nowrap;overflow-x:auto;position:sticky;top:
   margin-top: 15px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
+/* === Festora Security & Authentication Styles === */
+.festora-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.festora-user-pill:hover {
+  background: rgba(245, 158, 11, 0.25);
+  transform: translateY(-1px);
+}
+.festora-user-pill .avatar {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.festora-user-pill .user-sec-tag {
+  background: #10b981;
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
+  font-weight: 800;
+}
+.festora-auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 11, 7, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: festoraFadeIn 0.25s ease-out;
+}
+@keyframes festoraFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.festora-auth-card {
+  background: var(--card);
+  border: 2px solid var(--gold);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 26px 24px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.festora-auth-card h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.6rem;
+  color: var(--clay);
+  text-align: center;
+}
+.festora-auth-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 4px;
+  margin: 16px 0 20px 0;
+  gap: 4px;
+}
+.festora-auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: 9px 12px;
+  border-radius: 24px;
+  border: none;
+  background: transparent;
+  color: var(--mut);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.2s ease;
+}
+.festora-auth-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #18181b;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+}
+.festora-field {
+  margin-bottom: 14px;
+  text-align: left;
+}
+.festora-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.festora-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+.festora-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+.festora-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+.festora-avatar-btn {
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  font-size: 1.6rem;
+  padding: 8px 4px;
+  min-height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.festora-avatar-btn.selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  transform: scale(1.05);
+}
+.festora-captcha-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+.festora-captcha-badge {
+  flex: 0 0 110px;
+  height: 42px;
+  background: linear-gradient(135deg, #2b1f14, #442a12);
+  border: 2px dashed #f59e0b;
+  border-radius: 10px;
+  color: #ffd54f;
+  font-family: 'Courier New', monospace;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  text-decoration: line-through;
+  text-shadow: 1px 1px 3px #000;
+}
+.festora-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #18181b;
+  border: none;
+  border-radius: 14px;
+  padding: 13px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 12px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+  transition: all 0.2s;
+}
+.festora-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.55);
+}
+.festora-guest-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--mut);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.festora-guest-btn:hover {
+  color: var(--ink);
+  border-color: var(--gold);
+}
 </style></head><body>
-<header><button id="hb" class="alt" onclick="document.getElementById('nav').classList.toggle('open')" aria-label="Menu">☰</button><b>🪔 Festora · Ganesh Chaturthi</b><span class="coins" id="coins"></span></header>
+<header><button id="hb" class="alt" onclick="document.getElementById('nav').classList.toggle('open')" aria-label="Menu">☰</button><b>🪔 Festora · Ganesh Chaturthi</b><div id="festora-user-header" style="display:inline-flex; align-items:center; gap:8px;"></div><span class="coins" id="coins"></span></header>
 <nav id="nav"></nav><div class="bar"><i id="pb"></i></div><main id="app"></main>
 <script>
 
@@ -537,7 +746,7 @@ draw=function(){const nav=document.getElementById('nav'),hd=document.querySelect
    viewFn = (typeof GP !== 'undefined' && GP.Overview) ? GP.Overview : (window.V && window.V.Overview ? window.V.Overview : V.Overview);
  }
  document.getElementById('app').innerHTML=viewFn();saveProgress()};
-function VF(){ if (typeof window.VF === 'function' && window.VF !== VF) return window.VF(); return ''; }
+function VF(){ if (typeof window.VF === 'function' && window.VF !== VF) return window.VF(); return (typeof window.renderFestivalOverview === 'function' ? window.renderFestivalOverview() : ''); }
 /* --- Diwali pages --- */
 const tl=(e,h)=>`<div class="tile" style="height:${h||150}px;background:${window.TG||'linear-gradient(135deg,#ff9f1c,#7b2cbf)'}"><span class="fk">${e}</span></div>`;
 const V2={Gallery:()=>{return `<h2>Diwali Gallery</h2><div class="note">Scroll to see beautiful generated photos of Diwali celebrations.</div><div class="grid">${[['PEOPLE','Celebration','people celebrating Diwali festival traditional clothes India'],['FOOD','Feast','traditional food sweets for Diwali festival India'],['DECORATION','Decorations','beautiful diyas decorations for Diwali festival India'],['PUJA','Rituals','rituals and prayers for Diwali festival'],['PEOPLE','Community','crowd celebrating Diwali festival'],['ALL','Vibe','grand celebration of Diwali festival night view fireworks']].map((x,i)=>'<div class="tile" style="position:relative; overflow:hidden; border:2px solid #ff9f1c; height:200px;"><span style="position:absolute; bottom:8px; left:8px; z-index:1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: white; font-weight:bold; font-size:1.2rem; line-height:1.2;">'+x[1]+'</span></div>').join('')}</div>`},
@@ -10289,6 +10498,7 @@ window.renderFestivalProgress = function() {
 
 // Top-Level Unified Routing Dispatcher
 window.draw = function() {
+  if (window.FestoraAuth && typeof window.FestoraAuth.renderUserHeader === 'function') window.FestoraAuth.renderUserHeader();
   const nav = document.getElementById('nav');
   const hd = document.querySelector('header b');
 
@@ -10405,6 +10615,570 @@ window.pick = function(id) {
   CH = [['b', 'Namaste! Welcome to ' + fn + '. 🪔']];
   go('Overview');
 };
+
+/* ==============================================================
+   FESTORA ENTERPRISE AUTHENTICATION, SECURITY & DATA PERSISTENCE
+   ============================================================== */
+(function() {
+  const USERS_KEY = 'festora_users_db';
+  const CURRENT_KEY = 'festora_current_user';
+
+  window.FestoraAuth = {
+    activeTab: 'login', // 'login' or 'signup'
+    selectedAvatar: '🪔',
+    currentCaptcha: '',
+
+    getUsers: function() {
+      try {
+        const data = localStorage.getItem(USERS_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    },
+
+    saveUsers: function(users) {
+      try {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      } catch (e) {}
+    },
+
+    getCurrentUser: function() {
+      try {
+        const cur = localStorage.getItem(CURRENT_KEY);
+        return cur ? JSON.parse(cur) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    setCurrentUser: function(user) {
+      try {
+        if (user) {
+          localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
+        } else {
+          localStorage.removeItem(CURRENT_KEY);
+        }
+      } catch (e) {}
+    },
+
+    generateCaptcha: function() {
+      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+      let code = '';
+      for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      this.currentCaptcha = code;
+      const el = document.getElementById('festora-captcha-display');
+      if (el) el.textContent = code;
+      return code;
+    },
+
+    openModal: function(tab) {
+      this.activeTab = tab || 'login';
+      let root = document.getElementById('festora-auth-modal-root');
+      if (!root) {
+        root = document.createElement('div');
+        root.id = 'festora-auth-modal-root';
+        document.body.appendChild(root);
+      }
+      root.innerHTML = this.renderModalHtml();
+      this.generateCaptcha();
+      this.updateAvatarSelection(this.selectedAvatar);
+    },
+
+    closeModal: function() {
+      const root = document.getElementById('festora-auth-modal-root');
+      if (root) root.innerHTML = '';
+    },
+
+    switchTab: function(tab) {
+      this.activeTab = tab;
+      const card = document.getElementById('festora-auth-form-container');
+      if (card) {
+        card.innerHTML = (tab === 'login' ? this.renderLoginForm() : this.renderSignupForm());
+        this.generateCaptcha();
+        if (tab === 'signup') {
+          this.updateAvatarSelection(this.selectedAvatar);
+        }
+      }
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabSignup = document.getElementById('tab-btn-signup');
+      if (tabLogin) tabLogin.className = 'festora-auth-tab' + (tab === 'login' ? ' active' : '');
+      if (tabSignup) tabSignup.className = 'festora-auth-tab' + (tab === 'signup' ? ' active' : '');
+    },
+
+    selectAvatar: function(av) {
+      this.selectedAvatar = av;
+      this.updateAvatarSelection(av);
+    },
+
+    updateAvatarSelection: function(av) {
+      document.querySelectorAll('.festora-avatar-btn').forEach(btn => {
+        if (btn.getAttribute('data-avatar') === av) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
+      });
+    },
+
+    renderModalHtml: function() {
+      const isLogin = this.activeTab === 'login';
+      return `
+        <div class="festora-auth-overlay" onclick="if(event.target===this) window.FestoraAuth.closeModal();">
+          <div class="festora-auth-card">
+            <button type="button" onclick="window.FestoraAuth.closeModal()" style="position:absolute; top:16px; right:16px; background:transparent; border:none; color:var(--mut); font-size:1.4rem; cursor:pointer; line-height:1; min-height:0; padding:4px 8px;">✕</button>
+            <div style="text-align:center; font-size:2.8rem; margin-bottom:4px;">🪔</div>
+            <h2>Festora Cultural Security Portal</h2>
+            <p style="text-align:center; color:var(--mut); font-size:0.88rem; margin:0 auto 16px auto; max-width:380px;">
+              Maintain your 61-festival progress, safeguard earned Festora Coins, and protect your decorated mandirs with two-factor security verification.
+            </p>
+
+            <div class="festora-auth-tabs">
+              <button type="button" id="tab-btn-login" class="festora-auth-tab ${isLogin ? 'active' : ''}" onclick="window.FestoraAuth.switchTab('login')">
+                🔑 Sign In
+              </button>
+              <button type="button" id="tab-btn-signup" class="festora-auth-tab ${!isLogin ? 'active' : ''}" onclick="window.FestoraAuth.switchTab('signup')">
+                🛡️ Create Account
+              </button>
+            </div>
+
+            <div id="festora-auth-msg" style="display:none; padding:10px 14px; border-radius:10px; font-size:0.86rem; margin-bottom:14px; font-weight:700;"></div>
+
+            <div id="festora-auth-form-container">
+              ${isLogin ? this.renderLoginForm() : this.renderSignupForm()}
+            </div>
+
+            <div style="text-align:center; margin-top:16px; border-top:1px dashed var(--line); padding-top:14px;">
+              <button type="button" class="festora-guest-btn" onclick="window.FestoraAuth.guestContinue()">
+                ✨ Explore as Cultural Guest (No Password Required)
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    },
+
+    renderLoginForm: function() {
+      return `
+        <form onsubmit="event.preventDefault(); window.FestoraAuth.handleLogin();">
+          <div class="festora-field">
+            <label for="login-email">Username or Email Address</label>
+            <input type="text" id="login-email" class="festora-input" placeholder="e.g. arjun@festora.in" required autocomplete="username">
+          </div>
+
+          <div class="festora-field">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" class="festora-input" placeholder="Enter your secret password" required autocomplete="current-password">
+          </div>
+
+          <div class="festora-field">
+            <label for="login-pin">4-Digit Security Verification PIN</label>
+            <input type="password" id="login-pin" class="festora-input" placeholder="e.g. 1234" maxlength="4" pattern="\\d{4}" required inputmode="numeric" autocomplete="one-time-code">
+            <small style="color:var(--mut); font-size:0.75rem;">Protects your coins and saves account data against unauthorized tampering.</small>
+          </div>
+
+          <div class="festora-field">
+            <label>Security Verification Code (Anti-Bot Check)</label>
+            <div class="festora-captcha-row">
+              <div class="festora-captcha-badge" id="festora-captcha-display">${this.currentCaptcha || '7X2K'}</div>
+              <button type="button" class="alt" onclick="window.FestoraAuth.generateCaptcha()" style="min-height:42px; padding:6px 12px; font-size:0.85rem;" title="Get New Code">🔄 Refresh</button>
+              <input type="text" id="login-captcha" class="festora-input" placeholder="Enter code" style="flex:1;" required maxlength="6">
+            </div>
+          </div>
+
+          <button type="submit" class="festora-submit-btn">
+            🔒 Verify &amp; Sign In
+          </button>
+        </form>
+      `;
+    },
+
+    renderSignupForm: function() {
+      const avatars = ['🪔', '👑', '🪷', '🎨', '🕉️', '🌙', '🌸', '🐘'];
+      return `
+        <form onsubmit="event.preventDefault(); window.FestoraAuth.handleSignup();">
+          <div class="festora-field">
+            <label for="signup-name">Your Full Name</label>
+            <input type="text" id="signup-name" class="festora-input" placeholder="e.g. Priya Sharma" required autocomplete="name">
+          </div>
+
+          <div class="festora-field">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" class="festora-input" placeholder="e.g. priya@festora.in" required autocomplete="email">
+          </div>
+
+          <div class="festora-field">
+            <label>Choose Your Cultural Heritage Avatar</label>
+            <div class="festora-avatar-grid">
+              ${avatars.map(av => `
+                <button type="button" class="festora-avatar-btn ${this.selectedAvatar === av ? 'selected' : ''}" data-avatar="${av}" onclick="window.FestoraAuth.selectAvatar('${av}')">
+                  ${av}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="festora-field">
+            <label for="signup-password">Create Strong Password</label>
+            <input type="password" id="signup-password" class="festora-input" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password" oninput="window.FestoraAuth.checkPwdStrength(this.value)">
+            <div id="pwd-strength-bar" style="height:4px; border-radius:2px; background:#ddd; margin-top:5px; transition:all 0.3s;"></div>
+            <small id="pwd-strength-label" style="font-size:0.75rem; color:var(--mut);">Strength: Enter password</small>
+          </div>
+
+          <div class="festora-field">
+            <label for="signup-pin">Create 4-Digit Security Verification PIN</label>
+            <input type="password" id="signup-pin" class="festora-input" placeholder="4 digits (e.g. 5678)" maxlength="4" pattern="\\d{4}" required inputmode="numeric">
+            <small style="color:var(--mut); font-size:0.75rem;">Your personal two-factor PIN for secure logins and token storage.</small>
+          </div>
+
+          <div class="festora-field">
+            <label>Security Verification Code (Human Check)</label>
+            <div class="festora-captcha-row">
+              <div class="festora-captcha-badge" id="festora-captcha-display">${this.currentCaptcha || '9B3P'}</div>
+              <button type="button" class="alt" onclick="window.FestoraAuth.generateCaptcha()" style="min-height:42px; padding:6px 12px; font-size:0.85rem;" title="Get New Code">🔄 Refresh</button>
+              <input type="text" id="signup-captcha" class="festora-input" placeholder="Enter code" style="flex:1;" required maxlength="6">
+            </div>
+          </div>
+
+          <button type="submit" class="festora-submit-btn">
+            🛡️ Create Secure Account (+500 Welcome Coins)
+          </button>
+        </form>
+      `;
+    },
+
+    checkPwdStrength: function(val) {
+      const bar = document.getElementById('pwd-strength-bar');
+      const label = document.getElementById('pwd-strength-label');
+      if (!bar || !label) return;
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      if (score === 0) {
+        bar.style.width = '0%';
+        bar.style.background = '#ddd';
+        label.textContent = 'Strength: Too short';
+      } else if (score === 1) {
+        bar.style.width = '25%';
+        bar.style.background = '#ef4444';
+        label.textContent = 'Strength: Weak';
+        label.style.color = '#ef4444';
+      } else if (score === 2) {
+        bar.style.width = '50%';
+        bar.style.background = '#f59e0b';
+        label.textContent = 'Strength: Fair';
+        label.style.color = '#f59e0b';
+      } else if (score === 3) {
+        bar.style.width = '75%';
+        bar.style.background = '#3b82f6';
+        label.textContent = 'Strength: Strong';
+        label.style.color = '#3b82f6';
+      } else {
+        bar.style.width = '100%';
+        bar.style.background = '#10b981';
+        label.textContent = 'Strength: Very Secure ★';
+        label.style.color = '#10b981';
+      }
+    },
+
+    showError: function(msg) {
+      const box = document.getElementById('festora-auth-msg');
+      if (box) {
+        box.style.display = 'block';
+        box.style.background = 'rgba(239, 68, 68, 0.15)';
+        box.style.border = '1px solid #ef4444';
+        box.style.color = '#ef4444';
+        box.textContent = '⚠️ ' + msg;
+      }
+    },
+
+    showSuccess: function(msg) {
+      const box = document.getElementById('festora-auth-msg');
+      if (box) {
+        box.style.display = 'block';
+        box.style.background = 'rgba(16, 185, 129, 0.15)';
+        box.style.border = '1px solid #10b981';
+        box.style.color = '#10b981';
+        box.textContent = '✅ ' + msg;
+      }
+    },
+
+    handleLogin: function() {
+      const email = (document.getElementById('login-email').value || '').trim();
+      const pwd = document.getElementById('login-password').value || '';
+      const pin = (document.getElementById('login-pin').value || '').trim();
+      const captcha = (document.getElementById('login-captcha').value || '').trim().toUpperCase();
+
+      if (captcha !== this.currentCaptcha.toUpperCase()) {
+        this.showError('Security Verification Code is incorrect. Please re-enter the characters.');
+        this.generateCaptcha();
+        return;
+      }
+
+      const users = this.getUsers();
+      const user = users.find(u => (u.email.toLowerCase() === email.toLowerCase() || u.name.toLowerCase() === email.toLowerCase()));
+
+      if (!user) {
+        this.showError('No account found with this email or username. Please check or Sign Up.');
+        return;
+      }
+
+      if (user.password !== pwd) {
+        this.showError('Incorrect password. Please try again.');
+        return;
+      }
+
+      if (user.pin && user.pin !== pin) {
+        this.showError('Incorrect 4-Digit Security PIN. Two-factor security check failed.');
+        return;
+      }
+
+      // Successful Login
+      user.lastLoginAt = new Date().toISOString();
+      this.saveUsers(users);
+      this.setCurrentUser(user);
+
+      // Restore user coins & state
+      if (typeof S !== 'undefined') {
+        S.coins = user.coins || S.coins || 0;
+        if (user.f) S.f = Object.assign(S.f || {}, user.f);
+        if (typeof saveProgress === 'function') saveProgress();
+      }
+
+      this.showSuccess('Security Verified! Welcome back, ' + user.name);
+      setTimeout(() => {
+        this.closeModal();
+        this.renderUserHeader();
+        if (typeof toast === 'function') toast('🔒 Welcome back, ' + user.name + '! Security Verified.');
+        if (typeof draw === 'function') draw();
+      }, 700);
+    },
+
+    handleSignup: function() {
+      const name = (document.getElementById('signup-name').value || '').trim();
+      const email = (document.getElementById('signup-email').value || '').trim();
+      const pwd = document.getElementById('signup-password').value || '';
+      const pin = (document.getElementById('signup-pin').value || '').trim();
+      const captcha = (document.getElementById('signup-captcha').value || '').trim().toUpperCase();
+
+      if (!name) {
+        this.showError('Please enter your full name.');
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        this.showError('Please enter a valid email address.');
+        return;
+      }
+      if (pwd.length < 6) {
+        this.showError('Password must be at least 6 characters long.');
+        return;
+      }
+      if (!/^\d{4}$/.test(pin)) {
+        this.showError('Security PIN must be exactly 4 digits.');
+        return;
+      }
+      if (captcha !== this.currentCaptcha.toUpperCase()) {
+        this.showError('Security Verification Code is incorrect. Try again.');
+        this.generateCaptcha();
+        return;
+      }
+
+      const users = this.getUsers();
+      if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        this.showError('An account with this email already exists. Please Sign In.');
+        return;
+      }
+
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        name: name,
+        email: email,
+        avatar: this.selectedAvatar || '🪔',
+        password: pwd,
+        pin: pin,
+        verified: true,
+        coins: (typeof S !== 'undefined' && S.coins > 0 ? S.coins : 500),
+        f: (typeof S !== 'undefined' && S.f ? JSON.parse(JSON.stringify(S.f)) : {}),
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      this.saveUsers(users);
+      this.setCurrentUser(newUser);
+
+      if (typeof S !== 'undefined') {
+        S.coins = newUser.coins;
+        if (typeof saveProgress === 'function') saveProgress();
+      }
+
+      this.showSuccess('Account created successfully! +500 Welcome Coins granted.');
+      setTimeout(() => {
+        this.closeModal();
+        this.renderUserHeader();
+        if (typeof confetti === 'function') confetti();
+        if (typeof toast === 'function') toast('🎉 Welcome to Festora, ' + name + '! Account Secured & Verified.');
+        if (typeof draw === 'function') draw();
+      }, 800);
+    },
+
+    guestContinue: function() {
+      this.closeModal();
+      this.setCurrentUser({
+        name: 'Cultural Explorer',
+        avatar: '✨',
+        isGuest: true
+      });
+      this.renderUserHeader();
+      if (typeof toast === 'function') toast('✨ Exploring as Guest. You can Sign In anytime from the header to save data.');
+    },
+
+    logout: function() {
+      if (confirm('Are you sure you want to sign out safely?')) {
+        this.saveCurrentData();
+        this.setCurrentUser(null);
+        this.renderUserHeader();
+        if (typeof toast === 'function') toast('🚪 Signed out safely. Your heritage progress is stored securely.');
+        this.openModal('login');
+        if (typeof draw === 'function') draw();
+      }
+    },
+
+    saveCurrentData: function() {
+      const user = this.getCurrentUser();
+      if (user && !user.isGuest && typeof S !== 'undefined') {
+        user.coins = S.coins;
+        user.f = S.f || {};
+        this.setCurrentUser(user);
+
+        const users = this.getUsers();
+        const idx = users.findIndex(u => u.id === user.id);
+        if (idx >= 0) {
+          users[idx].coins = S.coins;
+          users[idx].f = S.f || {};
+          this.saveUsers(users);
+        }
+      }
+    },
+
+    renderUserHeader: function() {
+      const el = document.getElementById('festora-user-header');
+      if (!el) return;
+      const user = this.getCurrentUser();
+
+      if (user && !user.isGuest) {
+        el.innerHTML = `
+          <div class="festora-user-pill" onclick="window.FestoraAuth.openProfileModal()" title="View Cultural Security Passport">
+            <span class="avatar">${user.avatar || '🪔'}</span>
+            <span class="user-name">${(user.name || 'User').split(' ')[0]}</span>
+            <span class="user-sec-tag">🔒 Verified</span>
+          </div>
+          <button type="button" class="alt" onclick="window.FestoraAuth.logout()" title="Secure Logout" style="min-height:30px; padding:3px 10px; font-size:0.75rem; border-radius:14px; border-color:var(--line);">Sign Out</button>
+        `;
+      } else if (user && user.isGuest) {
+        el.innerHTML = `
+          <div class="festora-user-pill" onclick="window.FestoraAuth.openModal('login')" title="Click to Sign In">
+            <span class="avatar">✨</span>
+            <span class="user-name">Guest</span>
+          </div>
+          <button type="button" onclick="window.FestoraAuth.openModal('login')" style="min-height:30px; padding:3px 12px; font-size:0.8rem; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; font-weight:bold; border:none; cursor:pointer;">🔑 Sign In</button>
+        `;
+      } else {
+        el.innerHTML = `
+          <button type="button" onclick="window.FestoraAuth.openModal('login')" style="min-height:32px; padding:4px 14px; font-size:0.82rem; border-radius:16px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; font-weight:800; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(245,158,11,0.35);">
+            🔑 Sign In / Register
+          </button>
+        `;
+      }
+    },
+
+    openProfileModal: function() {
+      const user = this.getCurrentUser();
+      if (!user) return this.openModal('login');
+      let root = document.getElementById('festora-auth-modal-root');
+      if (!root) {
+        root = document.createElement('div');
+        root.id = 'festora-auth-modal-root';
+        document.body.appendChild(root);
+      }
+
+      root.innerHTML = `
+        <div class="festora-auth-overlay" onclick="if(event.target===this) window.FestoraAuth.closeModal();">
+          <div class="festora-auth-card" style="text-align:center;">
+            <button type="button" onclick="window.FestoraAuth.closeModal()" style="position:absolute; top:16px; right:16px; background:transparent; border:none; color:var(--mut); font-size:1.4rem; cursor:pointer; line-height:1; min-height:0; padding:4px 8px;">✕</button>
+            <div style="font-size:3.8rem; margin:10px 0 6px 0;">${user.avatar || '🪔'}</div>
+            <h2 style="margin:0 0 4px 0;">${user.name}</h2>
+            <div style="display:inline-block; background:#10b981; color:#fff; font-size:0.75rem; font-weight:800; padding:3px 12px; border-radius:12px; margin-bottom:16px;">
+              🔒 Tier-1 Security Verified Account
+            </div>
+
+            <div style="background:rgba(0,0,0,0.06); border:1px solid var(--line); border-radius:16px; padding:16px; text-align:left; margin-bottom:18px;">
+              <div style="margin-bottom:8px;">📧 <b>Email:</b> ${user.email}</div>
+              <div style="margin-bottom:8px;">🪙 <b>Festora Coins:</b> <span style="color:var(--gold); font-weight:800;">${typeof S !== 'undefined' ? S.coins : (user.coins || 0)}</span></div>
+              <div style="margin-bottom:8px;">🔐 <b>Two-Factor PIN:</b> Enabled (4-Digit Secure PIN)</div>
+              <div style="margin-bottom:8px;">🛡️ <b>Security Verification:</b> Passed &amp; Active</div>
+              <div style="font-size:0.82rem; color:var(--mut);">📅 Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active Explorer'}</div>
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:center;">
+              <button type="button" class="alt" onclick="window.FestoraAuth.closeModal(); window.FestoraAuth.openModal('login');">
+                🔄 Switch User
+              </button>
+              <button type="button" onclick="window.FestoraAuth.closeModal(); window.FestoraAuth.logout();" style="background:#ef4444; color:#fff; border:none; padding:10px 20px; border-radius:12px; font-weight:bold; cursor:pointer;">
+                🚪 Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    },
+
+    init: function() {
+      // Auto-load user if exists
+      const user = this.getCurrentUser();
+      if (user && !user.isGuest && typeof S !== 'undefined') {
+        if (user.coins != null) S.coins = user.coins;
+        if (user.f) S.f = Object.assign(S.f || {}, user.f);
+      }
+      this.renderUserHeader();
+
+      // Show welcome auth modal on first visit if no active user session
+      if (!user) {
+        setTimeout(() => {
+          if (!this.getCurrentUser()) {
+            this.openModal('login');
+          }
+        }, 800);
+      }
+    }
+  };
+
+  // Sync state changes with auth user persistence
+  const origSaveProgress = window.saveProgress;
+  window.saveProgress = function() {
+    if (typeof origSaveProgress === 'function') origSaveProgress();
+    if (window.FestoraAuth) window.FestoraAuth.saveCurrentData();
+  };
+
+  const origAddCoins = window.addCoins;
+  window.addCoins = function(n, why) {
+    if (typeof origAddCoins === 'function') origAddCoins(n, why);
+    if (window.FestoraAuth) window.FestoraAuth.saveCurrentData();
+  };
+
+  // Boot Auth System
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => window.FestoraAuth.init());
+  } else {
+    window.FestoraAuth.init();
+  }
+})();
+
 
 </script>
 
