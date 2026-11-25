@@ -12812,15 +12812,99 @@ window.pick = function(id) {
       }
       this.renderUserHeader();
 
-      // Show welcome auth modal on first visit if no active user session
+      // Show impressive Welcome to Festora opening page on first visit if not signed in
       if (!user) {
-        setTimeout(() => {
-          if (!this.getCurrentUser()) {
-            this.openModal('login');
-          }
-        }, 800);
+        this.showWelcomePage();
       }
+    },
+
+    hideWelcomePage: function() {
+      const el = document.getElementById('festora-welcome-screen');
+      if (el) el.remove();
+    },
+
+    showWelcomePage: function() {
+      if (document.getElementById('festora-welcome-screen')) return;
+      const wrap = document.createElement('div');
+      wrap.id = 'festora-welcome-screen';
+      wrap.style.cssText = 'position:fixed;inset:0;z-index:9500;overflow-y:auto;background:radial-gradient(circle at 50% 15%, #5c280a 0%, #241207 52%, #0e0805 100%);color:#fff;font-family:Georgia,serif;padding:24px 16px;display:flex;align-items:center;justify-content:center;';
+      wrap.innerHTML = `
+        <div style="max-width:1020px;width:100%;margin:auto;text-align:center;animation:festoraFadeIn 0.4s ease-out;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,0.16);border:1px solid rgba(245,158,11,0.45);color:#fde68a;padding:6px 16px;border-radius:24px;font-size:0.86rem;font-weight:700;margin-bottom:14px;">
+            🪔 A Gamified AI-Powered Cultural Heritage Platform
+          </div>
+          <h1 style="margin:0 0 12px;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;background:linear-gradient(135deg,#fde047,#f59e0b,#fb7185);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px;">
+            Welcome to Festora
+          </h1>
+          <p style="margin:0 auto 26px;max-width:720px;font-size:1.08rem;line-height:1.6;color:#e7dcc8;">
+            Discover the living soul of India across <b>61 regional festivals</b> — explore sacred stories, perform interactive Pujas in 6 languages, play 22+ cultural mini-games, listen to traditional folk rhythms, and decorate realistic 3D festival homes.
+          </p>
+
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:30px;">
+            <button type="button" onclick="window.FestoraAuth.openModal('login')" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#18181b;font-weight:800;font-size:1.05rem;padding:13px 30px;border-radius:30px;border:none;cursor:pointer;box-shadow:0 6px 24px rgba(245,158,11,0.45);">
+              🔑 Sign In
+            </button>
+            <button type="button" onclick="window.FestoraAuth.openModal('signup')" style="background:rgba(255,255,255,0.12);color:#fff;font-weight:800;font-size:1.05rem;padding:13px 30px;border-radius:30px;border:1.5px solid #fbbf24;cursor:pointer;">
+              🛡️ Create Account (Sign Up)
+            </button>
+            <button type="button" onclick="window.FestoraAuth.guestContinue()" style="background:transparent;color:#d6c7b2;font-weight:700;font-size:0.98rem;padding:13px 22px;border-radius:30px;border:1px solid rgba(255,255,255,0.22);cursor:pointer;">
+              ✨ Explore as Guest
+            </button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;text-align:left;">
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🎪</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">61 Indian Festivals</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Filter by state &amp; region to uncover legends, traditional dishes, attire, and cultural secrets.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🎮</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">22+ Cultural Games</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Play boat races, kite battles, 3D memory, rangoli, and cooking challenges to earn Festora Coins.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🏠</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">3D Festival Home Decor</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Step into unique Three.js 3D regional rooms, place sacred ornaments, and download your decorated home.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🌐</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">AI Guides &amp; 6 Languages</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Learn stories &amp; Puja theory with Kabir &amp; Alena in English, ಕನ್ನಡ, हिन्दी, தமிழ், తెలుగు &amp; മലയാളം.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🥁</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">Traditional Rhythms</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Experience Dhol Tasha, Chenda Melam, Bihu Pepa, Thavil, and regional percussion for every festival.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:16px;">
+              <div style="font-size:1.8rem;margin-bottom:6px;">🔐</div>
+              <b style="color:#fbbf24;font-size:1.02rem;">Verified Progress &amp; Vault</b>
+              <p style="margin:5px 0 0;font-size:0.86rem;color:#d6c7b2;line-height:1.45;">Two-factor PIN &amp; security verification safeguard your coins, badges, and 3D decorated homes.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(wrap);
     }
+  };
+
+  // Hide Welcome screen when closing/completing auth or continuing as guest
+  const origCloseModal = window.FestoraAuth.closeModal.bind(window.FestoraAuth);
+  window.FestoraAuth.closeModal = function() {
+    origCloseModal();
+    if (this.getCurrentUser()) this.hideWelcomePage();
+  };
+  const origGuest = window.FestoraAuth.guestContinue.bind(window.FestoraAuth);
+  window.FestoraAuth.guestContinue = function() {
+    origGuest();
+    this.hideWelcomePage();
+  };
+  const origLogout = window.FestoraAuth.logout.bind(window.FestoraAuth);
+  window.FestoraAuth.logout = function() {
+    origLogout();
+    this.showWelcomePage();
   };
 
   // Sync state changes with auth user persistence
