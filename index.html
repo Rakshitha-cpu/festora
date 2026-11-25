@@ -12965,38 +12965,6 @@ window.pick = function(id) {
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 0 38px rgba(251,191,36,0.78), inset 0 1px 2px rgba(255,255,255,0.8);
           }
-          .fw-side-auth {
-            position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-            width: 288px; background: rgba(20, 10, 38, 0.82); backdrop-filter: blur(16px);
-            border: 1.4px solid rgba(251, 191, 36, 0.45); border-radius: 20px;
-            padding: 16px; box-shadow: 0 14px 40px rgba(0,0,0,0.65), 0 0 24px rgba(245,158,11,0.16);
-            text-align: left; z-index: 5;
-          }
-          .fw-side-tabs {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;
-            background: rgba(255,255,255,0.06); padding: 4px; border-radius: 12px;
-          }
-          .fw-side-tab {
-            padding: 7px 8px; border-radius: 9px; border: none; cursor: pointer;
-            font-family: Georgia, serif; font-size: 0.85rem; font-weight: 700;
-            background: transparent; color: #e2d5f3; transition: all 0.2s;
-          }
-          .fw-side-tab.active {
-            background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a0e05;
-          }
-          .fw-side-input {
-            width: 100%; padding: 9px 11px; border-radius: 10px; margin-bottom: 8px;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(251,191,36,0.3);
-            color: #fff; font-size: 0.86rem; outline: none;
-          }
-          .fw-side-input::placeholder { color: rgba(254,243,199,0.55); }
-          .fw-side-input:focus { border-color: #fbbf24; }
-          .fw-side-submit {
-            width: 100%; padding: 10px; border-radius: 11px; border: none; cursor: pointer;
-            background: linear-gradient(135deg, #fde047, #f59e0b); color: #1c1005;
-            font-family: Georgia, serif; font-weight: 800; font-size: 0.92rem;
-            box-shadow: 0 4px 16px rgba(245,158,11,0.35); margin-top: 2px;
-          }
           .fw-bottom-wrap {
             display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px;
           }
@@ -13029,8 +12997,7 @@ window.pick = function(id) {
             display: flex; align-items: center; justify-content: center;
           }
           @media (max-width: 1060px) {
-            .fw-hero-stage { flex-direction: column; gap: 16px; }
-            .fw-side-auth { position: static; transform: none; width: 100%; max-width: 360px; margin: 0 auto; }
+            
           }
           @media (max-width: 640px) {
             .fw-shell { padding: 14px 14px 18px; }
@@ -13080,30 +13047,7 @@ window.pick = function(id) {
               </button>
             </div>
 
-            <aside class="fw-side-auth" aria-label="Account Login and Sign Up">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                <span style="font-size:0.88rem;font-weight:700;color:#fde68a;">🪔 Member Portal</span>
-                <button type="button" id="fw-side-toggle" onclick="const b=document.getElementById('fw-side-body');const h=b.style.display==='none';b.style.display=h?'block':'none';this.textContent=h?'Hide':'Open';" style="background:transparent;border:1px solid rgba(251,191,36,0.35);color:#fde68a;border-radius:8px;padding:2px 8px;font-size:0.75rem;cursor:pointer;">Hide</button>
-              </div>
-              <div id="fw-side-body">
-                <div class="fw-side-tabs">
-                  <button type="button" id="fw-tab-login" class="fw-side-tab active" onclick="document.getElementById('fw-tab-login').classList.add('active');document.getElementById('fw-tab-signup').classList.remove('active');document.getElementById('fw-form-login').style.display='block';document.getElementById('fw-form-signup').style.display='none';">🔑 Login</button>
-                  <button type="button" id="fw-tab-signup" class="fw-side-tab" onclick="document.getElementById('fw-tab-signup').classList.add('active');document.getElementById('fw-tab-login').classList.remove('active');document.getElementById('fw-form-signup').style.display='block';document.getElementById('fw-form-login').style.display='none';">🛡️ Sign Up</button>
-                </div>
-                <form id="fw-form-login" onsubmit="event.preventDefault(); const em=document.getElementById('fw-side-login-email').value; window.FestoraAuth.openModal('login'); setTimeout(()=>{ const el=document.getElementById('login-email'); if(el&&em) el.value=em; },30);">
-                  <input id="fw-side-login-email" type="text" class="fw-side-input" placeholder="Email or Username" autocomplete="username"/>
-                  <button type="submit" class="fw-side-submit">Continue to Secure Login →</button>
-                </form>
-                <form id="fw-form-signup" style="display:none;" onsubmit="event.preventDefault(); const nm=document.getElementById('fw-side-signup-name').value; const em=document.getElementById('fw-side-signup-email').value; window.FestoraAuth.openModal('signup'); setTimeout(()=>{ const nEl=document.getElementById('signup-name'); const eEl=document.getElementById('signup-email'); if(nEl&&nm) nEl.value=nm; if(eEl&&em) eEl.value=em; },30);">
-                  <input id="fw-side-signup-name" type="text" class="fw-side-input" placeholder="Your Full Name"/>
-                  <input id="fw-side-signup-email" type="email" class="fw-side-input" placeholder="Email Address"/>
-                  <button type="submit" class="fw-side-submit">Create Verified Account →</button>
-                </form>
-                <div style="margin-top:10px;text-align:center;">
-                  <button type="button" onclick="window.FestoraAuth.guestContinue()" style="background:transparent;border:none;color:#d6c7b2;font-size:0.78rem;cursor:pointer;text-decoration:underline;">✨ Or continue as Guest</button>
-                </div>
-              </div>
-            </aside>
+            
           </div>
 
           <div class="fw-bottom-wrap">
