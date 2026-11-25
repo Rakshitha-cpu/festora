@@ -8299,24 +8299,193 @@ window.renderFestivalFood = function() {
     (it ? ('<div class="card" style="margin-top:16px;"><div style="display:flex; gap:16px; align-items:center;"><div class="tile" style="font-size:4rem; width:80px; height:80px; display:flex; align-items:center; justify-content:center;">' + it[0] + '</div><div style="flex:1;"><h3 style="margin:0 0 4px 0;">' + it[1] + '</h3><p style="margin:0 0 6px 0; font-size:0.95rem;">' + it[2] + '</p><small style="color:var(--mut);"><b>Region:</b> ' + (it[3] || g.state) + ' &nbsp;|&nbsp; <b>When Served:</b> ' + (it[4] || 'Auspicious festive feast') + '</small></div></div><button style="margin-top:14px; background:#b02a2a; color:#fff; width:100%; font-weight:700;" onclick="window.open(\'https://www.youtube.com/results?search_query=' + encodeURIComponent(g.name + ' ' + it[1] + ' recipe') + '\', \'_blank\');">▶ Watch Recipe on YouTube</button></div>') : '');
 };
 
+window.pujaState = window.pujaState || { lang: 'en-IN', thaliX: 240, thaliY: 165, petals: [] };
+
+window.mountPujaCanvas = function() {
+  const cv = document.getElementById('puja-anim-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const g = window.getFestivalData();
+  const rIdx = (typeof R !== 'undefined' && R.item != null) ? R.item : 0;
+  const it = g.rituals[rIdx] || g.rituals[0] || ['🪔', 'Sacred Puja', 'Traditional prayer offering'];
+  const W = cv.width, H = cv.height;
+  let dragging = false;
+
+  const move = (clientX, clientY) => {
+    const r = cv.getBoundingClientRect();
+    window.pujaState.thaliX = Math.max(36, Math.min(W - 36, ((clientX - r.left) / r.width) * W));
+    window.pujaState.thaliY = Math.max(36, Math.min(H - 36, ((clientY - r.top) / r.height) * H));
+    if (Math.random() < 0.35) {
+      window.pujaState.petals.push({
+        x: window.pujaState.thaliX + (Math.random() - 0.5) * 30,
+        y: window.pujaState.thaliY - 10,
+        vy: 0.8 + Math.random() * 1.4,
+        vx: (Math.random() - 0.5) * 0.8,
+        col: ['#f59e0b', '#ec4899', '#fde047', '#fb7185'][Math.floor(Math.random() * 4)]
+      });
+    }
+  };
+  cv.onmousedown = (e) => { dragging = true; move(e.clientX, e.clientY); };
+  cv.onmousemove = (e) => { if (dragging) move(e.clientX, e.clientY); };
+  window.addEventListener('mouseup', () => { dragging = false; });
+  cv.ontouchstart = (e) => { e.preventDefault(); dragging = true; if (e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY); };
+  cv.ontouchmove = (e) => { e.preventDefault(); if (dragging && e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY); };
+  cv.ontouchend = () => { dragging = false; };
+
+  const loop = (ts) => {
+    if (!document.getElementById('puja-anim-canvas')) return;
+    const t = ts / 1000;
+    const bg = ctx.createRadialGradient(W / 2, H * 0.45, 16, W / 2, H * 0.45, 220);
+    bg.addColorStop(0, (g.c1 || '#f59e0b') + '44');
+    bg.addColorStop(1, '#160e08');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    const pulse = 56 + Math.sin(t * 2.5) * 6;
+    ctx.strokeStyle = 'rgba(251,191,36,0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(W / 2, H * 0.43, pulse, 0, Math.PI * 2); ctx.stroke();
+
+    ctx.font = '56px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(g.e || '🕉️', W / 2, H * 0.42 + Math.sin(t * 2) * 4);
+    ctx.font = '32px serif';
+    ctx.fillText(it[0] || '🪔', W * 0.22, H * 0.45 + Math.cos(t * 2.2) * 7);
+    ctx.fillText((g.fl && g.fl[1]) || '🌺', W * 0.78, H * 0.45 + Math.sin(t * 2.2) * 7);
+
+    for (let s = 0; s < 5; s++) {
+      const sy = H * 0.72 - ((t * 32 + s * 22) % 90);
+      const sx = W * 0.22 + Math.sin(t * 3 + s) * 10;
+      ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0, 0.32 - (H * 0.72 - sy) / 260) + ')';
+      ctx.beginPath(); ctx.arc(sx, sy, 4 + s, 0, Math.PI * 2); ctx.fill();
+    }
+
+    window.pujaState.petals = window.pujaState.petals.filter(pt => pt.y < H + 10);
+    window.pujaState.petals.forEach(pt => {
+      pt.y += pt.vy; pt.x += pt.vx;
+      ctx.fillStyle = pt.col;
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2); ctx.fill();
+    });
+
+    const tx = window.pujaState.thaliX, ty = window.pujaState.thaliY;
+    const gThali = ctx.createRadialGradient(tx, ty, 4, tx, ty, 34);
+    gThali.addColorStop(0, 'rgba(253,224,71,0.75)');
+    gThali.addColorStop(1, 'transparent');
+    ctx.fillStyle = gThali;
+    ctx.beginPath(); ctx.arc(tx, ty, 34, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '30px serif';
+    ctx.fillText('🪔', tx, ty);
+
+    ctx.fillStyle = '#fde68a'; ctx.font = 'bold 12px Georgia';
+    ctx.fillText('✨ Drag or touch to move the Aarti Diya across the altar', W / 2, H - 14);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+};
+
+window.speakPujaText = function(text, langCode) {
+  try {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = langCode || 'en-IN';
+    u.rate = 0.96;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+};
+
 window.renderFestivalPuja = function() {
   const g = window.getFestivalData();
   const i = (typeof R !== 'undefined' && R.item != null) ? R.item : 0;
   const it = g.rituals[i] || g.rituals[0];
   if (typeof F === 'function') F().done.reg = 1;
-  if (typeof saveProgress === 'function') saveProgress();
 
-  return '<h2>How ' + g.name + ' Puja &amp; Rituals Are Performed</h2>' +
-    '<div class="note">Ceremonial sequence observed by families and temples. Tap any sacred item to inspect its spiritual significance.</div>' +
-    '<h3>Ordered Sequence of Rituals</h3>' +
-    '<ol style="line-height:1.8; margin-bottom:20px;">' +
-      g.rituals.map(r => '<li><b>' + r[1] + ':</b> ' + r[2] + '</li>').join('') +
-    '</ol>' +
-    '<h3>Explore Sacred Items &amp; Offerings</h3>' +
+  const lang = window.pujaState.lang || 'en-IN';
+  const langs = [
+    { code: 'en-IN', tl: 'en', label: '🇬🇧 English' },
+    { code: 'kn-IN', tl: 'kn', label: '🇮🇳 ಕನ್ನಡ (Kannada)' },
+    { code: 'hi-IN', tl: 'hi', label: '🇮🇳 हिन्दी (Hindi)' },
+    { code: 'ta-IN', tl: 'ta', label: '🇮🇳 தமிழ் (Tamil)' },
+    { code: 'te-IN', tl: 'te', label: '🇮🇳 తెలుగు (Telugu)' },
+    { code: 'ml-IN', tl: 'ml', label: '🇮🇳 മലയാളം (Malayalam)' }
+  ];
+  const curLang = langs.find(l => l.code === lang) || langs[0];
+
+  const theoryEn = it
+    ? (it[2] + ' Spiritual & Cultural Theory: Performing ' + it[1] + ' during ' + g.name + ' cultivates mindfulness, purifies the home atmosphere with natural herbs, lamp warmth, and fragrant incense, and reminds families of gratitude, harmony with nature, and shared community blessings.')
+    : ('Puja during ' + g.name + ' unites meditation, gratitude to nature, and sacred family traditions.');
+  const stepListEn = g.rituals.map((r, idx2) => (idx2 + 1) + '. ' + r[1] + ': ' + r[2]).join('\n');
+
+  let dispHeading = 'How ' + g.name + ' Puja & Rituals Are Performed';
+  let dispItemTitle = it ? it[1] : g.name + ' Puja';
+  let dispTheory = theoryEn;
+  let dispSteps = g.rituals.map(r => '<li><b>' + r[1] + ':</b> ' + r[2] + '</li>').join('');
+  let translatingNote = '';
+
+  if (curLang.tl !== 'en' && typeof S !== 'undefined') {
+    S.tr = S.tr || {};
+    const kHead = curLang.tl + '|puja_h|' + dispHeading;
+    const kItem = curLang.tl + '|puja_i|' + dispItemTitle;
+    const kTheory = curLang.tl + '|puja_t|' + theoryEn;
+    const kSteps = curLang.tl + '|puja_s|' + stepListEn;
+
+    if (S.tr[kHead] && S.tr[kItem] && S.tr[kTheory] && S.tr[kSteps]) {
+      dispHeading = S.tr[kHead];
+      dispItemTitle = S.tr[kItem];
+      dispTheory = S.tr[kTheory];
+      dispSteps = S.tr[kSteps].split('\n').filter(Boolean).map(line => '<li>' + line + '</li>').join('');
+    } else {
+      translatingNote = '<div class="note" style="border-left-color:#10b981;">🔄 Translating Puja theory &amp; rituals into ' + curLang.label + '...</div>';
+      if (!window._isFetchingPujaTr) {
+        window._isFetchingPujaTr = true;
+        const trReq = (txt) => fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + curLang.tl + '&dt=t&q=' + encodeURIComponent(txt))
+          .then(r => r.json())
+          .then(d => d[0].map(x => x[0]).join(''));
+        Promise.all([trReq(dispHeading), trReq(dispItemTitle), trReq(theoryEn), trReq(stepListEn)])
+          .then(([hT, iT, tT, sT]) => {
+            S.tr[kHead] = hT; S.tr[kItem] = iT; S.tr[kTheory] = tT; S.tr[kSteps] = sT;
+            if (typeof saveProgress === 'function') saveProgress();
+            window._isFetchingPujaTr = false;
+            if (typeof draw === 'function') draw();
+          })
+          .catch(() => { window._isFetchingPujaTr = false; });
+      }
+    }
+  }
+
+  setTimeout(() => { if (document.getElementById('puja-anim-canvas')) window.mountPujaCanvas(); }, 15);
+  const safeSpeak = (dispItemTitle + '. ' + dispTheory).replace(/['"\n\r]/g, ' ');
+
+  return '<h2>' + dispHeading + '</h2>' +
+    '<div class="card" style="margin-bottom:14px; border:1.5px solid var(--gold); background:rgba(201,147,26,0.08);">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">' +
+        '<div><b>🌐 Select Puja Language (6 Languages):</b></div>' +
+        '<div style="display:flex; gap:6px; flex-wrap:wrap;">' +
+          langs.map(l => '<button type="button" class="' + (l.code === lang ? '' : 'alt') + '" style="padding:6px 12px; min-height:36px; font-size:0.82rem; border-radius:18px;" onclick="window.pujaState.lang=\'' + l.code + '\'; draw();">' + l.label + '</button>').join('') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    translatingNote +
+    '<div class="card" style="margin-bottom:16px; background:#1a120b; border:1.5px solid rgba(245,158,11,0.45); text-align:center;">' +
+      '<h3 style="margin:0 0 8px; color:#f59e0b;">🪔 Interactive Animated ' + g.name + ' Puja Altar</h3>' +
+      '<canvas id="puja-anim-canvas" width="520" height="230" style="width:100%; max-width:520px; border-radius:14px; border:1px solid rgba(245,158,11,0.35); display:block; margin:0 auto; cursor:grab; touch-action:none;"></canvas>' +
+    '</div>' +
+    '<h3>📖 Ordered Sequence of Rituals (' + curLang.label + ')</h3>' +
+    '<ol style="line-height:1.85; margin-bottom:20px;">' + dispSteps + '</ol>' +
+    '<h3>✨ Explore Sacred Items &amp; Understandable Theory</h3>' +
     '<div class="row" style="margin-bottom:14px;">' +
       g.rituals.map((r, j) => '<span class="chip ' + (j === i ? 'sel' : '') + '" onclick="R.item=' + j + '; draw();">' + r[0] + ' ' + r[1] + '</span>').join('') +
     '</div>' +
-    (it ? ('<div class="card" style="margin-top:12px;"><div class="big" style="font-size:3rem; margin-bottom:8px;">' + it[0] + '</div><h3 style="margin:0 0 6px 0;">' + it[1] + '</h3><p style="margin:0 0 8px 0; font-size:1.02rem; line-height:1.6;"><b>What:</b> ' + it[2] + '</p><p style="margin:0; font-size:0.95rem; color:var(--mut);"><b>Sacred Spiritual Use:</b> Invoked with pure devotion during the rituals of ' + g.name + ' to awaken divine grace, peace, and auspicious energy in the home.</p></div>') : '');
+    (it ? (
+      '<div class="card" style="margin-top:12px; border-left:5px solid var(--gold);">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;">' +
+          '<div style="display:flex; align-items:center; gap:12px;">' +
+            '<span class="big" style="font-size:3rem; animation:in 1s infinite alternate;">' + it[0] + '</span>' +
+            '<h3 style="margin:0;">' + dispItemTitle + '</h3>' +
+          '</div>' +
+          '<button type="button" onclick="window.speakPujaText(\'' + safeSpeak + '\', \'' + curLang.code + '\')" style="padding:7px 14px; min-height:36px; border-radius:18px; font-size:0.85rem;">🔊 Listen</button>' +
+        '</div>' +
+        '<p style="margin:0; font-size:1rem; line-height:1.65;">' + dispTheory + '</p>' +
+      '</div>'
+    ) : '');
 };
 
 window.renderFestivalLearn = function() {
