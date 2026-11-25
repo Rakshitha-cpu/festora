@@ -8306,22 +8306,33 @@ window.mountPujaCanvas = function() {
   if (!cv) return;
   const ctx = cv.getContext('2d');
   const g = window.getFestivalData();
+  const fid = window.cur || 'ganesh';
   const rIdx = (typeof R !== 'undefined' && R.item != null) ? R.item : 0;
   const it = g.rituals[rIdx] || g.rituals[0] || ['🪔', 'Sacred Puja', 'Traditional prayer offering'];
   const W = cv.width, H = cv.height;
   let dragging = false;
 
+  const getSceneType = (id) => {
+    if (['chhath','devdeepawali','kumbh','rathyatra','onam','balijatra','chithirai'].includes(id)) return 'river';
+    if (['pushkar','rann','gangaur','teej','tarnetar'].includes(id)) return 'desert';
+    if (['hemis','kullu','bastar','hornbill','wangala','chapchar','sangai','medaram'].includes(id)) return 'mountain';
+    if (['diwali','uttarayan','basant','lohri','holi','lathmar','baisakhi','holamohalla','gurpurab','kilaraipur'].includes(id)) return 'sky_fire';
+    if (['eid','xmas','mahavir','buddha','rakhi','karwachauth'].includes(id)) return 'celestial';
+    return 'temple';
+  };
+  const scene = getSceneType(fid);
+
   const move = (clientX, clientY) => {
     const r = cv.getBoundingClientRect();
-    window.pujaState.thaliX = Math.max(36, Math.min(W - 36, ((clientX - r.left) / r.width) * W));
-    window.pujaState.thaliY = Math.max(36, Math.min(H - 36, ((clientY - r.top) / r.height) * H));
-    if (Math.random() < 0.35) {
+    window.pujaState.thaliX = Math.max(32, Math.min(W - 32, ((clientX - r.left) / r.width) * W));
+    window.pujaState.thaliY = Math.max(32, Math.min(H - 32, ((clientY - r.top) / r.height) * H));
+    if (Math.random() < 0.4) {
       window.pujaState.petals.push({
-        x: window.pujaState.thaliX + (Math.random() - 0.5) * 30,
-        y: window.pujaState.thaliY - 10,
-        vy: 0.8 + Math.random() * 1.4,
-        vx: (Math.random() - 0.5) * 0.8,
-        col: ['#f59e0b', '#ec4899', '#fde047', '#fb7185'][Math.floor(Math.random() * 4)]
+        x: window.pujaState.thaliX + (Math.random() - 0.5) * 28,
+        y: window.pujaState.thaliY - 8,
+        vy: 0.7 + Math.random() * 1.4,
+        vx: (Math.random() - 0.5) * 0.9,
+        col: [g.c1 || '#f59e0b', g.c2 || '#ec4899', '#fde047', '#34d399'][Math.floor(Math.random() * 4)]
       });
     }
   };
@@ -8335,29 +8346,127 @@ window.mountPujaCanvas = function() {
   const loop = (ts) => {
     if (!document.getElementById('puja-anim-canvas')) return;
     const t = ts / 1000;
-    const bg = ctx.createRadialGradient(W / 2, H * 0.45, 16, W / 2, H * 0.45, 220);
-    bg.addColorStop(0, (g.c1 || '#f59e0b') + '44');
-    bg.addColorStop(1, '#160e08');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    const c1 = g.c1 || '#f59e0b', c2 = g.c2 || '#b45309';
 
-    const pulse = 56 + Math.sin(t * 2.5) * 6;
-    ctx.strokeStyle = 'rgba(251,191,36,0.35)';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(W / 2, H * 0.43, pulse, 0, Math.PI * 2); ctx.stroke();
-
-    ctx.font = '56px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(g.e || '🕉️', W / 2, H * 0.42 + Math.sin(t * 2) * 4);
-    ctx.font = '32px serif';
-    ctx.fillText(it[0] || '🪔', W * 0.22, H * 0.45 + Math.cos(t * 2.2) * 7);
-    ctx.fillText((g.fl && g.fl[1]) || '🌺', W * 0.78, H * 0.45 + Math.sin(t * 2.2) * 7);
-
-    for (let s = 0; s < 5; s++) {
-      const sy = H * 0.72 - ((t * 32 + s * 22) % 90);
-      const sx = W * 0.22 + Math.sin(t * 3 + s) * 10;
-      ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0, 0.32 - (H * 0.72 - sy) / 260) + ')';
-      ctx.beginPath(); ctx.arc(sx, sy, 4 + s, 0, Math.PI * 2); ctx.fill();
+    if (scene === 'river') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#1e1b4b'); sky.addColorStop(0.5, '#9a3412'); sky.addColorStop(1, '#0c4a6e');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      // Rising/Setting Sun reflection
+      ctx.fillStyle = 'rgba(253,224,71,0.75)';
+      ctx.beginPath(); ctx.arc(W / 2, H * 0.42, 32, 0, Math.PI * 2); ctx.fill();
+      // Shimmering River Waves
+      ctx.fillStyle = '#0369a1'; ctx.fillRect(0, H * 0.52, W, H * 0.48);
+      for (let w = 0; w < 5; w++) {
+        ctx.strokeStyle = 'rgba(186,230,253,0.35)'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let x = 0; x <= W; x += 20) {
+          const y = H * 0.58 + w * 18 + Math.sin(t * 2 + x * 0.04 + w) * 4;
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      // Drifting River Diyas
+      for (let d = 0; d < 4; d++) {
+        const dx = ((t * 22 + d * 135) % (W + 40)) - 20;
+        const dy = H * 0.64 + (d % 2) * 26 + Math.sin(t * 2 + d) * 3;
+        ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.fillText('🪔', dx, dy);
+      }
+      ctx.font = '44px serif'; ctx.textAlign = 'center'; ctx.fillText(g.e || '🌅', W / 2, H * 0.42);
+    } else if (scene === 'desert') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#0f172a'); sky.addColorStop(0.65, '#7c2d12'); sky.addColorStop(1, '#b45309');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      for (let s2 = 0; s2 < 18; s2++) {
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + 0.5 * Math.sin(t * 2 + s2)) + ')';
+        ctx.beginPath(); ctx.arc((s2 * 67) % W, (s2 * 31) % (H * 0.55), 1.6, 0, Math.PI * 2); ctx.fill();
+      }
+      // Desert Dunes
+      ctx.fillStyle = '#92400e';
+      ctx.beginPath(); ctx.moveTo(0, H); ctx.quadraticCurveTo(W * 0.25, H * 0.55, W * 0.55, H * 0.72); ctx.quadraticCurveTo(W * 0.8, H * 0.58, W, H * 0.75); ctx.lineTo(W, H); ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath(); ctx.moveTo(0, H); ctx.quadraticCurveTo(W * 0.4, H * 0.68, W, H * 0.82); ctx.lineTo(W, H); ctx.fill();
+      // Oasis Lake Reflection
+      ctx.fillStyle = 'rgba(14,165,233,0.45)';
+      ctx.beginPath(); ctx.ellipse(W * 0.5, H * 0.8, 120, 18, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '46px serif'; ctx.textAlign = 'center';
+      ctx.fillText(g.e || '🐪', W * 0.5 + Math.sin(t) * 14, H * 0.62);
+      ctx.font = '26px serif';
+      ctx.fillText(it[0] || '🏺', W * 0.2, H * 0.72);
+      ctx.fillText('⛺', W * 0.82, H * 0.68);
+    } else if (scene === 'mountain') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#0284c7'); sky.addColorStop(0.65, '#38bdf8'); sky.addColorStop(1, '#1e293b');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      // Mountain Peaks
+      ctx.fillStyle = '#334155';
+      ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(W * 0.25, H * 0.3); ctx.lineTo(W * 0.5, H * 0.62); ctx.lineTo(W * 0.75, H * 0.25); ctx.lineTo(W, H); ctx.fill();
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.moveTo(W * 0.25, H * 0.3); ctx.lineTo(W * 0.18, H * 0.43); ctx.lineTo(W * 0.32, H * 0.43); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(W * 0.75, H * 0.25); ctx.lineTo(W * 0.67, H * 0.4); ctx.lineTo(W * 0.83, H * 0.4); ctx.fill();
+      // Fluttering Prayer Flags
+      const flagCols = ['#3b82f6', '#ffffff', '#ef4444', '#22c55e', '#eab308'];
+      for (let f = 0; f < 10; f++) {
+        ctx.fillStyle = flagCols[f % 5];
+        const fx = 30 + f * 48, fy = 28 + Math.sin(t * 4 + f) * 5 + Math.sin((f / 9) * Math.PI) * 18;
+        ctx.fillRect(fx, fy, 24, 16);
+      }
+      ctx.font = '48px serif'; ctx.textAlign = 'center';
+      ctx.fillText(g.e || '🏔️', W / 2, H * 0.68 + Math.sin(t * 2) * 4);
+      ctx.font = '26px serif'; ctx.fillText(it[0] || '🕯️', W * 0.25, H * 0.78); ctx.fillText('☸️', W * 0.75, H * 0.78);
+    } else if (scene === 'sky_fire') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#09090b'); sky.addColorStop(0.6, '#3b0764'); sky.addColorStop(1, '#451a03');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      // Animated Fireworks / Sparks
+      for (let fw = 0; fw < 3; fw++) {
+        const cx = W * (0.22 + fw * 0.28), cy = H * (0.28 + (fw % 2) * 0.14);
+        const rad = ((t * 35 + fw * 18) % 42);
+        ctx.strokeStyle = [c1, '#ec4899', '#fde047'][fw];
+        for (let r2 = 0; r2 < 8; r2++) {
+          const a = (r2 / 8) * Math.PI * 2;
+          ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * rad * 0.4, cy + Math.sin(a) * rad * 0.4);
+          ctx.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad); ctx.stroke();
+        }
+      }
+      ctx.font = '50px serif'; ctx.textAlign = 'center';
+      ctx.fillText(g.e || '🪔', W / 2, H * 0.62 + Math.sin(t * 2) * 4);
+      for (let d = 0; d < 5; d++) {
+        ctx.font = '22px serif'; ctx.fillText('🪔', 70 + d * 95, H * 0.84);
+      }
+    } else if (scene === 'celestial') {
+      const sky = ctx.createRadialGradient(W / 2, H * 0.35, 20, W / 2, H * 0.35, 250);
+      sky.addColorStop(0, c1 + '55'); sky.addColorStop(1, '#020617');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      for (let s2 = 0; s2 < 22; s2++) {
+        ctx.fillStyle = 'rgba(253,224,71,' + (0.35 + 0.55 * Math.sin(t * 2.5 + s2)) + ')';
+        ctx.beginPath(); ctx.arc((s2 * 59) % W, (s2 * 41) % (H * 0.85), 2, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(W / 2, H * 0.45, 70 + Math.sin(t * 2) * 5, 0, Math.PI * 2); ctx.stroke();
+      ctx.font = '54px serif'; ctx.textAlign = 'center';
+      ctx.fillText(g.e || '🌙', W / 2, H * 0.45);
+      ctx.font = '28px serif'; ctx.fillText(it[0] || '🕯️', W * 0.25, H * 0.65); ctx.fillText('✨', W * 0.75, H * 0.65);
+    } else {
+      // Temple Gopuram & Pillars
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#2c1208'); bg.addColorStop(1, '#120804');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      // Carved Temple Pillars
+      ctx.fillStyle = '#5c2d16'; ctx.fillRect(28, 20, 26, H - 40); ctx.fillRect(W - 54, 20, 26, H - 40);
+      // Toran Arch
+      ctx.strokeStyle = c1; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(W / 2, 95, 170, Math.PI, 0); ctx.stroke();
+      // Swinging Hanging Bells
+      ctx.font = '24px serif'; ctx.textAlign = 'center';
+      ctx.fillText('🔔', W * 0.26 + Math.sin(t * 3) * 4, 52);
+      ctx.fillText('🔔', W * 0.74 - Math.sin(t * 3) * 4, 52);
+      ctx.font = '56px serif';
+      ctx.fillText(g.e || '🕉️', W / 2, H * 0.48 + Math.sin(t * 2) * 3);
+      ctx.font = '30px serif'; ctx.fillText(it[0] || '🌺', W * 0.26, H * 0.68); ctx.fillText((g.fl && g.fl[1]) || '🌺', W * 0.74, H * 0.68);
     }
 
+    // Falling Petals (interactive across all scenes)
     window.pujaState.petals = window.pujaState.petals.filter(pt => pt.y < H + 10);
     window.pujaState.petals.forEach(pt => {
       pt.y += pt.vy; pt.x += pt.vx;
@@ -8365,17 +8474,18 @@ window.mountPujaCanvas = function() {
       ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2); ctx.fill();
     });
 
+    // Movable Glowing Offering / Diya
     const tx = window.pujaState.thaliX, ty = window.pujaState.thaliY;
-    const gThali = ctx.createRadialGradient(tx, ty, 4, tx, ty, 34);
+    const gThali = ctx.createRadialGradient(tx, ty, 4, tx, ty, 32);
     gThali.addColorStop(0, 'rgba(253,224,71,0.75)');
     gThali.addColorStop(1, 'transparent');
     ctx.fillStyle = gThali;
-    ctx.beginPath(); ctx.arc(tx, ty, 34, 0, Math.PI * 2); ctx.fill();
-    ctx.font = '30px serif';
-    ctx.fillText('🪔', tx, ty);
+    ctx.beginPath(); ctx.arc(tx, ty, 32, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(it[0] || '🪔', tx, ty);
 
-    ctx.fillStyle = '#fde68a'; ctx.font = 'bold 12px Georgia';
-    ctx.fillText('✨ Drag or touch to move the Aarti Diya across the altar', W / 2, H - 14);
+    ctx.fillStyle = '#fde68a'; ctx.font = 'bold 11.5px Georgia';
+    ctx.fillText('✨ Drag to move ' + (it[1] || 'sacred offering') + ' across ' + g.name + ' scene', W / 2, H - 12);
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
