@@ -290,43 +290,61 @@
   }
 
   // ---- PROCEDURAL 3D PROP GEOMETRY BUILDER ----
-  function buildPropMesh(THREE, shape, colorHex, isGhost) {
+  function buildPropMesh(THREE, shape, colorHex, isGhost, festId) {
     const grp = new THREE.Group();
     const matMain = isGhost
-      ? new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.7, transparent: true, opacity: 0.28, wireframe: false })
-      : new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.35, metalness: (shape === 'lamp' || shape === 'kalash' || shape === 'lantern') ? 0.75 : 0.2 });
-    const goldMat = isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#fbbf24', roughness: 0.25, metalness: 0.85 });
+      ? new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.72, transparent: true, opacity: 0.3 })
+      : new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.35, metalness: (shape === 'lamp' || shape === 'kalash' || shape === 'lantern') ? 0.75 : 0.22 });
+    const goldMat = isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#fbbf24', roughness: 0.24, metalness: 0.85 });
+    const darkMat = isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#5c2d16', roughness: 0.85 });
+    const greenMat = isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#16a34a', roughness: 0.65 });
     const flameMat = isGhost ? matMain : new THREE.MeshBasicMaterial({ color: '#fef08a' });
 
     if (shape === 'lamp' || shape === 'kalash' || shape === 'pot') {
       const pts = shape === 'lamp'
         ? [new THREE.Vector2(0, 0), new THREE.Vector2(0.24, 0), new THREE.Vector2(0.06, 0.2), new THREE.Vector2(0.05, 0.7), new THREE.Vector2(0.22, 0.78), new THREE.Vector2(0.04, 0.9), new THREE.Vector2(0, 0.95)]
-        : [new THREE.Vector2(0, 0), new THREE.Vector2(0.22, 0), new THREE.Vector2(0.32, 0.28), new THREE.Vector2(0.18, 0.55), new THREE.Vector2(0.24, 0.65), new THREE.Vector2(0, 0.65)];
+        : [new THREE.Vector2(0, 0), new THREE.Vector2(0.22, 0), new THREE.Vector2(0.34, 0.28), new THREE.Vector2(0.18, 0.56), new THREE.Vector2(0.25, 0.66), new THREE.Vector2(0, 0.66)];
       const lathe = new THREE.Mesh(new THREE.LatheGeometry(pts, 20), matMain);
-      lathe.castShadow = !isGhost;
       grp.add(lathe);
       if (shape === 'lamp' && !isGhost) {
         const fl = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.16, 10), flameMat);
-        fl.position.y = 1.02;
-        fl.userData.isFlame = true;
-        grp.add(fl);
+        fl.position.y = 1.02; fl.userData.isFlame = true; grp.add(fl);
       }
       if (shape === 'kalash') {
-        const coco = new THREE.Mesh(new THREE.SphereGeometry(0.14, 14, 12), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.85 }));
-        coco.position.y = 0.72;
-        grp.add(coco);
+        const coco = new THREE.Mesh(new THREE.SphereGeometry(0.14, 14, 12), darkMat);
+        coco.position.y = 0.72; grp.add(coco);
+        for (let li = 0; li < 5; li++) {
+          const leaf = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.24, 6), greenMat);
+          const a = (li / 5) * Math.PI * 2;
+          leaf.position.set(Math.cos(a) * 0.18, 0.68, Math.sin(a) * 0.18);
+          leaf.rotation.z = -Math.cos(a) * 0.6; leaf.rotation.x = Math.sin(a) * 0.6;
+          grp.add(leaf);
+        }
+      }
+      if (shape === 'pot' && festId === 'pongal' && !isGhost) {
+        const foam = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), new THREE.MeshStandardMaterial({ color: '#fffbeb', roughness: 0.4 }));
+        foam.scale.set(1, 0.45, 1); foam.position.y = 0.7; grp.add(foam);
+        [-0.36, 0.36].forEach(sx => {
+          const cane = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 1.35, 8), greenMat);
+          cane.position.set(sx, 0.65, -0.05); cane.rotation.z = sx > 0 ? 0.12 : -0.12;
+          grp.add(cane);
+        });
       }
     } else if (shape === 'rangoli') {
-      const disc1 = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.05, 0.03, 32), matMain);
-      const disc2 = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.045, 24), goldMat);
-      const disc3 = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.06, 16), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#ec4899', roughness: 0.5 }));
-      grp.add(disc1, disc2, disc3);
+      const rings = festId === 'onam'
+        ? [['#ec4899', 1.15], ['#f59e0b', 0.92], ['#fef08a', 0.7], ['#16a34a', 0.48], ['#ffffff', 0.26]]
+        : [[colorHex, 1.05], ['#fbbf24', 0.72], ['#ec4899', 0.42], ['#fffbeb', 0.18]];
+      rings.forEach((rg, idx) => {
+        const d = new THREE.Mesh(new THREE.CylinderGeometry(rg[1], rg[1], 0.025 + idx * 0.012, 28), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: rg[0], roughness: 0.45 }));
+        grp.add(d);
+      });
     } else if (shape === 'toran') {
-      for (let i = -4; i <= 4; i++) {
-        const x = i * 0.34;
-        const y = -0.18 * Math.cos((i / 4) * 1.1);
-        const bead = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 10), i % 2 === 0 ? matMain : goldMat);
+      for (let i = -5; i <= 5; i++) {
+        const x = i * 0.3;
+        const y = -0.22 * Math.cos((i / 5) * 1.15);
+        const bead = new THREE.Mesh(i % 2 === 0 ? new THREE.ConeGeometry(0.08, 0.22, 6) : new THREE.SphereGeometry(0.1, 12, 10), i % 2 === 0 ? greenMat : goldMat);
         bead.position.set(x, y, 0);
+        if (i % 2 === 0) bead.rotation.x = Math.PI;
         grp.add(bead);
       }
     } else if (shape === 'lantern') {
@@ -336,47 +354,120 @@
       const core = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 10), flameMat);
       grp.add(cord, body, core);
     } else if (shape === 'tree') {
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.4, 10), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.9 }));
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.4, 10), darkMat);
       trunk.position.y = 0.2;
-      const c1 = new THREE.Mesh(new THREE.ConeGeometry(0.65, 0.8, 16), matMain); c1.position.y = 0.7;
-      const c2 = new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.7, 16), matMain); c2.position.y = 1.15;
-      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), goldMat); star.position.y = 1.56;
-      grp.add(trunk, c1, c2, star);
+      const c1 = new THREE.Mesh(new THREE.ConeGeometry(0.68, 0.85, 16), matMain); c1.position.y = 0.72;
+      const c2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.72, 16), matMain); c2.position.y = 1.18;
+      const c3 = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.55, 16), matMain); c3.position.y = 1.58;
+      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), goldMat); star.position.y = 1.92;
+      grp.add(trunk, c1, c2, c3, star);
+      if (!isGhost) {
+        const bCols = ['#ef4444', '#fbbf24', '#38bdf8', '#f472b6'];
+        for (let bi = 0; bi < 8; bi++) {
+          const ba = (bi / 8) * Math.PI * 2;
+          const b = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), new THREE.MeshStandardMaterial({ color: bCols[bi % 4], roughness: 0.2, metalness: 0.6 }));
+          b.position.set(Math.cos(ba) * 0.42, 0.65 + (bi % 3) * 0.34, Math.sin(ba) * 0.42);
+          grp.add(b);
+        }
+      }
     } else if (shape === 'bonfire') {
       for (let i = 0; i < 4; i++) {
-        const log = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.8, 8), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#5c2d16', roughness: 0.9 }));
-        log.position.y = 0.08;
-        log.rotation.z = Math.PI / 2.2;
-        log.rotation.y = (i * Math.PI) / 4;
+        const log = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.8, 8), darkMat);
+        log.position.y = 0.08; log.rotation.z = Math.PI / 2.2; log.rotation.y = (i * Math.PI) / 4;
         grp.add(log);
       }
       const fl = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.65, 12), flameMat);
-      fl.position.y = 0.42; fl.userData.isFlame = true;
-      grp.add(fl);
+      fl.position.y = 0.42; fl.userData.isFlame = true; grp.add(fl);
     } else if (shape === 'drum') {
-      const d = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.2, 0.52, 18), matMain);
-      d.rotation.z = Math.PI / 2; d.position.y = 0.28;
-      grp.add(d);
+      const d = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.2, 0.54, 18), matMain);
+      d.rotation.z = Math.PI / 2; d.position.y = 0.28; grp.add(d);
     } else if (shape === 'feast') {
-      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.36, 0.04, 24), goldMat);
+      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.38, 0.04, 24), goldMat);
       grp.add(plate);
-      for (let k = 0; k < 5; k++) {
-        const a = (k / 5) * Math.PI * 2;
-        const sweet = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), matMain);
-        sweet.position.set(Math.cos(a) * 0.18, 0.08, Math.sin(a) * 0.18);
+      for (let k = 0; k < 6; k++) {
+        const a = (k / 6) * Math.PI * 2;
+        const sweet = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), k % 2 === 0 ? matMain : goldMat);
+        sweet.position.set(Math.cos(a) * 0.2, 0.08, Math.sin(a) * 0.2);
         grp.add(sweet);
       }
+    } else if (shape === 'swing') {
+      [-0.45, 0.45].forEach(sx => {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.3, 8), darkMat);
+        post.position.set(sx, 0.65, 0); grp.add(post);
+      });
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.08, 0.32), goldMat);
+      seat.position.set(0, 0.35, 0); grp.add(seat);
     } else {
-      // 'idol', 'swing', 'flag' - sculpted pedestal + sacred form
-      const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 0.22, 16), goldMat);
-      ped.position.y = 0.11;
-      const body = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.62, 16), matMain);
-      body.position.y = 0.52;
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 14), matMain);
-      head.position.y = 0.92;
-      const halo = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.03, 8, 24), goldMat);
-      halo.position.y = 0.92;
-      grp.add(ped, body, head, halo);
+      // Sculpted Festival-Specific Hero Models
+      const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 0.22, 18), goldMat);
+      ped.position.y = 0.11; grp.add(ped);
+
+      if (festId === 'ganesh') {
+        const belly = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 14), matMain); belly.position.y = 0.48;
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 14), matMain); head.position.y = 0.86;
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.035, 0.32, 10), matMain);
+        trunk.position.set(0, 0.72, 0.2); trunk.rotation.x = 0.55;
+        const earL = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.04, 12), matMain);
+        earL.rotation.z = Math.PI / 2; earL.position.set(-0.22, 0.88, 0);
+        const earR = earL.clone(); earR.position.x = 0.22;
+        const crown = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.26, 12), goldMat); crown.position.y = 1.12;
+        const halo = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.03, 8, 24), goldMat); halo.position.y = 0.88;
+        grp.add(belly, head, trunk, earL, earR, crown, halo);
+      } else if (festId === 'hampi') {
+        const base = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.24, 0.62), matMain); base.position.y = 0.34;
+        const shrine = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.48, 0.46), matMain); shrine.position.y = 0.68;
+        const tower = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.42, 4), goldMat); tower.rotation.y = Math.PI / 4; tower.position.y = 1.12;
+        grp.add(base, shrine, tower);
+        [[-0.4, -0.18], [0.4, -0.18], [-0.4, 0.18], [0.4, 0.18]].forEach(wp => {
+          const wh = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.06, 14), goldMat);
+          wh.rotation.z = Math.PI / 2; wh.position.set(wp[0], 0.24, wp[1]); grp.add(wh);
+        });
+      } else if (festId === 'varamahalakshmi' || festId === 'gowrihabba') {
+        const skirt = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.56, 18), matMain); skirt.position.y = 0.5;
+        const potNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.17, 0.16, 14), goldMat); potNeck.position.y = 0.82;
+        const mukha = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 14), goldMat); mukha.position.y = 1.0;
+        const crown = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.22, 12), goldMat); crown.position.y = 1.22;
+        const garland = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.045, 8, 20), isGhost ? matMain : new THREE.MeshStandardMaterial({ color: '#f472b6', roughness: 0.6 }));
+        garland.position.set(0, 0.78, 0.12); garland.rotation.x = 0.35;
+        grp.add(skirt, potNeck, mukha, crown, garland);
+      } else if (festId === 'dasara') {
+        for (let st = 0; st < 4; st++) {
+          const step = new THREE.Mesh(new THREE.BoxGeometry(0.86 - st * 0.14, 0.16, 0.45 - st * 0.05), st % 2 === 0 ? matMain : goldMat);
+          step.position.set(0, 0.28 + st * 0.18, -0.05 * st);
+          grp.add(step);
+          const doll = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.18, 10), goldMat);
+          doll.position.set((st - 1.5) * 0.15, 0.44 + st * 0.18, -0.05 * st);
+          grp.add(doll);
+        }
+      } else if (festId === 'eid') {
+        const archL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.9, 10), goldMat); archL.position.set(-0.32, 0.65, 0);
+        const archR = archL.clone(); archR.position.x = 0.32;
+        const archTop = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.06, 10, 20, Math.PI), goldMat); archTop.position.set(0, 1.05, 0);
+        const cres = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.035, 8, 20, Math.PI * 1.4), matMain); cres.position.set(0, 0.85, 0); cres.rotation.z = 0.5;
+        grp.add(archL, archR, archTop, cres);
+      } else if (festId === 'shivaratri') {
+        const yoni = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.28, 0.16, 18), darkMat); yoni.position.y = 0.3;
+        const lingam = new THREE.Mesh(new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.14, 0.32, 8, 16) : new THREE.CylinderGeometry(0.14, 0.15, 0.46, 16), matMain);
+        lingam.position.y = 0.58;
+        const tri = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.95, 8), goldMat); tri.position.set(0.35, 0.68, 0);
+        grp.add(yoni, lingam, tri);
+      } else if (festId === 'durga') {
+        const body = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.68, 16), matMain); body.position.y = 0.56;
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 12), goldMat); head.position.y = 0.98;
+        const arch = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.04, 8, 24, Math.PI), goldMat); arch.position.y = 0.72;
+        const crown = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.22, 10), goldMat); crown.position.y = 1.2;
+        grp.add(body, head, arch, crown);
+      } else if (festId === 'uttarayan' || festId === 'basant') {
+        const kite = new THREE.Mesh(new THREE.OctahedronGeometry(0.36, 0), matMain);
+        kite.scale.set(1, 1.25, 0.15); kite.position.y = 0.82; kite.rotation.z = 0.25;
+        grp.add(kite);
+      } else {
+        const body = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.64, 16), matMain); body.position.y = 0.54;
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 14), matMain); head.position.y = 0.95;
+        const crown = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.18, 12), goldMat); crown.position.y = 1.16;
+        const halo = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.03, 8, 24), goldMat); halo.position.y = 0.95;
+        grp.add(body, head, crown, halo);
+      }
     }
     grp.traverse(obj => { if (obj.isMesh && !isGhost) { obj.castShadow = true; obj.receiveShadow = true; } });
     return grp;
@@ -650,7 +741,7 @@
         const isPlaced = store.placed.includes(item.id);
         if (ghostMeshes[item.id]) ghostMeshes[item.id].visible = !isPlaced;
         if (isPlaced && !placedMeshes[item.id]) {
-          const mesh = buildPropMesh(THREE, item.shape, item.color, false);
+          const mesh = buildPropMesh(THREE, item.shape, item.color, false, festId);
           mesh.position.set(item.slot[0], item.slot[1], item.slot[2]);
           mesh.scale.setScalar(item.scale || 1);
           mesh.traverse(o => { if (o.userData && o.userData.isFlame) flames.push(o); });
@@ -661,7 +752,7 @@
     }
 
     data.items.forEach(item => {
-      const ghost = buildPropMesh(THREE, item.shape, '#38bdf8', true);
+      const ghost = buildPropMesh(THREE, item.shape, '#38bdf8', true, festId);
       ghost.position.set(item.slot[0], item.slot[1], item.slot[2]);
       ghost.scale.setScalar(item.scale || 1);
       ghost.userData = { slotItemId: item.id, slotName: item.name };
