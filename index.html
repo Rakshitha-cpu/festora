@@ -12146,6 +12146,25 @@ window.renderFestivalProgress = function() {
 };
 
 // Top-Level Unified Routing Dispatcher
+window._pageHistory = window._pageHistory || [];
+window.festoraBack = function() {
+  if (window._pageHistory.length > 1) {
+    window._pageHistory.pop();
+    const prev = window._pageHistory[window._pageHistory.length - 1];
+    if (prev && prev.cur && prev.cur !== window.cur) {
+      window.cur = prev.cur;
+      try { cur = prev.cur; } catch (e) {}
+      if (typeof applyTheme === 'function') applyTheme(prev.cur);
+    }
+    if (prev && prev.page && typeof window.go === 'function') {
+      window._skipHistPush = true;
+      window.go(prev.page);
+      return;
+    }
+  }
+  if (typeof window.go === 'function') window.go(page === 'Overview' ? 'Festivals' : 'Overview');
+};
+
 window.draw = function() {
   if (window.FestoraAuth && typeof window.FestoraAuth.renderUserHeader === 'function') window.FestoraAuth.renderUserHeader();
   const nav = document.getElementById('nav');
@@ -12159,7 +12178,11 @@ window.draw = function() {
     const pb = document.getElementById('pb');
     if (pb) pb.style.width = '0%';
     const app = document.getElementById('app');
-    if (app) app.innerHTML = (typeof window.VF === 'function' ? window.VF() : '');
+    const welcomeBar = '<div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">' +
+      '<button type="button" class="alt" onclick="if(window.FestoraAuth)window.FestoraAuth.showWelcomePage();" style="font-weight:700; border-radius:20px; padding:6px 16px; cursor:pointer;">← 🏠 Welcome to Festora</button>' +
+      '<small style="color:var(--mut);">Select any of 61 festivals to begin your journey</small>' +
+    '</div>';
+    if (app) app.innerHTML = welcomeBar + (typeof window.VF === 'function' ? window.VF() : '');
     return;
   }
 
@@ -12182,17 +12205,20 @@ window.draw = function() {
     nav.innerHTML = allPages.map(p => '<button class="' + (p === page || (p === 'Games' && /^G\d$/.test(page)) ? 'on' : '') + '" onclick="go(\'' + p + '\')">' + (p === 'Festivals' ? '🎪 Festivals' : p) + '</button>').join('');
   }
 
-  // Single Clean Breadcrumb / Back Navigation Bar
+  // Universal Back & Return Navigation Bar on Every Page
   let backBtnHtml = '';
   if (/^G\d$/.test(page)) {
-    backBtnHtml = '<button class="alt" onclick="go(\'Games\')" style="font-weight:700; border-radius:20px; padding:6px 16px; cursor:pointer; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); color:#f59e0b;">← 🎮 Back to ' + g.name + ' Games</button>';
-  } else if (page === 'Games') {
-    backBtnHtml = '<button class="alt" onclick="go(\'Overview\')" style="font-weight:700; border-radius:20px; padding:6px 16px; cursor:pointer; background:rgba(255,255,255,0.08);">← Back to ' + g.name + '</button>';
-  } else if (page !== 'Festivals') {
+    backBtnHtml = '<button class="alt" onclick="go(\'Games\')" style="font-weight:700; border-radius:20px; padding:6px 16px; cursor:pointer; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); color:#f59e0b;">← 🎮 Back to ' + g.name + ' Games</button>' +
+      '<button class="alt" onclick="go(\'Overview\')" style="font-weight:700; border-radius:20px; padding:6px 14px; cursor:pointer;">🏠 ' + g.name + ' Overview</button>';
+  } else if (page === 'Overview') {
     backBtnHtml = '<button class="alt" onclick="go(\'Festivals\')" style="font-weight:700; border-radius:20px; padding:6px 16px; cursor:pointer; background:rgba(255,255,255,0.08);">← 🎪 Back to All Festivals (61)</button>';
+  } else {
+    backBtnHtml = '<button class="alt" onclick="window.festoraBack()" style="font-weight:700; border-radius:20px; padding:6px 14px; cursor:pointer; background:rgba(245,158,11,0.12); border-color:var(--gold);">← Back</button>' +
+      '<button class="alt" onclick="go(\'Overview\')" style="font-weight:700; border-radius:20px; padding:6px 14px; cursor:pointer;">🏠 ' + g.name + ' Overview</button>' +
+      '<button class="alt" onclick="go(\'Festivals\')" style="font-weight:700; border-radius:20px; padding:6px 14px; cursor:pointer;">🎪 All Festivals</button>';
   }
 
-  const barHtml = (page === 'Festivals') ? '' : (
+  const barHtml = (
     '<div class="row" style="margin-bottom:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">' +
       '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">' +
         backBtnHtml +
@@ -12240,8 +12266,25 @@ window.draw = function() {
     viewHtml = window.renderFestivalOverview ? window.renderFestivalOverview() : '';
   }
 
+  // Connected Journey Footer Bar on Every Subpage
+  const journey = ['Overview','Story','Family','Celebrate','Puja','Food','Gallery','Watch','Learn','Quiz','Games','Shop','My Home','Progress'];
+  const jIdx = journey.indexOf(page);
+  const prevP = jIdx > 0 ? journey[jIdx - 1] : null;
+  const nextP = (jIdx >= 0 && jIdx < journey.length - 1) ? journey[jIdx + 1] : null;
+  const connFooterHtml = (page === 'Festivals' || /^G\d$/.test(page)) ? '' : (
+    '<div class="card" style="margin-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:2px solid var(--gold);">' +
+      '<div style="display:flex; gap:8px; flex-wrap:wrap;">' +
+        (prevP ? '<button type="button" class="alt" onclick="go(\'' + prevP + '\')" style="border-radius:18px; padding:8px 16px;">← ' + prevP + '</button>' : '<button type="button" class="alt" onclick="go(\'Festivals\')" style="border-radius:18px; padding:8px 16px;">← 🎪 All Festivals</button>') +
+        (page !== 'Overview' ? '<button type="button" class="alt" onclick="go(\'Overview\')" style="border-radius:18px; padding:8px 16px;">🏠 ' + g.name + ' Overview</button>' : '') +
+      '</div>' +
+      '<div style="display:flex; gap:8px; flex-wrap:wrap;">' +
+        (nextP ? '<button type="button" onclick="go(\'' + nextP + '\')" style="border-radius:18px; padding:8px 18px;">Continue to ' + nextP + ' →</button>' : '<button type="button" onclick="go(\'Festivals\')" style="border-radius:18px; padding:8px 18px;">🎪 Explore Another Festival →</button>') +
+      '</div>' +
+    '</div>'
+  );
+
   const app = document.getElementById('app');
-  if (app) app.innerHTML = barHtml + viewHtml;
+  if (app) app.innerHTML = barHtml + viewHtml + connFooterHtml;
 };
 
 window.render = function(p) {
@@ -12261,6 +12304,14 @@ window.render = function(p) {
       window._rgT = null;
     }
   }
+  if (!window._skipHistPush) {
+    const last = window._pageHistory[window._pageHistory.length - 1];
+    if (!last || last.page !== p || last.cur !== window.cur) {
+      window._pageHistory.push({ page: p, cur: window.cur || 'ganesh' });
+      if (window._pageHistory.length > 30) window._pageHistory.shift();
+    }
+  }
+  window._skipHistPush = false;
   page = p;
   window.page = p;
   R = window._r || {};
