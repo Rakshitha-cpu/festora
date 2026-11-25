@@ -8234,7 +8234,7 @@ window.renderFestivalOverview = function() {
   (fGames.length ? (
     '<h2>🎮 Play ' + g.name + ' Games</h2>' +
     '<div class="grid" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:14px;">' +
-      fGames.map((gm, idx) => '<div class="card" onclick="go(\'G' + (idx + 1) + '\')" style="cursor:pointer; text-align:center; border-top:4px solid var(--gold);"><div class="big">' + gm.icon + '</div><b>' + gm.title + '</b><br><small style="color:var(--mut); display:block; margin:4px 0 8px;">' + gm.desc + '</small><button type="button" style="padding:7px 16px; font-size:0.85rem; border-radius:18px;">▶ Play Game ' + (idx + 1) + '</button></div>').join('') +
+      ((window.FG && window.FG.CFG && window.FG.CFG[window.cur]) ? window.FG.CFG[window.cur].map((item, idx) => ({ icon: (window.FG.SETS && window.FG.SETS[window.cur] && window.FG.SETS[window.cur][idx]) || '🎮', title: item[1], desc: item[2], action: "if(window.FG){window.FG.start('" + window.cur + "'," + (idx + 1) + ");}else{go('G" + (idx + 1) + "');}" })) : fGames.map((gm, idx) => ({ icon: gm.icon, title: gm.title, desc: gm.desc, action: "go('G" + (idx + 1) + "')" }))).map((gm, idx) => '<div class="card" onclick="' + gm.action + '" style="cursor:pointer; text-align:center; border-top:4px solid var(--gold);"><div class="big">' + gm.icon + '</div><b>' + gm.title + '</b><br><small style="color:var(--mut); display:block; margin:4px 0 8px;">' + gm.desc + '</small><button type="button" style="padding:7px 16px; font-size:0.85rem; border-radius:18px;">▶ Play Game ' + (idx + 1) + '</button></div>').join('') +
     '</div>'
   ) : '') +
   rhythmHtml +
@@ -12568,5 +12568,22 @@ window.pick = function(id) {
 
 </script>
 
+
+<script src="js/core.js"></script>
+<script src="js/engA.js"></script>
+<script src="js/engB.js"></script>
+<script src="js/data.js"></script>
+<script>
+window.Home3D = window.Home3D || {
+  open: function(id) {
+    if (id) { window.cur = id; try { cur = id; } catch (e) {} }
+    if (typeof window.go === 'function') window.go('My Home');
+  }
+};
+window.renderUniversalG1 = function() { setTimeout(function(){ if(window.FG) window.FG.start(window.cur || 'ganesh', 1); }, 0); return window.renderFestivalGames ? window.renderFestivalGames() : ''; };
+window.renderUniversalG2 = function() { setTimeout(function(){ if(window.FG) window.FG.start(window.cur || 'ganesh', 2); }, 0); return window.renderFestivalGames ? window.renderFestivalGames() : ''; };
+window.renderUniversalG3 = function() { setTimeout(function(){ if(window.FG) window.FG.start(window.cur || 'ganesh', 3); }, 0); return window.renderFestivalGames ? window.renderFestivalGames() : ''; };
+if (typeof window.draw === 'function') { try { window.draw(); } catch (e) {} }
+</script>
 </body>
 </html>
