@@ -107,7 +107,7 @@
       var r = rec[i + 1] || {}, stars = r.stars ? '⭐'.repeat(r.stars) + '☆'.repeat(3 - r.stars) : '☆☆☆';
       h += '<div class="card" style="text-align:center"><div style="font-size:2.6rem">' + esc(FG.SETS[id] ? FG.SETS[id][i] || '🎮' : '🎮') + '</div><h3 style="margin:6px 0 2px">' + esc(g[1]) + '</h3><small style="color:var(--gold);font-weight:700">' + esc(FG.ENG_LABEL[g[0]] || g[0]) + '</small><p style="font-size:.86rem;color:var(--mut);margin:8px 0">' + esc(g[2]) + '</p><div style="margin:6px 0">' + stars + (r.best ? ' · best ' + r.best : '') + '</div><button type="button" onclick="FG.start(\'' + id + '\',' + (i + 1) + ')">▶ Play</button></div>';
     });
-    h += '</div><div class="card" style="text-align:center;margin-top:14px"><div style="font-size:2rem">🏠</div><h3 style="margin:4px 0">3D Home Decoration</h3><p style="color:var(--mut);margin:4px 0 10px">Some items are missing in your festival home. Buy them with coins and place them in the 3D room.</p><button type="button" onclick="window.Home3D&&Home3D.open(\'' + id + '\')">🏠 Decorate my home</button></div></div>';
+    h += '</div></div>';
     return h;
   };
 
