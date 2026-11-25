@@ -896,7 +896,7 @@
       const owned = store.owned.includes(it.id);
       const sel = window._home3dSelected === it.id;
       return `<button type="button" ${placed ? 'disabled' : ''} onclick="window.Home3D._onShopClick('${fid}','${it.id}')" style="text-align:left;padding:10px 12px;border-radius:12px;background:${placed ? '#10b98122' : (sel ? '#f59e0b33' : '#261e16')};border:1.5px solid ${placed ? '#10b981' : (sel ? '#fbbf24' : '#ffffff22')};color:#fff;cursor:${placed ? 'default' : 'pointer'};min-width:170px;flex:1 1 170px;">
-        <div style="font-weight:700;font-size:0.88rem;">${placed ? '✅ ' : ''}${it.name}</div>
+        <div style="font-weight:700;font-size:0.88rem;">${placed ? '✅ ' : (({idol:((window.G$&&window.G$[fid]&&window.G$[fid].e)||'🛕'),lamp:'🪔',rangoli:'🌸',kalash:'🏺',feast:'🍽️',toran:'🌿',lantern:'🏮',pot:'🍲',tree:'🎄',bonfire:'🔥',drum:'🥁',swing:'🎠'})[it.shape]||'✨') + ' '}${it.name}</div>
         <div style="font-size:0.78rem;color:#fbbf24;margin-top:3px;">${placed ? 'Placed in 3D room' : (owned ? 'Tap to place' : '🪙 ' + it.price + ' coins · Buy & Place')}</div>
       </button>`;
     }).join('');
