@@ -8396,6 +8396,81 @@ window.buyFestivalItem = function(id, cost) {
   draw();
 };
 
+window.renderDecorItemSvg = function(it, accent) {
+  const id = (it.id || '').toLowerCase();
+  const c = accent || '#f59e0b';
+  if (id.includes('diya') || id.includes('deepak') || id.includes('butter') || id.includes('nilavilakku')) {
+    return `<svg width="64" height="64" viewBox="0 0 64 64"><defs><radialGradient id="fg_${it.uid}" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#fef08a"/><stop offset="60%" stop-color="#f97316"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="32" cy="20" r="18" fill="url(#fg_${it.uid})"/><path d="M32 8 C37 16,38 23,32 27 C26 23,27 16,32 8Z" fill="#fde047"/><path d="M32 13 C35 18,35 23,32 25 C29 23,29 18,32 13Z" fill="#fff"/><path d="M12 34 Q32 42 52 34 L46 49 Q32 55 18 49 Z" fill="#b45309" stroke="#fbbf24" stroke-width="1.5"/><ellipse cx="32" cy="34" rx="20" ry="6" fill="#78350f" stroke="#f59e0b" stroke-width="1.5"/><ellipse cx="32" cy="52" rx="14" ry="3" fill="#451a03"/></svg>`;
+  }
+  if (id.includes('urli')) {
+    return `<svg width="72" height="58" viewBox="0 0 72 58"><ellipse cx="36" cy="46" rx="26" ry="7" fill="#78350f"/><path d="M10 24 Q36 32 62 24 L56 44 Q36 52 16 44 Z" fill="#d97706" stroke="#fde68a" stroke-width="1.5"/><ellipse cx="36" cy="24" rx="26" ry="8" fill="#0ea5e9" stroke="#fbbf24" stroke-width="2"/><circle cx="26" cy="24" r="3" fill="#fb7185"/><circle cx="45" cy="25" r="3" fill="#f43f5e"/><circle cx="36" cy="21" r="2.5" fill="#fef08a"/><path d="M36 13 L38 19 L34 19 Z" fill="#fde047"/></svg>`;
+  }
+  if (id.includes('rangoli') || id.includes('pookalam') || id.includes('kolam') || id.includes('alpana')) {
+    return `<svg width="86" height="56" viewBox="0 0 100 64"><g transform="translate(50,32) scale(1,0.58)"><circle r="44" fill="${c}33" stroke="#fbbf24" stroke-width="2"/><circle r="32" fill="#ec489944" stroke="#f472b6" stroke-width="2"/><circle r="20" fill="#10b98144" stroke="#34d399" stroke-width="2"/><circle r="9" fill="#fde047"/><path d="M0 -42 L7 -14 L0 -8 L-7 -14 Z M0 42 L7 14 L0 8 L-7 14 Z M-42 0 L-14 7 L-8 0 L-14 -7 Z M42 0 L14 7 L8 0 L14 -7 Z" fill="#f59e0b" opacity="0.9"/></g></svg>`;
+  }
+  if (id.includes('toran') || id.includes('garland') || id.includes('banner')) {
+    return `<svg width="110" height="44" viewBox="0 0 110 44"><path d="M4 8 Q55 34 106 8" fill="none" stroke="#15803d" stroke-width="5"/><circle cx="18" cy="14" r="6" fill="#f97316"/><circle cx="36" cy="20" r="6.5" fill="#facc15"/><circle cx="55" cy="22" r="7" fill="#f97316"/><circle cx="74" cy="20" r="6.5" fill="#facc15"/><circle cx="92" cy="14" r="6" fill="#f97316"/><path d="M27 18 L24 30 L30 30 Z M46 21 L43 34 L49 34 Z M64 21 L61 34 L67 34 Z M83 18 L80 30 L86 30 Z" fill="#22c55e"/></svg>`;
+  }
+  if (id.includes('lantern') || id.includes('fanoos') || id.includes('nakshatram') || id.includes('fairy')) {
+    return `<svg width="64" height="74" viewBox="0 0 64 74"><line x1="32" y1="0" x2="32" y2="14" stroke="#fbbf24" stroke-width="2"/><polygon points="32,12 48,28 42,50 22,50 16,28" fill="${c}" stroke="#fef08a" stroke-width="2"/><polygon points="32,16 41,29 37,46 27,46 23,29" fill="#fde047" opacity="0.8"/><line x1="25" y1="50" x2="23" y2="66" stroke="#f97316" stroke-width="2"/><line x1="32" y1="50" x2="32" y2="68" stroke="#fbbf24" stroke-width="2"/><line x1="39" y1="50" x2="41" y2="66" stroke="#f97316" stroke-width="2"/></svg>`;
+  }
+  if (id.includes('kalash') || id.includes('pongal_pot') || id.includes('garbo')) {
+    return `<svg width="64" height="68" viewBox="0 0 64 68"><path d="M22 26 Q12 42 22 56 L42 56 Q52 42 42 26 Z" fill="#b45309" stroke="#fbbf24" stroke-width="2"/><ellipse cx="32" cy="26" rx="12" ry="4" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/><path d="M24 24 Q16 14 26 16 M40 24 Q48 14 38 16 M32 22 L32 10" stroke="#22c55e" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="32" cy="20" r="7" fill="#7c2d12" stroke="#d97706" stroke-width="1.5"/></svg>`;
+  }
+  if (id.includes('xmas_tree')) {
+    return `<svg width="72" height="82" viewBox="0 0 72 82"><rect x="31" y="64" width="10" height="14" fill="#78350f"/><polygon points="36,8 56,34 16,34" fill="#15803d"/><polygon points="36,24 60,50 12,50" fill="#166534"/><polygon points="36,38 64,66 8,66" fill="#14532d"/><circle cx="36" cy="8" r="4" fill="#fde047"/><circle cx="28" cy="30" r="3" fill="#f43f5e"/><circle cx="44" cy="44" r="3" fill="#fbbf24"/><circle cx="24" cy="56" r="3" fill="#38bdf8"/><circle cx="48" cy="58" r="3" fill="#f43f5e"/></svg>`;
+  }
+  if (id.includes('bonfire')) {
+    return `<svg width="74" height="68" viewBox="0 0 74 68"><path d="M16 56 L58 46 M16 46 L58 56" stroke="#78350f" stroke-width="7" stroke-linecap="round"/><path d="M37 10 C48 26,52 42,37 50 C22 42,26 26,37 10Z" fill="#f97316"/><path d="M37 20 C43 30,45 42,37 48 C29 42,31 30,37 20Z" fill="#fde047"/></svg>`;
+  }
+  return `<svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="${c}28" stroke="${c}" stroke-width="2"/><circle cx="32" cy="32" r="20" fill="#1e150e" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/><text x="32" y="39" text-anchor="middle" font-size="24">${it.icon || '🪔'}</text></svg>`;
+};
+
+window.autoArrangeDecor = function() {
+  window.initHomeDecorState();
+  window.saveDecorHistory();
+  const items = window.homeDecorState.items;
+  const slots = [
+    { x: 50, y: 12 }, { x: 50, y: 36 }, { x: 50, y: 74 },
+    { x: 25, y: 69 }, { x: 75, y: 69 }, { x: 18, y: 26 },
+    { x: 82, y: 26 }, { x: 35, y: 83 }, { x: 65, y: 83 }
+  ];
+  items.forEach((it, idx) => {
+    const s = slots[idx % slots.length];
+    it.x = s.x; it.y = s.y; it.rot = 0;
+  });
+  if (typeof toast === 'function') toast('✨ Auto-arranged your 3D festive home!');
+  draw();
+};
+
+window.startHomeCelebrationFx = function() {
+  const c = document.getElementById('home-celebration-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const particles = Array.from({ length: 36 }, () => ({
+    x: Math.random() * c.width,
+    y: Math.random() * c.height,
+    vy: 0.7 + Math.random() * 1.4,
+    vx: (Math.random() - 0.5) * 0.6,
+    r: 2.5 + Math.random() * 3.5,
+    col: ['#fbbf24', '#f97316', '#ec4899', '#fde047'][Math.floor(Math.random() * 4)]
+  }));
+  const step = () => {
+    if (!document.getElementById('home-celebration-canvas')) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    particles.forEach(p => {
+      p.y += p.vy; p.x += p.vx;
+      if (p.y > c.height + 10) { p.y = -10; p.x = Math.random() * c.width; }
+      ctx.fillStyle = p.col;
+      ctx.shadowColor = p.col; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+};
+
 window.renderFestivalHome = function() {
   const g = window.getFestivalData();
   const f = typeof F === 'function' ? F() : { owned: [], house: [], done: {} };
@@ -9983,222 +10058,506 @@ window.renderGameRunner = function(gNum) {
   `;
 };
 
+window.stopFestivalCanvasGame = function() {
+  if (window._gameRaf) {
+    cancelAnimationFrame(window._gameRaf);
+    window._gameRaf = null;
+  }
+};
+
+window.mountFestivalCanvas = function(gNum) {
+  window.stopFestivalCanvasGame();
+  const canvas = document.getElementById('festora-game-canvas');
+  if (!canvas || !window.R_game) return;
+  const ctx = canvas.getContext('2d');
+  const gm = window.R_game;
+  const g = window.getFestivalData();
+  const c1 = g.c1 || '#f59e0b';
+  const c2 = g.c2 || '#d97706';
+  const W = canvas.width;
+  const H = canvas.height;
+  let lastTs = performance.now();
+
+  if (gm.ty === 'art') {
+    if (!gm._strokes) gm._strokes = [];
+    if (!gm.sym) gm.sym = 8;
+    const redrawArt = () => {
+      ctx.fillStyle = '#140f0a';
+      ctx.fillRect(0, 0, W, H);
+      // Subtle mandala guide rings
+      ctx.strokeStyle = 'rgba(245,158,11,0.14)';
+      ctx.lineWidth = 1;
+      [45, 90, 135, 175].forEach(r => {
+        ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2); ctx.stroke();
+      });
+      for (let i = 0; i < gm.sym; i++) {
+        const a = (i / gm.sym) * Math.PI * 2;
+        ctx.beginPath(); ctx.moveTo(W / 2, H / 2);
+        ctx.lineTo(W / 2 + Math.cos(a) * 180, H / 2 + Math.sin(a) * 180);
+        ctx.stroke();
+      }
+      // Draw all strokes with radial symmetry
+      gm._strokes.forEach(s => {
+        const cx = W / 2, cy = H / 2;
+        const dx = s.x - cx, dy = s.y - cy;
+        const dist = Math.hypot(dx, dy);
+        const baseAng = Math.atan2(dy, dx);
+        ctx.fillStyle = s.color;
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 8;
+        for (let k = 0; k < gm.sym; k++) {
+          const ang = baseAng + (k / gm.sym) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(cx + Math.cos(ang) * dist, cy + Math.sin(ang) * dist, s.size || 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+      });
+      // Center bindu
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath(); ctx.arc(W / 2, H / 2, 7, 0, Math.PI * 2); ctx.fill();
+    };
+    window._redrawArtCanvas = redrawArt;
+    redrawArt();
+
+    let drawing = false;
+    const addPt = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * W;
+      const y = ((clientY - rect.top) / rect.height) * H;
+      gm._strokes.push({ x, y, color: gm.curColor || '#f59e0b', size: gm.brushSize || 6 });
+      gm.paintedPoints = (gm.paintedPoints || 0) + 1;
+      redrawArt();
+    };
+    canvas.onmousedown = (e) => { drawing = true; addPt(e.clientX, e.clientY); };
+    canvas.onmousemove = (e) => { if (drawing) addPt(e.clientX, e.clientY); };
+    window.addEventListener('mouseup', () => { drawing = false; });
+    canvas.ontouchstart = (e) => { e.preventDefault(); drawing = true; if (e.touches[0]) addPt(e.touches[0].clientX, e.touches[0].clientY); };
+    canvas.ontouchmove = (e) => { e.preventDefault(); if (drawing && e.touches[0]) addPt(e.touches[0].clientX, e.touches[0].clientY); };
+    canvas.ontouchend = () => { drawing = false; };
+    return;
+  }
+
+  if (gm.ty === 'target') {
+    gm._aimX = W / 2; gm._aimY = H / 2;
+    gm._shots = []; gm._bursts = [];
+    gm.targets.forEach((t, i) => {
+      t.px = (t.x / 100) * W; t.py = (t.y / 100) * H;
+      t.vx = (i % 2 === 0 ? 1 : -1) * (1.2 + i * 0.25);
+    });
+    canvas.onmousemove = (e) => {
+      const r = canvas.getBoundingClientRect();
+      gm._aimX = ((e.clientX - r.left) / r.width) * W;
+      gm._aimY = ((e.clientY - r.top) / r.height) * H;
+    };
+    const fireAt = (clientX, clientY) => {
+      if (gm.end || gm.shotsLeft <= 0) return;
+      const r = canvas.getBoundingClientRect();
+      const tx = ((clientX - r.left) / r.width) * W;
+      const ty = ((clientY - r.top) / r.height) * H;
+      gm.shotsLeft--;
+      let hitAny = false;
+      gm.targets.forEach(t => {
+        if (!t.hit && Math.hypot(t.px - tx, t.py - ty) < 34) {
+          t.hit = true;
+          gm.hits++;
+          hitAny = true;
+          for (let p = 0; p < 16; p++) {
+            const a = (p / 16) * Math.PI * 2;
+            gm._bursts.push({ x: t.px, y: t.py, vx: Math.cos(a) * 3.5, vy: Math.sin(a) * 3.5, life: 1, col: '#fbbf24' });
+          }
+          if (window.FestoraRhythm) window.FestoraRhythm.playSingleHit(window.cur, 'accent');
+        }
+      });
+      if (!hitAny) {
+        for (let p = 0; p < 8; p++) {
+          const a = (p / 8) * Math.PI * 2;
+          gm._bursts.push({ x: tx, y: ty, vx: Math.cos(a) * 2, vy: Math.sin(a) * 2, life: 0.7, col: '#9ca3af' });
+        }
+      }
+      const hEl = document.getElementById('target-hits');
+      const sEl = document.getElementById('target-shots');
+      if (hEl) hEl.textContent = gm.hits + '/' + gm.targets.length;
+      if (sEl) sEl.textContent = gm.shotsLeft;
+      if (gm.hits >= gm.targets.length || gm.shotsLeft <= 0) {
+        setTimeout(() => {
+          window.completeFestivalGame(gNum, Math.min(100, gm.hits * 20));
+          if (typeof draw === 'function') draw();
+        }, 350);
+      }
+    };
+    canvas.onclick = (e) => fireAt(e.clientX, e.clientY);
+    canvas.ontouchstart = (e) => { e.preventDefault(); if (e.touches[0]) fireAt(e.touches[0].clientX, e.touches[0].clientY); };
+  }
+
+  if (gm.ty === 'ritual') {
+    gm._thaliX = W / 2; gm._thaliY = H * 0.78; gm._petals = []; gm._angleSum = 0; gm._lastAng = null;
+    const moveThali = (clientX, clientY) => {
+      if (gm.end) return;
+      const r = canvas.getBoundingClientRect();
+      gm._thaliX = ((clientX - r.left) / r.width) * W;
+      gm._thaliY = ((clientY - r.top) / r.height) * H;
+      const ang = Math.atan2(gm._thaliY - H * 0.45, gm._thaliX - W / 2);
+      if (gm._lastAng !== null) {
+        let diff = ang - gm._lastAng;
+        if (diff > Math.PI) diff -= Math.PI * 2;
+        if (diff < -Math.PI) diff += Math.PI * 2;
+        gm._angleSum += Math.abs(diff);
+        if (gm._angleSum > 1.25) {
+          gm._angleSum = 0;
+          const nextIdx = gm.steps.findIndex(s => !s.done);
+          if (nextIdx !== -1) {
+            window.performRitualStep(nextIdx, gNum);
+            for (let k = 0; k < 10; k++) {
+              gm._petals.push({ x: W / 2 + (Math.random() - 0.5) * 180, y: 20, vy: 1.5 + Math.random() * 2, col: k % 2 ? '#f59e0b' : '#ec4899' });
+            }
+          }
+        }
+      }
+      gm._lastAng = ang;
+    };
+    canvas.onmousemove = (e) => moveThali(e.clientX, e.clientY);
+    canvas.ontouchmove = (e) => { e.preventDefault(); if (e.touches[0]) moveThali(e.touches[0].clientX, e.touches[0].clientY); };
+  }
+
+  if (gm.ty === 'harvest') {
+    gm._basketX = W / 2;
+    gm._falling = [];
+    gm._spawnT = 0;
+    const goodIcons = [g.e || '🌾', '🌺', '🍬', '🪔', '🥥'];
+    const badIcons = ['🌧️', '⚡'];
+    canvas.onmousemove = (e) => {
+      const r = canvas.getBoundingClientRect();
+      gm._basketX = Math.max(40, Math.min(W - 40, ((e.clientX - r.left) / r.width) * W));
+    };
+    canvas.ontouchmove = (e) => {
+      e.preventDefault();
+      if (e.touches[0]) {
+        const r = canvas.getBoundingClientRect();
+        gm._basketX = Math.max(40, Math.min(W - 40, ((e.touches[0].clientX - r.left) / r.width) * W));
+      }
+    };
+    window._harvestKeyHandler = (e) => {
+      if (e.key === 'ArrowLeft') gm._basketX = Math.max(40, gm._basketX - 28);
+      if (e.key === 'ArrowRight') gm._basketX = Math.min(W - 40, gm._basketX + 28);
+    };
+    window.onkeydown = window._harvestKeyHandler;
+    gm._goodIcons = goodIcons;
+    gm._badIcons = badIcons;
+  }
+
+  const loop = (ts) => {
+    if (!document.getElementById('festora-game-canvas')) return;
+    const dt = Math.min(0.05, (ts - lastTs) / 1000);
+    lastTs = ts;
+    const tSec = ts / 1000;
+
+    // 1. COOKING ANIMATED HEARTH CANVAS
+    if (gm.ty === 'cooking') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#1f140d'); sky.addColorStop(1, '#3b1e0e');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      // Warm glow behind pot
+      const glow = ctx.createRadialGradient(W / 2, H * 0.65, 10, W / 2, H * 0.65, 160);
+      glow.addColorStop(0, gm.heat > 70 ? 'rgba(239,68,68,0.55)' : 'rgba(245,158,11,0.45)');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+      // Flames proportional to heat
+      const flameCount = 5;
+      for (let i = 0; i < flameCount; i++) {
+        const fx = W / 2 - 48 + i * 24;
+        const fh = (gm.heat / 100) * (42 + Math.sin(tSec * 12 + i) * 10);
+        ctx.fillStyle = i % 2 === 0 ? '#f97316' : '#fbbf24';
+        ctx.beginPath();
+        ctx.moveTo(fx - 12, H * 0.86);
+        ctx.quadraticCurveTo(fx, H * 0.86 - fh * 1.4, fx + 12, H * 0.86);
+        ctx.fill();
+      }
+      // Chulha / Hearth base
+      ctx.fillStyle = '#7c2d12';
+      ctx.fillRect(W / 2 - 80, H * 0.84, 160, 26);
+      // Brass Cooking Pot
+      const potGrad = ctx.createLinearGradient(W / 2 - 75, 0, W / 2 + 75, 0);
+      potGrad.addColorStop(0, '#b45309'); potGrad.addColorStop(0.5, '#fbbf24'); potGrad.addColorStop(1, '#92400e');
+      ctx.fillStyle = potGrad;
+      ctx.beginPath();
+      ctx.ellipse(W / 2, H * 0.62, 74, 52, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Pot Rim & Simmering Food
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath(); ctx.ellipse(W / 2, H * 0.48, 62, 16, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#d97706';
+      ctx.beginPath(); ctx.ellipse(W / 2, H * 0.48, 54, 12, 0, 0, Math.PI * 2); ctx.fill();
+      // Rising steam bubbles
+      if (gm.running) {
+        for (let s = 0; s < 6; s++) {
+          const sy = H * 0.42 - ((tSec * 45 + s * 28) % 90);
+          const sx = W / 2 + Math.sin(tSec * 3 + s) * 26;
+          ctx.fillStyle = 'rgba(255,255,255,' + (0.45 - (H * 0.42 - sy) / 220) + ')';
+          ctx.beginPath(); ctx.arc(sx, sy, 6 + (s % 3) * 3, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 14px Georgia'; ctx.textAlign = 'center';
+      ctx.fillText(g.name + ' Sacred Kitchen · ' + gm.ingredients + '/' + gm.maxIngredients + ' Ingredients', W / 2, 26);
+    }
+
+    // 3. ACTION RHYTHM PROCESSION CANVAS
+    else if (gm.ty === 'action_rhythm') {
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#0f172a'); bg.addColorStop(0.6, c2); bg.addColorStop(1, '#1e293b');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      // Animated scrolling lanterns/waves
+      for (let i = 0; i < 8; i++) {
+        const lx = ((i * 90 - (tSec * (gm.running ? 90 : 20))) % (W + 80) + (W + 80)) % (W + 80) - 40;
+        ctx.fillStyle = 'rgba(251,191,36,0.22)';
+        ctx.beginPath(); ctx.arc(lx, 50 + (i % 2) * 20, 10, 0, Math.PI * 2); ctx.fill();
+      }
+      // Track & Moving Festival Avatar
+      ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(30, H * 0.45, W - 60, 44);
+      const progX = 40 + ((gm.distance / gm.targetDistance) * (W - 100));
+      ctx.fillStyle = c1; ctx.fillRect(30, H * 0.45, Math.max(10, progX - 30), 44);
+      ctx.font = '32px serif'; ctx.textAlign = 'center';
+      ctx.fillText(g.e || '🥁', progX, H * 0.56);
+      // Sweet spot timing bar on canvas
+      const barY = H * 0.78;
+      ctx.fillStyle = '#18181b'; ctx.fillRect(40, barY, W - 80, 26);
+      ctx.fillStyle = '#10b981'; ctx.fillRect(40 + (W - 80) * 0.38, barY, (W - 80) * 0.24, 26);
+      const nx = 40 + (gm.needle / 100) * (W - 80);
+      ctx.fillStyle = '#fff'; ctx.fillRect(nx - 4, barY - 4, 8, 34);
+      ctx.fillStyle = '#fde68a'; ctx.font = 'bold 13px Georgia';
+      ctx.fillText('Tap BEAT (or Spacebar) when the white needle enters the GREEN zone!', W / 2, H * 0.72);
+    }
+
+    // 4. TARGET & ARCHERY CANVAS
+    else if (gm.ty === 'target') {
+      ctx.fillStyle = '#130f0c'; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(245,158,11,0.12)';
+      ctx.beginPath(); ctx.arc(W / 2, H / 2, 95, 0, Math.PI * 2); ctx.stroke();
+      gm.targets.forEach((t, i) => {
+        if (!t.hit) {
+          t.px += t.vx;
+          if (t.px < 35 || t.px > W - 35) t.vx *= -1;
+          t.py += Math.sin(tSec * 3 + i) * 0.45;
+          ctx.fillStyle = 'rgba(245,158,11,0.25)';
+          ctx.beginPath(); ctx.arc(t.px, t.py, 26, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.stroke();
+          ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(t.icon, t.px, t.py);
+        }
+      });
+      gm._bursts = (gm._bursts || []).filter(b => b.life > 0);
+      gm._bursts.forEach(b => {
+        b.x += b.vx; b.y += b.vy; b.life -= 0.04;
+        ctx.fillStyle = b.col; ctx.globalAlpha = Math.max(0, b.life);
+        ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+      // Aim Reticle
+      ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(gm._aimX, gm._aimY, 18, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gm._aimX - 24, gm._aimY); ctx.lineTo(gm._aimX + 24, gm._aimY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gm._aimX, gm._aimY - 24); ctx.lineTo(gm._aimX, gm._aimY + 24); ctx.stroke();
+    }
+
+    // 5. RITUAL SANCTUM AARTI CANVAS
+    else if (gm.ty === 'ritual') {
+      const grad = ctx.createRadialGradient(W / 2, H * 0.45, 20, W / 2, H * 0.45, 200);
+      grad.addColorStop(0, 'rgba(245,158,11,' + (0.18 + gm.aura / 200) + ')');
+      grad.addColorStop(1, '#120c08');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+      // Center Sanctum Emblem
+      ctx.font = '64px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(g.e || '🕉️', W / 2, H * 0.44);
+      // 5 Sacred Diyas around Sanctum
+      gm.steps.forEach((s, idx) => {
+        const a = -Math.PI / 2 + (idx / 5) * Math.PI * 2;
+        const dx = W / 2 + Math.cos(a) * 115;
+        const dy = H * 0.45 + Math.sin(a) * 85;
+        ctx.fillStyle = s.done ? 'rgba(245,158,11,0.35)' : 'rgba(255,255,255,0.08)';
+        ctx.beginPath(); ctx.arc(dx, dy, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.font = '22px serif';
+        ctx.fillText(s.done ? '🪔' : s.icon, dx, dy);
+      });
+      // Falling petals
+      gm._petals = (gm._petals || []).filter(p => p.y < H);
+      gm._petals.forEach(p => {
+        p.y += p.vy;
+        ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      });
+      // Interactive Glowing Aarti Thali
+      ctx.fillStyle = 'rgba(251,191,36,0.35)';
+      ctx.beginPath(); ctx.arc(gm._thaliX, gm._thaliY, 24, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '26px serif'; ctx.fillText('🪔', gm._thaliX, gm._thaliY);
+    }
+
+    // 6. HARVEST BASKET CATCH CANVAS
+    else if (gm.ty === 'harvest') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#1e293b'); sky.addColorStop(1, '#3f2e18');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      if (gm.running && !gm.end) {
+        gm._spawnT += dt;
+        if (gm._spawnT > 0.75) {
+          gm._spawnT = 0;
+          const isBad = Math.random() < 0.22;
+          const ic = isBad ? gm._badIcons[Math.floor(Math.random() * gm._badIcons.length)] : gm._goodIcons[Math.floor(Math.random() * gm._goodIcons.length)];
+          gm._falling.push({ x: 35 + Math.random() * (W - 70), y: -20, vy: 115 + Math.random() * 65, icon: ic, bad: isBad });
+        }
+        gm._falling = gm._falling.filter(it => {
+          it.y += it.vy * dt;
+          if (it.y > H - 55 && it.y < H - 15 && Math.abs(it.x - gm._basketX) < 42) {
+            if (it.bad) {
+              gm.gathered = Math.max(0, gm.gathered - 1);
+            } else {
+              gm.gathered++;
+              if (window.FestoraRhythm) window.FestoraRhythm.playSingleHit(window.cur, 'accent');
+            }
+            const gEl = document.getElementById('harvest-count');
+            if (gEl) gEl.textContent = gm.gathered + '/5';
+            if (gm.gathered >= 5) {
+              window.completeFestivalGame(gNum, 100);
+              if (typeof draw === 'function') draw();
+            }
+            return false;
+          }
+          return it.y < H + 20;
+        });
+      }
+      gm._falling.forEach(it => {
+        ctx.font = '28px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(it.icon, it.x, it.y);
+      });
+      // Woven Basket
+      ctx.fillStyle = '#d97706';
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(gm._basketX - 38, H - 42, 76, 26, 10) : ctx.fillRect(gm._basketX - 38, H - 42, 76, 26);
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.fillText('🧺', gm._basketX, H - 29);
+    }
+
+    window._gameRaf = requestAnimationFrame(loop);
+  };
+  window._gameRaf = requestAnimationFrame(loop);
+};
+
 window.renderSpecificGameType = function(gm, gNum, game) {
+  setTimeout(() => { if (document.getElementById('festora-game-canvas')) window.mountFestivalCanvas(gNum); }, 10);
+
   // 1. COOKING CHALLENGE
   if (gm.ty === 'cooking') {
     const isOptimal = gm.heat >= gm.targetMin && gm.heat <= gm.targetMax;
     const heatColor = gm.heat > gm.targetMax ? '#ef4444' : (gm.heat < gm.targetMin ? '#3b82f6' : '#10b981');
     return `
-      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div style="font-size:14px; color:#d1d5db;">⏱️ Time Remaining: <b id="cooking-time" style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
-          <div style="font-size:14px; color:#d1d5db;">🍯 Ingredients Added: <b style="color:#f59e0b; font-size:17px;">${gm.ingredients}/${gm.maxIngredients}</b></div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:14px; color:#d1d5db;">⏱️ Time: <b id="cooking-time" style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🍯 Ingredients: <b style="color:#f59e0b; font-size:17px;">${gm.ingredients}/${gm.maxIngredients}</b></div>
         </div>
-
-        <!-- Heat Gauge -->
-        <div style="margin:20px 0;">
-          <div style="display:flex; justify-content:space-between; font-size:12px; color:#a1a1aa; margin-bottom:6px;">
-            <span>Too Cold (0%)</span>
-            <span style="color:#10b981; font-weight:700;">★ Sweet Spot (40% - 70%) ★</span>
-            <span>Too Hot (100%)</span>
-          </div>
-          <div style="width:100%; height:26px; background:#2a2018; border-radius:13px; overflow:hidden; border:2px solid #444; position:relative;">
+        <canvas id="festora-game-canvas" width="540" height="230" style="width:100%; max-width:540px; border-radius:14px; border:2px solid rgba(245,158,11,0.35); display:block; margin:0 auto 14px;"></canvas>
+        <div style="margin:10px 0;">
+          <div style="width:100%; height:20px; background:#2a2018; border-radius:10px; overflow:hidden; border:2px solid #444; position:relative;">
             <div style="position:absolute; left:40%; width:30%; height:100%; background:rgba(16,185,129,0.25); border-left:1px dashed #10b981; border-right:1px dashed #10b981;"></div>
             <div id="cooking-heat-fill" style="width:${gm.heat}%; height:100%; background:${heatColor}; transition:width 0.25s ease;"></div>
           </div>
-          <div id="cooking-heat-text" style="margin-top:8px; font-weight:700; color:${heatColor}; font-size:14px;">
-            Hearth Temperature: ${gm.heat}% · ${isOptimal ? 'PERFECT TEMPERATURE! Cooking gently...' : (gm.heat < 40 ? 'Too Cold! Add wood!' : 'Too Hot! Simmer down!')}
+          <div id="cooking-heat-text" style="margin-top:6px; font-weight:700; color:${heatColor}; font-size:13.5px;">
+            Hearth Temperature: ${gm.heat}% · ${isOptimal ? 'PERFECT TEMPERATURE!' : (gm.heat < 40 ? 'Too Cold! Stoke fire!' : 'Too Hot! Simmer down!')}
           </div>
         </div>
-
-        <!-- Interactive Controls -->
-        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:24px;">
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px;">
           ${!gm.running ? `
-            <button onclick="window.startCookingTimer(${gNum});" style="padding:14px 32px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(245,158,11,0.4);">
-              🔥 Start Hearth &amp; Cook
-            </button>
+            <button onclick="window.startCookingTimer(${gNum});" style="padding:12px 28px; border-radius:26px; font-weight:800; font-size:15px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer;">🔥 Start Hearth &amp; Cook</button>
           ` : `
-            <button onclick="window.adjustGameHeat(12);" style="padding:12px 24px; border-radius:22px; font-weight:700; background:#b45309; color:#fff; border:none; cursor:pointer;">
-              🔥 Stoke Fire (+12%)
-            </button>
-            <button onclick="window.adjustGameHeat(-10);" style="padding:12px 24px; border-radius:22px; font-weight:700; background:#374151; color:#e5e7eb; border:none; cursor:pointer;">
-              💨 Reduce Flame (-10%)
-            </button>
-            <button onclick="window.addGameIngredient();" ${gm.ingredients >= gm.maxIngredients ? 'disabled' : ''} style="padding:12px 24px; border-radius:22px; font-weight:700; background:${gm.ingredients >= gm.maxIngredients ? '#4b5563' : '#059669'}; color:#fff; border:none; cursor:pointer;">
-              🍯 Add Sacred Ingredient (${gm.ingredients}/${gm.maxIngredients})
-            </button>
+            <button onclick="window.adjustGameHeat(12);" style="padding:10px 18px; border-radius:20px; font-weight:700; background:#b45309; color:#fff; border:none; cursor:pointer;">🔥 Stoke (+12%)</button>
+            <button onclick="window.adjustGameHeat(-10);" style="padding:10px 18px; border-radius:20px; font-weight:700; background:#374151; color:#e5e7eb; border:none; cursor:pointer;">💨 Simmer (-10%)</button>
+            <button onclick="window.addGameIngredient();" ${gm.ingredients >= gm.maxIngredients ? 'disabled' : ''} style="padding:10px 20px; border-radius:20px; font-weight:700; background:${gm.ingredients >= gm.maxIngredients ? '#4b5563' : '#059669'}; color:#fff; border:none; cursor:pointer;">🍯 Add Ingredient (${gm.ingredients}/${gm.maxIngredients})</button>
           `}
         </div>
       </div>
     `;
   }
 
-  // 2. FOLK ART / RANGOLI / KOLAM / POOKALAM DESIGNER
+  // 2. INTERACTIVE RADIAL SYMMETRY RANGOLI / FOLK ART CANVAS
   if (gm.ty === 'art') {
     return `
-      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-        <div style="margin-bottom:14px; font-size:14px; color:#d1d5db;">
-          🎨 Select traditional pigment and tap the concentric petals to weave your sacred mandala art!
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="margin-bottom:10px; font-size:13.5px; color:#d1d5db;">
+          🎨 Draw directly on the canvas with your mouse or finger — strokes mirror in <b>${gm.sym || 8}-fold radial symmetry</b>!
         </div>
-
-        <!-- Palette Chips -->
-        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-          ${gm.palette.map(c => `
-            <button onclick="window.R_game.curColor='${c}'; draw();" 
-                    style="width:38px; height:38px; border-radius:50%; background:${c}; border:${gm.curColor === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.2)'}; cursor:pointer; transform:${gm.curColor === c ? 'scale(1.18)' : 'scale(1)'}; transition:all 0.15s; box-shadow:0 3px 10px rgba(0,0,0,0.3);">
-            </button>
-          `).join('')}
+        <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
+          ${gm.palette.map(c => `<button onclick="window.R_game.curColor='${c}'; draw();" style="width:34px; height:34px; min-height:34px; padding:0; border-radius:50%; background:${c}; border:${gm.curColor === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.2)'}; cursor:pointer;"></button>`).join('')}
+          <select onchange="window.R_game.sym=Number(this.value); if(window._redrawArtCanvas)window._redrawArtCanvas();" style="background:#27272a; color:#fff; border:1px solid #555; border-radius:12px; padding:6px 10px; font-weight:700;">
+            <option value="4" ${gm.sym === 4 ? 'selected' : ''}>4-Fold Symmetry</option>
+            <option value="8" ${(!gm.sym || gm.sym === 8) ? 'selected' : ''}>8-Fold Symmetry</option>
+            <option value="12" ${gm.sym === 12 ? 'selected' : ''}>12-Fold Symmetry</option>
+          </select>
         </div>
-
-        <!-- Circular Mandala Grid -->
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); max-width:380px; gap:10px; margin:0 auto 22px;">
-          ${gm.sectors.map((color, sIdx) => `
-            <div onclick="window.paintArtSector(${sIdx});" 
-                 style="height:65px; border-radius:14px; background:${color}; border:2px solid rgba(255,255,255,0.15); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.4rem; transition:transform 0.15s;"
-                 onmouseenter="this.style.transform='scale(1.06)';" onmouseleave="this.style.transform='scale(1)';">
-              ✨
-            </div>
-          `).join('')}
-        </div>
-
-        <!-- Actions -->
-        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-          <button onclick="window.R_game.sectors=Array(12).fill('#2a2018'); draw();" style="padding:10px 18px; border-radius:20px; font-weight:700; background:#27272a; color:#d4d4d8; border:1px solid #444; cursor:pointer;">
-            🧹 Clear Canvas
-          </button>
-          <button onclick="window.autoHarmonizeArt();" style="padding:10px 20px; border-radius:20px; font-weight:700; background:#374151; color:#fff; border:none; cursor:pointer;">
-            ✨ Harmonize Symmetrical Colors
-          </button>
-          <button onclick="window.completeArtGame(${gNum});" style="padding:10px 26px; border-radius:20px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(245,158,11,0.4);">
-            🏆 Consecrate &amp; Score Art
-          </button>
+        <canvas id="festora-game-canvas" width="400" height="360" style="width:100%; max-width:400px; border-radius:16px; border:2px solid rgba(245,158,11,0.4); display:block; margin:0 auto 14px; cursor:crosshair; touch-action:none;"></canvas>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button onclick="if(window.R_game){window.R_game._strokes=[];window.R_game.paintedPoints=0;if(window._redrawArtCanvas)window._redrawArtCanvas();}" style="padding:9px 16px; border-radius:20px; font-weight:700; background:#27272a; color:#d4d4d8; border:1px solid #444; cursor:pointer;">🧹 Clear</button>
+          <button onclick="window.autoHarmonizeArt();" style="padding:9px 18px; border-radius:20px; font-weight:700; background:#374151; color:#fff; border:none; cursor:pointer;">✨ Generate Mandala</button>
+          <button onclick="window.completeArtGame(${gNum});" style="padding:9px 22px; border-radius:20px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer;">🏆 Consecrate Art</button>
         </div>
       </div>
     `;
   }
 
-  // 3. ACTION & RHYTHM RACE
+  // 3. ACTION & RHYTHM CANVAS
   if (gm.ty === 'action_rhythm') {
     return `
-      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-          <div style="font-size:14px; color:#d1d5db;">🏁 Distance: <b style="color:#f59e0b; font-size:18px;">${gm.distance}/${gm.targetDistance}m</b></div>
-          <div style="font-size:14px; color:#d1d5db;">⏱️ Time: <b id="rhythm-time" style="color:#fff; font-size:18px;">${gm.timeLeft}s</b></div>
-          <div style="font-size:14px; color:#d1d5db;">🔥 Combo: <b style="color:#10b981; font-size:18px;">x${Math.max(1, gm.combo)}</b></div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div style="font-size:14px; color:#d1d5db;">🏁 Distance: <b style="color:#f59e0b; font-size:17px;">${gm.distance}/${gm.targetDistance}m</b></div>
+          <div style="font-size:14px; color:#d1d5db;">⏱️ Time: <b id="rhythm-time" style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🔥 Combo: <b style="color:#10b981; font-size:17px;">x${Math.max(1, gm.combo)}</b></div>
         </div>
-
-        <!-- Track Progress Bar -->
-        <div style="width:100%; height:16px; background:#2a2018; border-radius:8px; overflow:hidden; margin-bottom:20px; border:1px solid #444;">
-          <div style="width:${(gm.distance / gm.targetDistance) * 100}%; height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); transition:width 0.2s;"></div>
-        </div>
-
-        <!-- Rhythm Timing Bar -->
-        <div style="margin:24px 0;">
-          <div style="font-size:12px; color:#a1a1aa; margin-bottom:6px;">Tap when the needle enters the GREEN SWEET SPOT!</div>
-          <div style="width:100%; height:32px; background:#18181b; border-radius:16px; position:relative; overflow:hidden; border:2px solid #555;">
-            <!-- Green target zone -->
-            <div style="position:absolute; left:40%; width:20%; height:100%; background:#10b981; opacity:0.85; border-radius:4px;"></div>
-            <!-- Needle -->
-            <div id="rhythm-needle" style="position:absolute; left:${gm.needle}%; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff; transform:translateX(-50%);"></div>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <div style="margin-top:20px;">
+        <canvas id="festora-game-canvas" width="540" height="230" style="width:100%; max-width:540px; border-radius:14px; border:2px solid rgba(59,130,246,0.4); display:block; margin:0 auto 14px;"></canvas>
+        <div>
           ${!gm.running ? `
-            <button onclick="window.startRhythmTimer(${gNum});" style="padding:14px 36px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(59,130,246,0.4);">
-              ⚡ Begin Race &amp; Rhythm
-            </button>
+            <button onclick="window.startRhythmTimer(${gNum});" style="padding:12px 32px; border-radius:26px; font-weight:800; font-size:15px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; border:none; cursor:pointer;">⚡ Begin Race &amp; Rhythm</button>
           ` : `
-            <button onclick="window.tapRhythmBeat(${gNum});" style="padding:16px 42px; border-radius:32px; font-weight:900; font-size:18px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; cursor:pointer; box-shadow:0 6px 22px rgba(16,185,129,0.5); transform:scale(1.05);">
-              🥁 ROW / SPRINT / BEAT!
-            </button>
+            <button onclick="window.tapRhythmBeat(${gNum});" style="padding:14px 38px; border-radius:30px; font-weight:900; font-size:17px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; cursor:pointer;">🥁 TAP BEAT!</button>
           `}
         </div>
       </div>
     `;
   }
 
-  // 4. TARGET & ARCHERY
+  // 4. TARGET & ARCHERY CANVAS
   if (gm.ty === 'target') {
     return `
-      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <div style="font-size:14px; color:#d1d5db;">🎯 Direct Hits: <b style="color:#10b981; font-size:18px;">${gm.hits}/${gm.targets.length}</b></div>
-          <div style="font-size:14px; color:#d1d5db;">🏹 Shots Left: <b style="color:#f59e0b; font-size:18px;">${gm.shotsLeft}</b></div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:14px; color:#d1d5db;">🎯 Hits: <b id="target-hits" style="color:#10b981; font-size:17px;">${gm.hits}/${gm.targets.length}</b></div>
+          <div style="font-size:14px; color:#d1d5db;">🏹 Shots Left: <b id="target-shots" style="color:#f59e0b; font-size:17px;">${gm.shotsLeft}</b></div>
         </div>
-
-        <!-- Target Arena -->
-        <div style="position:relative; width:100%; height:260px; background:radial-gradient(circle at 50% 50%, #2a2018 0%, #12100e 100%); border-radius:16px; overflow:hidden; border:2px dashed rgba(245,158,11,0.3); margin-bottom:18px;">
-          ${gm.targets.map(t => `
-            <div onclick="window.hitGameTarget(${t.id}, ${gNum});" 
-                 style="position:absolute; left:${t.x}%; top:${t.y}%; transform:translate(-50%,-50%); font-size:2.8rem; cursor:pointer; opacity:${t.hit ? 0.2 : 1}; filter:${t.hit ? 'grayscale(1)' : 'drop-shadow(0 4px 10px rgba(245,158,11,0.6))'}; transition:all 0.2s;">
-              ${t.hit ? '💥' : t.icon}
-            </div>
-          `).join('')}
-        </div>
-
-        <div style="font-size:13px; color:#a1a1aa;">
-          Tap floating sacred targets to score direct hits and unlock traditional victory!
-        </div>
+        <canvas id="festora-game-canvas" width="540" height="270" style="width:100%; max-width:540px; border-radius:14px; border:2px dashed rgba(245,158,11,0.4); display:block; margin:0 auto 10px; cursor:crosshair; touch-action:none;"></canvas>
+        <div style="font-size:13px; color:#a1a1aa;">Aim with your cursor or finger and click/tap moving targets!</div>
       </div>
     `;
   }
 
-  // 5. SACRED RITUAL ILLUMINATION
+  // 5. SACRED RITUAL AARTI CANVAS
   if (gm.ty === 'ritual') {
     return `
-      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-        <div style="margin-bottom:14px; font-size:14px; color:#d1d5db;">
-          ✨ Sacred Sanctum Devotional Aura: <b style="color:#8b5cf6; font-size:18px;">${gm.aura}%</b>
-        </div>
-
-        <!-- Aura Glow Bar -->
-        <div style="width:100%; height:16px; background:#2a2018; border-radius:8px; overflow:hidden; margin-bottom:20px; border:1px solid #444;">
-          <div style="width:${gm.aura}%; height:100%; background:linear-gradient(90deg, #8b5cf6, #f59e0b); transition:width 0.3s ease;"></div>
-        </div>
-
-        <!-- Ritual Steps List -->
-        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
-          ${gm.steps.map((step, idx) => `
-            <div onclick="window.performRitualStep(${idx}, ${gNum});" 
-                 style="background:${step.done ? 'rgba(139,92,246,0.25)' : '#2a2018'}; border:1px solid ${step.done ? '#8b5cf6' : '#555'}; border-radius:16px; padding:12px 18px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:all 0.2s;"
-                 onmouseenter="this.style.transform='scale(1.05)';" onmouseleave="this.style.transform='scale(1)';">
-              <span style="font-size:1.8rem;">${step.icon}</span>
-              <div style="text-align:left;">
-                <div style="font-weight:700; color:${step.done ? '#a78bfa' : '#fff'}; font-size:13px;">${step.name}</div>
-                <div style="font-size:11px; color:#9ca3af;">${step.done ? '✅ Consecrated' : 'Tap to Offer'}</div>
-              </div>
-            </div>
-          `).join('')}
+      <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+        <div style="margin-bottom:10px; font-size:14px; color:#d1d5db;">✨ Sanctum Aura: <b style="color:#a78bfa; font-size:17px;">${gm.aura}%</b></div>
+        <canvas id="festora-game-canvas" width="520" height="260" style="width:100%; max-width:520px; border-radius:14px; border:2px solid rgba(139,92,246,0.4); display:block; margin:0 auto 12px; cursor:grab; touch-action:none;"></canvas>
+        <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+          ${gm.steps.map((step, idx) => `<button onclick="window.performRitualStep(${idx}, ${gNum});" style="background:${step.done ? 'rgba(139,92,246,0.3)' : '#2a2018'}; border:1px solid ${step.done ? '#8b5cf6' : '#555'}; border-radius:14px; padding:7px 12px; font-size:12px; color:#fff; cursor:pointer;">${step.icon} ${step.name} ${step.done ? '✅' : ''}</button>`).join('')}
         </div>
       </div>
     `;
   }
 
-  // 6. HARVEST SPEED RUSH
+  // 6. HARVEST CATCH CANVAS
   return `
-    <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:22px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <div style="background:rgba(0,0,0,0.3); border-radius:18px; padding:18px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div style="font-size:14px; color:#d1d5db;">⏱️ Time: <b id="harvest-time" style="color:#fff; font-size:17px;">${gm.timeLeft}s</b></div>
-        <div style="font-size:14px; color:#d1d5db;">🧺 Basket Gathered: <b style="color:#eab308; font-size:18px;">${gm.gathered}/${gm.items.length}</b></div>
+        <div style="font-size:14px; color:#d1d5db;">🧺 Caught: <b id="harvest-count" style="color:#eab308; font-size:17px;">${gm.gathered}/5</b></div>
       </div>
-
-      <!-- Harvest Field -->
-      <div style="position:relative; width:100%; height:260px; background:radial-gradient(circle at 50% 50%, #201e14 0%, #100f0a 100%); border-radius:16px; overflow:hidden; border:2px dashed rgba(234,179,8,0.3); margin-bottom:18px;">
-        ${gm.items.map(it => `
-          <div onclick="window.gatherHarvestItem(${it.id}, ${gNum});" 
-               style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%,-50%); font-size:2.8rem; cursor:pointer; opacity:${it.active ? 1 : 0.15}; transition:all 0.2s;">
-            ${it.active ? it.icon : '✨'}
-          </div>
-        `).join('')}
-      </div>
-
-      ${!gm.running ? `
-        <button onclick="window.startHarvestTimer(${gNum});" style="padding:14px 34px; border-radius:28px; font-weight:800; font-size:16px; background:linear-gradient(135deg,#eab308,#ca8a04); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 18px rgba(234,179,8,0.4);">
-          🌾 Start Harvest Gathering
-        </button>
-      ` : ''}
+      <canvas id="festora-game-canvas" width="540" height="270" style="width:100%; max-width:540px; border-radius:14px; border:2px dashed rgba(234,179,8,0.4); display:block; margin:0 auto 12px; touch-action:none;"></canvas>
+      ${!gm.running ? `<button onclick="window.startHarvestTimer(${gNum});" style="padding:12px 30px; border-radius:26px; font-weight:800; font-size:15px; background:linear-gradient(135deg,#eab308,#ca8a04); color:#18181b; border:none; cursor:pointer;">🌾 Start Harvest Catch</button>` : `<div style="font-size:13px; color:#a1a1aa;">Move basket with Mouse, Finger, or ◀ ▶ Arrow keys!</div>`}
     </div>
   `;
 };
@@ -10312,18 +10671,22 @@ window.paintArtSector = function(idx) {
 window.autoHarmonizeArt = function() {
   if (!window.R_game) return;
   const p = window.R_game.palette;
-  for (let i = 0; i < 6; i++) {
-    const col = p[i % p.length];
-    window.R_game.sectors[i] = col;
-    window.R_game.sectors[i + 6] = col;
+  window.R_game._strokes = window.R_game._strokes || [];
+  const cx = 200, cy = 180;
+  for (let r = 35; r <= 145; r += 26) {
+    const col = p[Math.floor(r / 26) % p.length];
+    for (let a = 0; a < 0.7; a += 0.14) {
+      window.R_game._strokes.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, color: col, size: 7 });
+    }
   }
-  if (typeof draw === 'function') draw();
+  window.R_game.paintedPoints = Math.max(window.R_game.paintedPoints || 0, 24);
+  if (window._redrawArtCanvas) window._redrawArtCanvas();
 };
 
 window.completeArtGame = function(gNum) {
   if (!window.R_game) return;
-  const painted = window.R_game.sectors.filter(c => c !== '#2a2018').length;
-  const sc = painted === 0 ? 60 : Math.min(100, 60 + Math.round((painted / 12) * 40));
+  const pts = window.R_game.paintedPoints || (window.R_game._strokes ? window.R_game._strokes.length : 0);
+  const sc = pts === 0 ? 60 : Math.min(100, 65 + Math.round(Math.min(35, pts * 1.2)));
   window.completeFestivalGame(gNum, sc);
   if (typeof draw === 'function') draw();
 };
@@ -10605,6 +10968,81 @@ window.initHomeDecorState = function() {
   window.homeDecorState = window.homeDecorStates[curId];
 };
 
+window.renderDecorItemSvg = function(it, accent) {
+  const id = (it.id || '').toLowerCase();
+  const c = accent || '#f59e0b';
+  if (id.includes('diya') || id.includes('deepak') || id.includes('butter') || id.includes('nilavilakku')) {
+    return `<svg width="64" height="64" viewBox="0 0 64 64"><defs><radialGradient id="fg_${it.uid}" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#fef08a"/><stop offset="60%" stop-color="#f97316"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="32" cy="20" r="18" fill="url(#fg_${it.uid})"/><path d="M32 8 C37 16,38 23,32 27 C26 23,27 16,32 8Z" fill="#fde047"/><path d="M32 13 C35 18,35 23,32 25 C29 23,29 18,32 13Z" fill="#fff"/><path d="M12 34 Q32 42 52 34 L46 49 Q32 55 18 49 Z" fill="#b45309" stroke="#fbbf24" stroke-width="1.5"/><ellipse cx="32" cy="34" rx="20" ry="6" fill="#78350f" stroke="#f59e0b" stroke-width="1.5"/><ellipse cx="32" cy="52" rx="14" ry="3" fill="#451a03"/></svg>`;
+  }
+  if (id.includes('urli')) {
+    return `<svg width="72" height="58" viewBox="0 0 72 58"><ellipse cx="36" cy="46" rx="26" ry="7" fill="#78350f"/><path d="M10 24 Q36 32 62 24 L56 44 Q36 52 16 44 Z" fill="#d97706" stroke="#fde68a" stroke-width="1.5"/><ellipse cx="36" cy="24" rx="26" ry="8" fill="#0ea5e9" stroke="#fbbf24" stroke-width="2"/><circle cx="26" cy="24" r="3" fill="#fb7185"/><circle cx="45" cy="25" r="3" fill="#f43f5e"/><circle cx="36" cy="21" r="2.5" fill="#fef08a"/><path d="M36 13 L38 19 L34 19 Z" fill="#fde047"/></svg>`;
+  }
+  if (id.includes('rangoli') || id.includes('pookalam') || id.includes('kolam') || id.includes('alpana')) {
+    return `<svg width="86" height="56" viewBox="0 0 100 64"><g transform="translate(50,32) scale(1,0.58)"><circle r="44" fill="${c}33" stroke="#fbbf24" stroke-width="2"/><circle r="32" fill="#ec489944" stroke="#f472b6" stroke-width="2"/><circle r="20" fill="#10b98144" stroke="#34d399" stroke-width="2"/><circle r="9" fill="#fde047"/><path d="M0 -42 L7 -14 L0 -8 L-7 -14 Z M0 42 L7 14 L0 8 L-7 14 Z M-42 0 L-14 7 L-8 0 L-14 -7 Z M42 0 L14 7 L8 0 L14 -7 Z" fill="#f59e0b" opacity="0.9"/></g></svg>`;
+  }
+  if (id.includes('toran') || id.includes('garland') || id.includes('banner')) {
+    return `<svg width="110" height="44" viewBox="0 0 110 44"><path d="M4 8 Q55 34 106 8" fill="none" stroke="#15803d" stroke-width="5"/><circle cx="18" cy="14" r="6" fill="#f97316"/><circle cx="36" cy="20" r="6.5" fill="#facc15"/><circle cx="55" cy="22" r="7" fill="#f97316"/><circle cx="74" cy="20" r="6.5" fill="#facc15"/><circle cx="92" cy="14" r="6" fill="#f97316"/><path d="M27 18 L24 30 L30 30 Z M46 21 L43 34 L49 34 Z M64 21 L61 34 L67 34 Z M83 18 L80 30 L86 30 Z" fill="#22c55e"/></svg>`;
+  }
+  if (id.includes('lantern') || id.includes('fanoos') || id.includes('nakshatram') || id.includes('fairy')) {
+    return `<svg width="64" height="74" viewBox="0 0 64 74"><line x1="32" y1="0" x2="32" y2="14" stroke="#fbbf24" stroke-width="2"/><polygon points="32,12 48,28 42,50 22,50 16,28" fill="${c}" stroke="#fef08a" stroke-width="2"/><polygon points="32,16 41,29 37,46 27,46 23,29" fill="#fde047" opacity="0.8"/><line x1="25" y1="50" x2="23" y2="66" stroke="#f97316" stroke-width="2"/><line x1="32" y1="50" x2="32" y2="68" stroke="#fbbf24" stroke-width="2"/><line x1="39" y1="50" x2="41" y2="66" stroke="#f97316" stroke-width="2"/></svg>`;
+  }
+  if (id.includes('kalash') || id.includes('pongal_pot') || id.includes('garbo')) {
+    return `<svg width="64" height="68" viewBox="0 0 64 68"><path d="M22 26 Q12 42 22 56 L42 56 Q52 42 42 26 Z" fill="#b45309" stroke="#fbbf24" stroke-width="2"/><ellipse cx="32" cy="26" rx="12" ry="4" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/><path d="M24 24 Q16 14 26 16 M40 24 Q48 14 38 16 M32 22 L32 10" stroke="#22c55e" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="32" cy="20" r="7" fill="#7c2d12" stroke="#d97706" stroke-width="1.5"/></svg>`;
+  }
+  if (id.includes('xmas_tree')) {
+    return `<svg width="72" height="82" viewBox="0 0 72 82"><rect x="31" y="64" width="10" height="14" fill="#78350f"/><polygon points="36,8 56,34 16,34" fill="#15803d"/><polygon points="36,24 60,50 12,50" fill="#166534"/><polygon points="36,38 64,66 8,66" fill="#14532d"/><circle cx="36" cy="8" r="4" fill="#fde047"/><circle cx="28" cy="30" r="3" fill="#f43f5e"/><circle cx="44" cy="44" r="3" fill="#fbbf24"/><circle cx="24" cy="56" r="3" fill="#38bdf8"/><circle cx="48" cy="58" r="3" fill="#f43f5e"/></svg>`;
+  }
+  if (id.includes('bonfire')) {
+    return `<svg width="74" height="68" viewBox="0 0 74 68"><path d="M16 56 L58 46 M16 46 L58 56" stroke="#78350f" stroke-width="7" stroke-linecap="round"/><path d="M37 10 C48 26,52 42,37 50 C22 42,26 26,37 10Z" fill="#f97316"/><path d="M37 20 C43 30,45 42,37 48 C29 42,31 30,37 20Z" fill="#fde047"/></svg>`;
+  }
+  return `<svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="${c}28" stroke="${c}" stroke-width="2"/><circle cx="32" cy="32" r="20" fill="#1e150e" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/><text x="32" y="39" text-anchor="middle" font-size="24">${it.icon || '🪔'}</text></svg>`;
+};
+
+window.autoArrangeDecor = function() {
+  window.initHomeDecorState();
+  window.saveDecorHistory();
+  const items = window.homeDecorState.items;
+  const slots = [
+    { x: 50, y: 12 }, { x: 50, y: 36 }, { x: 50, y: 74 },
+    { x: 25, y: 69 }, { x: 75, y: 69 }, { x: 18, y: 26 },
+    { x: 82, y: 26 }, { x: 35, y: 83 }, { x: 65, y: 83 }
+  ];
+  items.forEach((it, idx) => {
+    const s = slots[idx % slots.length];
+    it.x = s.x; it.y = s.y; it.rot = 0;
+  });
+  if (typeof toast === 'function') toast('✨ Auto-arranged your 3D festive home!');
+  draw();
+};
+
+window.startHomeCelebrationFx = function() {
+  const c = document.getElementById('home-celebration-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const particles = Array.from({ length: 36 }, () => ({
+    x: Math.random() * c.width,
+    y: Math.random() * c.height,
+    vy: 0.7 + Math.random() * 1.4,
+    vx: (Math.random() - 0.5) * 0.6,
+    r: 2.5 + Math.random() * 3.5,
+    col: ['#fbbf24', '#f97316', '#ec4899', '#fde047'][Math.floor(Math.random() * 4)]
+  }));
+  const step = () => {
+    if (!document.getElementById('home-celebration-canvas')) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    particles.forEach(p => {
+      p.y += p.vy; p.x += p.vx;
+      if (p.y > c.height + 10) { p.y = -10; p.x = Math.random() * c.width; }
+      ctx.fillStyle = p.col;
+      ctx.shadowColor = p.col; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+};
+
 window.renderFestivalHome = function() {
   const g = window.getFestivalData();
   const festId = window.cur || 'ganesh';
@@ -10682,10 +11120,10 @@ window.renderFestivalHome = function() {
         <div style="position:absolute; top:4px; left:4px; right:4px; bottom:4px; border:1px dashed ${fTheme.accent}66; border-radius:9px;"></div>
       </div>
 
-      <!-- Showcase Floating Sparkles -->
-      ${isShowcase ? (g.fl || ['✨','🪔','🌺','✨']).slice(0, 6).map((em, idx) => `<div style="position:absolute; top:${18 + (idx % 3) * 18}%; left:${12 + idx * 15}%; font-size:1.4rem; opacity:0.85; pointer-events:none; animation:in 1.4s infinite alternate;">${em}</div>`).join('') : ''}
+      <!-- Showcase Floating Sparkles & Canvas Overlay -->
+      ${isShowcase ? `<canvas id="home-celebration-canvas" width="900" height="460" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;"></canvas>` : ''}
 
-      <!-- Placed Interactive Draggable Items -->
+      <!-- Placed Interactive Draggable Items (Detailed 3D SVG Art) -->
       ${st.items.map(it => {
         const isSelected = (!isShowcase && it.uid === st.selectedItemId);
         return `
@@ -10693,8 +11131,8 @@ window.renderFestivalHome = function() {
                style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%, -50%) rotate(${it.rot || 0}deg) scale(${it.scale || 1}); z-index:${it.zIndex || 10}; cursor:${isShowcase ? 'default' : 'move'}; transition:box-shadow 0.15s; ${isSelected ? 'outline:2px dashed #f59e0b; outline-offset:6px;' : ''}"
                ${isShowcase ? '' : `onmousedown="window.startDecorDrag(event, '${it.uid}');" ontouchstart="window.startDecorTouchDrag(event, '${it.uid}');"`}
                title="${it.name}">
-            <div style="font-size:3.1rem; line-height:1; filter:${theme.glowFilter}; user-select:none;">
-              ${it.icon}
+            <div style="filter:${theme.glowFilter}; user-select:none; line-height:0;">
+              ${window.renderDecorItemSvg(it, fTheme.accent)}
             </div>
             ${isSelected ? `
               <div style="position:absolute; top:-38px; left:50%; transform:translateX(-50%); display:flex; gap:5px; background:rgba(0,0,0,0.88); border:1px solid #f59e0b; padding:3px 8px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:99;">
@@ -10713,6 +11151,7 @@ window.renderFestivalHome = function() {
 
   // Post-Decoration Realistic Celebration Showcase
   if (typeof R !== 'undefined' && R.res) {
+    setTimeout(() => { if (window.startHomeCelebrationFx) window.startHomeCelebrationFx(); }, 20);
     return `
       <div style="max-width:960px; margin:12px auto; text-align:center;">
         <div style="background:linear-gradient(135deg,#1e1a16,#2b2016); border:2px solid ${fTheme.accent}; border-radius:24px; padding:24px; box-shadow:0 16px 45px rgba(0,0,0,0.55); margin-bottom:20px;">
@@ -10795,6 +11234,9 @@ window.renderFestivalHome = function() {
           </button>
           <button onclick="window.resetDecor();" style="padding:6px 14px; border-radius:16px; background:#2a2018; color:#ef4444; border:1px solid #555; font-size:12.5px; font-weight:700; cursor:pointer;">
             🔄 Reset Room
+          </button>
+          <button onclick="window.autoArrangeDecor();" style="padding:6px 14px; border-radius:16px; background:#2a2018; color:#10b981; border:1px solid #10b981; font-size:12.5px; font-weight:700; cursor:pointer;">
+            ✨ Auto-Arrange
           </button>
         </div>
 
@@ -11150,6 +11592,7 @@ window.render = function(p) {
     window.FestoraRhythm.stop(true);
   }
   if (!/^G\d$/.test(p)) {
+    if (typeof window.stopFestivalCanvasGame === 'function') window.stopFestivalCanvasGame();
     if (window.R_game && window.R_game.interval) {
       clearInterval(window.R_game.interval);
       window.R_game.interval = null;
