@@ -10482,115 +10482,291 @@ window.HOME_DECOR_CATALOG = {
   ugadi: [
     { id: 'neem_toran', name: 'Neem Blossom & Mango Leaf Toran', icon: '🍃', type: 'wall', defaultScale: 1.3 },
     { id: 'pachadi_bowl', name: 'Traditional Six-Taste Ugadi Pachadi Bowl', icon: '🥣', type: 'table', defaultScale: 1.1 }
+  ],
+  durga: [
+    { id: 'durga_pratima', name: 'Devi Durga Pandal Shrine', icon: '🔱', type: 'altar', glow: true, defaultScale: 1.4 },
+    { id: 'dhunuchi_pot', name: 'Smoking Clay Dhunuchi Censer', icon: '🪔', type: 'table', glow: true, defaultScale: 1.2 },
+    { id: 'alpana_lotus', name: 'Bengali White Alpana Floor Art', icon: '🪷', type: 'floor', defaultScale: 1.5 }
+  ],
+  navratri: [
+    { id: 'garbo_pot', name: 'Illuminated Perforated Garbo Pot', icon: '🏺', type: 'table', glow: true, defaultScale: 1.3 },
+    { id: 'dandiya_pair', name: 'Mirror-Work Dandiya Sticks', icon: '🥢', type: 'wall', defaultScale: 1.2 }
+  ],
+  dasara: [
+    { id: 'golu_steps', name: 'Bommai Golu Traditional Doll Steps', icon: '🎎', type: 'altar', defaultScale: 1.4 },
+    { id: 'royal_howdah', name: 'Golden Mysore Palace Emblem', icon: '👑', type: 'wall', glow: true, defaultScale: 1.3 }
+  ],
+  bihu: [
+    { id: 'jaapi_hat', name: 'Decorated Assamese Bamboo Jaapi', icon: '👒', type: 'wall', defaultScale: 1.4 },
+    { id: 'bihu_dhol', name: 'Assamese Bihu Dhol & Pepa', icon: '🥁', type: 'floor', defaultScale: 1.2 },
+    { id: 'gamosa_drape', name: 'Woven Red-Border Gamosa Drape', icon: '🧣', type: 'wall', defaultScale: 1.3 }
+  ],
+  eid: [
+    { id: 'fanoos_lantern', name: 'Golden Crescent Moon Fanoos Lantern', icon: '🏮', type: 'hanging', glow: true, defaultScale: 1.4 },
+    { id: 'sheer_khurma', name: 'Silver Sheer Khurma & Dates Platter', icon: '🥣', type: 'table', defaultScale: 1.2 },
+    { id: 'crescent_arch', name: 'Crescent & Starry Arch Decor', icon: '🌙', type: 'wall', glow: true, defaultScale: 1.3 }
+  ],
+  xmas: [
+    { id: 'nakshatram_star', name: 'Glowing Paper Star (Nakshatram)', icon: '🌟', type: 'hanging', glow: true, defaultScale: 1.5 },
+    { id: 'xmas_tree_india', name: 'Festive Decorated Mango/Pine Tree', icon: '🎄', type: 'floor', glow: true, defaultScale: 1.6 },
+    { id: 'kuswar_platter', name: 'Goan Bebinca & Kuswar Platter', icon: '🍰', type: 'table', defaultScale: 1.1 }
+  ],
+  gurpurab: [
+    { id: 'ik_onkar_glow', name: 'Golden Illuminated Shrine Frame', icon: '✨', type: 'altar', glow: true, defaultScale: 1.4 },
+    { id: 'karah_prasad', name: 'Sacred Karah Prasad Brass Bowl', icon: '🍲', type: 'table', defaultScale: 1.2 }
+  ],
+  lohri: [
+    { id: 'lohri_bonfire', name: 'Warm Courtyard Sacred Bonfire', icon: '🔥', type: 'floor', glow: true, defaultScale: 1.5 },
+    { id: 'rewri_platter', name: 'Peanuts, Popcorn & Rewri Basket', icon: '🥜', type: 'table', defaultScale: 1.2 }
+  ],
+  chhath: [
+    { id: 'chhath_soop', name: 'Bamboo Soop with Thekua & Fruits', icon: '🧺', type: 'table', defaultScale: 1.3 },
+    { id: 'ghat_diya_row', name: 'Row of Clay Diyas for Surya Arghya', icon: '🌅', type: 'floor', glow: true, defaultScale: 1.4 }
+  ],
+  hemis: [
+    { id: 'thangka_scroll', name: 'Silk Appliqué Monastic Thangka', icon: '📜', type: 'wall', defaultScale: 1.4 },
+    { id: 'butter_lamps', name: 'Row of Himalayan Butter Lamps', icon: '🕯️', type: 'table', glow: true, defaultScale: 1.3 },
+    { id: 'cham_mask', name: 'Sacred Cham Dance Mask', icon: '👹', type: 'wall', defaultScale: 1.2 }
   ]
 };
 
 window.getFestivalDecorItems = function() {
   const curId = window.cur || 'ganesh';
+  const g = (typeof window.getFestivalData === 'function') ? window.getFestivalData() : { name: 'Festival', e: '🪔', food: [], rituals: [] };
   const general = window.HOME_DECOR_CATALOG.general || [];
-  const specific = window.HOME_DECOR_CATALOG[curId] || [];
+  let specific = window.HOME_DECOR_CATALOG[curId];
+  if (!specific || specific.length === 0) {
+    const fDish = (g.food && g.food[0]) ? { id: curId + '_food', name: g.food[0][1] + ' Festive Platter', icon: g.food[0][0] || '🍲', type: 'table', defaultScale: 1.15 } : { id: curId + '_prasad', name: g.name + ' Special Prasad', icon: '🍲', type: 'table', defaultScale: 1.15 };
+    const fRitual = (g.rituals && g.rituals[0]) ? { id: curId + '_ritual', name: g.rituals[0][1] + ' Sacred Emblem', icon: g.rituals[0][0] || g.e, type: 'altar', glow: true, defaultScale: 1.35 } : { id: curId + '_emblem', name: g.name + ' Sacred Emblem', icon: g.e || '🪔', type: 'altar', glow: true, defaultScale: 1.35 };
+    const fBanner = { id: curId + '_banner', name: g.name + ' Ceremonial Garland', icon: (g.fl && g.fl[1]) || '🌺', type: 'wall', defaultScale: 1.35 };
+    specific = [fRitual, fDish, fBanner];
+  }
   return [...specific, ...general];
 };
 
+window.getFestivalRoomTheme = function(festId, g) {
+  const presets = {
+    ganesh: { style: 'Mandapam Courtyard', wallGrad: 'radial-gradient(ellipse at 50% 35%, #5c2b12 0%, #241007 85%)', floorGrad: 'linear-gradient(180deg, #42200e 0%, #1a0b04 100%)', accent: '#f59e0b', floorPattern: '🌺', windowSky: 'linear-gradient(180deg,#ff9f1c,#7c2d12)', windowIcon: '🌙', archLabel: 'GANPATI MANDAP', carpetBg: 'radial-gradient(ellipse, rgba(245,158,11,0.35), transparent 70%)' },
+    diwali: { style: 'Illuminated Haveli', wallGrad: 'radial-gradient(ellipse at 50% 35%, #3d1c4a 0%, #13081c 85%)', floorGrad: 'linear-gradient(180deg, #2a1236 0%, #0d0512 100%)', accent: '#fbbf24', floorPattern: '✨', windowSky: 'linear-gradient(180deg,#0f172a,#4c1d95)', windowIcon: '🎆', archLabel: 'DEEPAVALI MAHAL', carpetBg: 'radial-gradient(ellipse, rgba(251,191,36,0.4), transparent 70%)' },
+    onam: { style: 'Kerala Tharavadu', wallGrad: 'radial-gradient(ellipse at 50% 35%, #1d4a35 0%, #0a1f16 85%)', floorGrad: 'linear-gradient(180deg, #3b2614 0%, #1c1008 100%)', accent: '#34d399', floorPattern: '🌼', windowSky: 'linear-gradient(180deg,#38bdf8,#065f46)', windowIcon: '🌴', archLabel: 'ONAM POOKALAM HALL', carpetBg: 'radial-gradient(ellipse, rgba(244,63,94,0.38), rgba(250,204,21,0.22), transparent 72%)' },
+    pongal: { style: 'Tamil Village Courtyard', wallGrad: 'radial-gradient(ellipse at 50% 35%, #634116 0%, #291807 85%)', floorGrad: 'linear-gradient(180deg, #4d3219 0%, #241509 100%)', accent: '#eab308', floorPattern: '🌾', windowSky: 'linear-gradient(180deg,#fef08a,#ea580c)', windowIcon: '☀️', archLabel: 'SURYA PONGAL MUTRAM', carpetBg: 'radial-gradient(ellipse, rgba(255,255,255,0.28), transparent 70%)' },
+    holi: { style: 'Braj Rang-Mahal', wallGrad: 'radial-gradient(ellipse at 50% 35%, #5e1742 0%, #24081a 85%)', floorGrad: 'linear-gradient(180deg, #381230 0%, #170614 100%)', accent: '#ec4899', floorPattern: '🎨', windowSky: 'linear-gradient(180deg,#f472b6,#facc15)', windowIcon: '🌈', archLabel: 'HOLI RANGOTSAV', carpetBg: 'radial-gradient(ellipse, rgba(236,72,153,0.38), rgba(59,130,246,0.22), transparent 72%)' },
+    durga: { style: 'Kolkata Bonedi Bari', wallGrad: 'radial-gradient(ellipse at 50% 35%, #69141b 0%, #260609 85%)', floorGrad: 'linear-gradient(180deg, #401014 0%, #1c0507 100%)', accent: '#f87171', floorPattern: '🪷', windowSky: 'linear-gradient(180deg,#fb7185,#7f1d1d)', windowIcon: '🔱', archLabel: 'SHARADIYA PANDAL', carpetBg: 'radial-gradient(ellipse, rgba(248,113,113,0.35), transparent 70%)' },
+    navratri: { style: 'Gujarati Jharokha Chowk', wallGrad: 'radial-gradient(ellipse at 50% 35%, #4b1d5e 0%, #1b0824 85%)', floorGrad: 'linear-gradient(180deg, #341342 0%, #13061a 100%)', accent: '#c084fc', floorPattern: '💃', windowSky: 'linear-gradient(180deg,#7e22ce,#1e1b4b)', windowIcon: '🌙', archLabel: 'GARBA MANDAP', carpetBg: 'radial-gradient(ellipse, rgba(192,132,252,0.35), transparent 70%)' },
+    dasara: { style: 'Mysore Royal Durbar', wallGrad: 'radial-gradient(ellipse at 50% 35%, #6b3f0f 0%, #291604 85%)', floorGrad: 'linear-gradient(180deg, #45290b 0%, #1f1103 100%)', accent: '#fbbf24', floorPattern: '👑', windowSky: 'linear-gradient(180deg,#f59e0b,#451a03)', windowIcon: '🏰', archLabel: 'MYSURU AMBA VILAS', carpetBg: 'radial-gradient(ellipse, rgba(251,191,36,0.42), transparent 70%)' },
+    bihu: { style: 'Assamese Chang Ghar', wallGrad: 'radial-gradient(ellipse at 50% 35%, #5c1c20 0%, #21080a 85%)', floorGrad: 'linear-gradient(180deg, #3b2416 0%, #1a0f08 100%)', accent: '#fb7185', floorPattern: '🥁', windowSky: 'linear-gradient(180deg,#86efac,#15803d)', windowIcon: '🌾', archLabel: 'RONGALI BIHU GHAR', carpetBg: 'radial-gradient(ellipse, rgba(225,29,72,0.3), transparent 70%)' },
+    eid: { style: 'Mughal Crescent Courtyard', wallGrad: 'radial-gradient(ellipse at 50% 35%, #0f4738 0%, #051c16 85%)', floorGrad: 'linear-gradient(180deg, #0b3328 0%, #03140f 100%)', accent: '#34d399', floorPattern: '🌙', windowSky: 'linear-gradient(180deg,#064e3b,#020617)', windowIcon: '🌙', archLabel: 'EID MUBARAK DIWAN', carpetBg: 'radial-gradient(ellipse, rgba(52,211,153,0.32), transparent 70%)' },
+    xmas: { style: 'Goan Heritage Villa', wallGrad: 'radial-gradient(ellipse at 50% 35%, #5e141c 0%, #142b1d 85%)', floorGrad: 'linear-gradient(180deg, #2b1a14 0%, #120906 100%)', accent: '#f43f5e', floorPattern: '❄️', windowSky: 'linear-gradient(180deg,#1e3a8a,#0f172a)', windowIcon: '🌟', archLabel: 'CHRISTMAS VERANDAH', carpetBg: 'radial-gradient(ellipse, rgba(244,63,94,0.32), rgba(16,185,129,0.22), transparent 72%)' },
+    hemis: { style: 'Ladakhi Monastery Hall', wallGrad: 'radial-gradient(ellipse at 50% 35%, #6e2618 0%, #1f0c08 85%)', floorGrad: 'linear-gradient(180deg, #421f13 0%, #1c0b06 100%)', accent: '#f97316', floorPattern: '☸️', windowSky: 'linear-gradient(180deg,#7dd3fc,#0284c7)', windowIcon: '🏔️', archLabel: 'HEMIS GOMPA', carpetBg: 'radial-gradient(ellipse, rgba(249,115,22,0.32), transparent 70%)' },
+    chhath: { style: 'River Ghat Sanctuary', wallGrad: 'radial-gradient(ellipse at 50% 35%, #5c2d0c 0%, #1f0e04 85%)', floorGrad: 'linear-gradient(180deg, #164e63 0%, #082f49 100%)', accent: '#fb923c', floorPattern: '🌊', windowSky: 'linear-gradient(180deg,#fb923c,#c2410c)', windowIcon: '🌅', archLabel: 'CHHATH SURYA GHAT', carpetBg: 'radial-gradient(ellipse, rgba(251,146,60,0.35), transparent 70%)' },
+    devdeepawali: { style: 'Kashi Ganga Ghat', wallGrad: 'radial-gradient(ellipse at 50% 35%, #593310 0%, #1c0f04 85%)', floorGrad: 'linear-gradient(180deg, #1e3a5f 0%, #091526 100%)', accent: '#fbbf24', floorPattern: '🪔', windowSky: 'linear-gradient(180deg,#1e1b4b,#020617)', windowIcon: '✨', archLabel: 'KASHI DASHASHWAMEDH', carpetBg: 'radial-gradient(ellipse, rgba(251,191,36,0.4), transparent 70%)' },
+    gurpurab: { style: 'Golden Gurdwara Sahib', wallGrad: 'radial-gradient(ellipse at 50% 35%, #66450d 0%, #241804 85%)', floorGrad: 'linear-gradient(180deg, #4a330a 0%, #1f1503 100%)', accent: '#facc15', floorPattern: '✨', windowSky: 'linear-gradient(180deg,#1e3a8a,#1e1b4b)', windowIcon: '🎆', archLabel: 'DARBAR SAHIB HALL', carpetBg: 'radial-gradient(ellipse, rgba(250,204,21,0.38), transparent 70%)' },
+    lohri: { style: 'Punjabi Winter Courtyard', wallGrad: 'radial-gradient(ellipse at 50% 35%, #66290c 0%, #240c03 85%)', floorGrad: 'linear-gradient(180deg, #42220d 0%, #1c0c04 100%)', accent: '#fb923c', floorPattern: '🔥', windowSky: 'linear-gradient(180deg,#1e1b4b,#312e81)', windowIcon: '🌙', archLabel: 'LOHRI BONFIRE CHOWK', carpetBg: 'radial-gradient(ellipse, rgba(249,115,22,0.4), transparent 70%)' }
+  };
+  if (presets[festId]) return presets[festId];
+  const c1 = g.c1 || '#f59e0b';
+  const c2 = g.c2 || '#b45309';
+  return {
+    style: (g.state || 'Indian') + ' Heritage Home',
+    wallGrad: 'radial-gradient(ellipse at 50% 35%, ' + c1 + '55 0%, #1c140d 85%)',
+    floorGrad: 'linear-gradient(180deg, ' + c2 + '44 0%, #120b06 100%)',
+    accent: c1,
+    floorPattern: g.e || '🪔',
+    windowSky: 'linear-gradient(180deg, ' + c1 + '99, ' + c2 + ')',
+    windowIcon: (g.fl && g.fl[0]) || '✨',
+    archLabel: g.name.toUpperCase() + ' MANDIR',
+    carpetBg: 'radial-gradient(ellipse, ' + c1 + '55, transparent 70%)'
+  };
+};
+
+window.homeDecorStates = window.homeDecorStates || {};
+
 window.initHomeDecorState = function() {
-  if (!window.homeDecorState) {
-    window.homeDecorState = {
+  const curId = window.cur || 'ganesh';
+  if (!window.homeDecorStates[curId]) {
+    const itemsList = window.getFestivalDecorItems();
+    const spec1 = itemsList[0] || { id: 'diya_brass', name: 'Brass Diya', icon: '🪔', defaultScale: 1.3 };
+    const spec2 = itemsList[1] || { id: 'puja_thali', name: 'Puja Thali', icon: '🪙', defaultScale: 1.1 };
+    const spec3 = itemsList[2] || { id: 'toran_marigold', name: 'Door Toran', icon: '🌼', defaultScale: 1.4 };
+    window.homeDecorStates[curId] = {
       lightingMode: 'sunset',
       selectedItemId: null,
       history: [],
       redoStack: [],
       items: [
-        { uid: 'init_1', id: 'urli_brass', name: 'Brass Urli with Floating Candles', icon: '🍲', x: 50, y: 72, rot: 0, scale: 1.2, zIndex: 10 },
-        { uid: 'init_2', id: 'toran_marigold', name: 'Marigold & Mango Leaf Toran', icon: '🌼', x: 50, y: 14, rot: 0, scale: 1.5, zIndex: 5 },
-        { uid: 'init_3', id: 'diya_brass_1', name: 'Traditional Brass Diya', icon: '🪔', x: 28, y: 68, rot: 0, scale: 1.1, zIndex: 8 },
-        { uid: 'init_4', id: 'diya_brass_2', name: 'Traditional Brass Diya', icon: '🪔', x: 72, y: 68, rot: 0, scale: 1.1, zIndex: 8 }
+        { uid: curId + '_init_1', id: spec1.id, name: spec1.name, icon: spec1.icon, x: 50, y: 36, rot: 0, scale: spec1.defaultScale || 1.3, zIndex: 10 },
+        { uid: curId + '_init_2', id: spec2.id, name: spec2.name, icon: spec2.icon, x: 50, y: 74, rot: 0, scale: spec2.defaultScale || 1.15, zIndex: 12 },
+        { uid: curId + '_init_3', id: spec3.id, name: spec3.name, icon: spec3.icon, x: 50, y: 12, rot: 0, scale: spec3.defaultScale || 1.4, zIndex: 6 },
+        { uid: curId + '_init_4', id: 'diya_brass_l', name: 'Traditional Brass Diya', icon: '🪔', x: 26, y: 69, rot: 0, scale: 1.1, zIndex: 9 },
+        { uid: curId + '_init_5', id: 'diya_brass_r', name: 'Traditional Brass Diya', icon: '🪔', x: 74, y: 69, rot: 0, scale: 1.1, zIndex: 9 }
       ]
     };
   }
+  window.homeDecorState = window.homeDecorStates[curId];
 };
 
 window.renderFestivalHome = function() {
   const g = window.getFestivalData();
+  const festId = window.cur || 'ganesh';
   window.initHomeDecorState();
   const st = window.homeDecorState;
   const decorCatalog = window.getFestivalDecorItems();
+  const fTheme = window.getFestivalRoomTheme(festId, g);
 
-  // Evaluation results view
+  const lightingThemes = {
+    daylight: {
+      sunbeam: 'linear-gradient(135deg, rgba(255,248,220,0.22) 0%, rgba(255,248,220,0) 70%)',
+      glowFilter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.55)) drop-shadow(0 0 12px ' + fTheme.accent + '88)',
+      ambientOverlay: 'rgba(255,245,220,0.06)'
+    },
+    sunset: {
+      sunbeam: 'linear-gradient(135deg, rgba(249,115,22,0.24) 0%, rgba(249,115,22,0) 70%)',
+      glowFilter: 'drop-shadow(0 8px 14px rgba(0,0,0,0.65)) drop-shadow(0 0 18px ' + fTheme.accent + 'bb)',
+      ambientOverlay: 'rgba(245,158,11,0.04)'
+    },
+    night: {
+      sunbeam: 'linear-gradient(135deg, rgba(168,85,247,0.12) 0%, rgba(168,85,247,0) 70%)',
+      glowFilter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 22px #f59e0b) drop-shadow(0 0 38px ' + fTheme.accent + ')',
+      ambientOverlay: 'rgba(10,5,20,0.28)'
+    }
+  };
+  const theme = lightingThemes[st.lightingMode] || lightingThemes.sunset;
+
+  const render3DViewport = (isShowcase) => `
+    <div id="decor-room-canvas" 
+         style="position:relative; width:100%; height:${isShowcase ? '460px' : '520px'}; border-radius:22px; overflow:hidden; border:2px solid ${fTheme.accent}; box-shadow:0 18px 50px rgba(0,0,0,0.65), inset 0 0 80px rgba(0,0,0,0.5); background:${fTheme.wallGrad}; user-select:none; perspective:900px;"
+         ${isShowcase ? '' : `onclick="if(event.target.id === 'decor-room-canvas') { window.homeDecorState.selectedItemId = null; draw(); }" onmousemove="window.handleDecorDrag(event);" onmouseup="window.endDecorDrag();" ontouchmove="window.handleDecorTouchDrag(event);" ontouchend="window.endDecorDrag();"`}>
+
+      <div style="position:absolute; inset:0; background:${theme.ambientOverlay}; pointer-events:none;"></div>
+
+      <!-- Left Jharokha Window with Festival Vista -->
+      <div style="position:absolute; top:38px; left:24px; width:106px; height:172px; border:3px solid ${fTheme.accent}; border-top-left-radius:53px; border-top-right-radius:53px; background:${fTheme.windowSky}; box-shadow:inset 0 0 22px rgba(0,0,0,0.7), 0 6px 18px rgba(0,0,0,0.5); pointer-events:none; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <span style="font-size:2.4rem; filter:drop-shadow(0 0 12px rgba(255,255,255,0.6));">${fTheme.windowIcon}</span>
+        <div style="position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0, rgba(0,0,0,0.22) 2px, transparent 0, transparent 26px);"></div>
+      </div>
+
+      <!-- Right Jharokha Window with Festival Vista -->
+      <div style="position:absolute; top:38px; right:24px; width:106px; height:172px; border:3px solid ${fTheme.accent}; border-top-left-radius:53px; border-top-right-radius:53px; background:${fTheme.windowSky}; box-shadow:inset 0 0 22px rgba(0,0,0,0.7), 0 6px 18px rgba(0,0,0,0.5); pointer-events:none; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <span style="font-size:2.4rem; filter:drop-shadow(0 0 12px rgba(255,255,255,0.6));">${(g.fl && g.fl[1]) || fTheme.windowIcon}</span>
+        <div style="position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0, rgba(0,0,0,0.22) 2px, transparent 0, transparent 26px);"></div>
+      </div>
+
+      <!-- Projected Volumetric Sunbeam / Aura -->
+      <div style="position:absolute; top:40px; left:65px; width:360px; height:420px; background:${theme.sunbeam}; transform:rotate(28deg); pointer-events:none; filter:blur(12px);"></div>
+      ${isShowcase ? `<div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 42%, ${fTheme.accent}44 0%, transparent 65%); pointer-events:none;"></div>` : ''}
+
+      <!-- Back Wall Archway -->
+      <div style="position:absolute; top:0; left:15%; right:15%; height:86px; border-bottom:4px solid ${fTheme.accent}; border-bottom-left-radius:180px; border-bottom-right-radius:180px; background:linear-gradient(180deg, ${fTheme.accent}33 0%, transparent 100%); pointer-events:none; display:flex; justify-content:space-around; align-items:flex-end; padding-bottom:8px;">
+        <span style="font-size:1.35rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+        <span style="font-size:1.2rem; color:${fTheme.accent}; font-weight:800; letter-spacing:1.2px; text-shadow:0 2px 6px #000;">${fTheme.style.toUpperCase()}</span>
+        <span style="font-size:1.35rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
+      </div>
+
+      <!-- Center Sanctum / Festival Altar Niche -->
+      <div style="position:absolute; top:94px; left:50%; transform:translateX(-50%); width:188px; height:158px; border:3px solid ${fTheme.accent}; border-top-left-radius:94px; border-top-right-radius:94px; background:radial-gradient(circle at 50% 45%, ${fTheme.accent}44 0%, #120b07 85%); box-shadow:0 0 32px ${fTheme.accent}55, inset 0 0 20px #000; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="font-size:3.4rem; filter:drop-shadow(0 0 16px ${fTheme.accent});">${g.e}</div>
+        <small style="color:${fTheme.accent}; font-size:10.5px; font-weight:800; letter-spacing:0.6px; margin-top:4px; text-align:center;">${fTheme.archLabel}</small>
+      </div>
+
+      <!-- 3D Perspective Floor Base -->
+      <div style="position:absolute; bottom:0; left:-5%; width:110%; height:235px; background:${fTheme.floorGrad}; border-top:3px solid ${fTheme.accent}99; box-shadow:inset 0 22px 35px rgba(0,0,0,0.65); pointer-events:none;">
+        <div style="width:100%; height:100%; background:repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 44px, rgba(0,0,0,0.28) 44px, rgba(0,0,0,0.28) 46px);"></div>
+        <!-- Festive Floor Carpet / Rangoli / Pookalam Glow -->
+        <div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%) rotateX(48deg); width:360px; height:150px; border-radius:50%; background:${fTheme.carpetBg}; border:2px dashed ${fTheme.accent}88; display:flex; align-items:center; justify-content:center; font-size:2rem; opacity:0.85;">
+          ${fTheme.floorPattern}
+        </div>
+      </div>
+
+      <!-- Traditional Carved Furniture Base (Chowki / Altar Table) -->
+      <div style="position:absolute; bottom:56px; left:50%; transform:translateX(-50%); width:270px; height:72px; background:linear-gradient(180deg, #523018 0%, #261408 100%); border-radius:14px; border:2px solid ${fTheme.accent}; box-shadow:0 16px 30px rgba(0,0,0,0.75); pointer-events:none;">
+        <div style="position:absolute; top:4px; left:4px; right:4px; bottom:4px; border:1px dashed ${fTheme.accent}66; border-radius:9px;"></div>
+      </div>
+
+      <!-- Showcase Floating Sparkles -->
+      ${isShowcase ? (g.fl || ['✨','🪔','🌺','✨']).slice(0, 6).map((em, idx) => `<div style="position:absolute; top:${18 + (idx % 3) * 18}%; left:${12 + idx * 15}%; font-size:1.4rem; opacity:0.85; pointer-events:none; animation:in 1.4s infinite alternate;">${em}</div>`).join('') : ''}
+
+      <!-- Placed Interactive Draggable Items -->
+      ${st.items.map(it => {
+        const isSelected = (!isShowcase && it.uid === st.selectedItemId);
+        return `
+          <div id="item-${it.uid}"
+               style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%, -50%) rotate(${it.rot || 0}deg) scale(${it.scale || 1}); z-index:${it.zIndex || 10}; cursor:${isShowcase ? 'default' : 'move'}; transition:box-shadow 0.15s; ${isSelected ? 'outline:2px dashed #f59e0b; outline-offset:6px;' : ''}"
+               ${isShowcase ? '' : `onmousedown="window.startDecorDrag(event, '${it.uid}');" ontouchstart="window.startDecorTouchDrag(event, '${it.uid}');"`}
+               title="${it.name}">
+            <div style="font-size:3.1rem; line-height:1; filter:${theme.glowFilter}; user-select:none;">
+              ${it.icon}
+            </div>
+            ${isSelected ? `
+              <div style="position:absolute; top:-38px; left:50%; transform:translateX(-50%); display:flex; gap:5px; background:rgba(0,0,0,0.88); border:1px solid #f59e0b; padding:3px 8px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:99;">
+                <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', -15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Left">↺</button>
+                <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', 15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Right">↻</button>
+                <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', 0.15);" style="border:none; background:none; color:#10b981; font-size:13px; font-weight:800; cursor:pointer;" title="Enlarge">➕</button>
+                <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', -0.15);" style="border:none; background:none; color:#f59e0b; font-size:13px; font-weight:800; cursor:pointer;" title="Shrink">➖</button>
+                <button onclick="event.stopPropagation(); window.removeDecorItem('${it.uid}');" style="border:none; background:none; color:#ef4444; font-size:12px; cursor:pointer;" title="Remove">🗑️</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  // Post-Decoration Realistic Celebration Showcase
   if (typeof R !== 'undefined' && R.res) {
     return `
-      <div style="max-width:760px; margin:20px auto; text-align:center; background:#1e1a16; border:2px solid #f59e0b; border-radius:24px; padding:35px 25px; box-shadow:0 12px 40px rgba(0,0,0,0.5);">
-        <div style="font-size:4.5rem; margin-bottom:10px;">✨ 🪔 ✨</div>
-        <h2 style="margin:0 0 10px; color:#f59e0b; font-size:2rem;">${g.name} Festive Home Altar Evaluation</h2>
-        <p style="color:#d1d5db; font-size:15px; margin-bottom:20px;">
-          Your virtual Indian living room radiates divine grace, cultural authenticity, and warm festive hospitality.
-        </p>
-        
-        <div style="background:rgba(0,0,0,0.4); border-radius:18px; padding:20px; margin-bottom:25px; border:1px solid rgba(255,255,255,0.08);">
-          ${[
-            ['Cultural Authenticity & Traditions', R.res[0] || 92],
-            ['Aesthetic Harmony & Lighting Balance', R.res[1] || 95],
-            ['Festive Grandeur & Atmosphere', R.res[2] || 96]
-          ].map(row => `
-            <div style="margin:12px 0; text-align:left;">
-              <div style="display:flex; justify-content:space-between; font-weight:700; color:#e5e7eb; font-size:13.5px; margin-bottom:5px;">
-                <span>${row[0]}</span>
-                <span style="color:#f59e0b;">${row[1]}%</span>
-              </div>
-              <div style="width:100%; height:12px; background:#2a2018; border-radius:6px; overflow:hidden; border:1px solid #444;">
-                <div style="width:${row[1]}%; height:100%; background:linear-gradient(90deg, #f59e0b, #10b981); transition:width 0.4s;"></div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
+      <div style="max-width:960px; margin:12px auto; text-align:center;">
+        <div style="background:linear-gradient(135deg,#1e1a16,#2b2016); border:2px solid ${fTheme.accent}; border-radius:24px; padding:24px; box-shadow:0 16px 45px rgba(0,0,0,0.55); margin-bottom:20px;">
+          <h2 style="margin:0 0 6px; color:${fTheme.accent}; font-size:1.75rem;">✨ ${g.name} Illuminated 3D Home Celebration ✨</h2>
+          <p style="color:#d1d5db; font-size:14px; margin:0 0 16px;">
+            Your <b>${fTheme.style}</b> is consecrated and glowing with ${st.items.length} festive ornaments!
+          </p>
 
-        <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
-          <button onclick="R.res=null; draw();" style="padding:12px 24px; border-radius:25px; font-weight:700; background:#333; color:#fff; border:1px solid #555; cursor:pointer;">
-            ✏️ Continue Decorating
-          </button>
-          <button onclick="go('Progress')" style="padding:12px 24px; border-radius:25px; font-weight:700; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(245,158,11,0.4);">
-            🏆 View Badges &amp; Rewards
-          </button>
+          ${render3DViewport(true)}
+
+          <div style="background:rgba(0,0,0,0.4); border-radius:18px; padding:18px; margin:20px 0; border:1px solid rgba(255,255,255,0.08);">
+            ${[
+              ['Cultural Authenticity & Traditions', R.res[0] || 92],
+              ['Aesthetic Harmony & 3D Lighting Balance', R.res[1] || 95],
+              ['Festive Grandeur & Atmosphere', R.res[2] || 96]
+            ].map(row => `
+              <div style="margin:10px 0; text-align:left;">
+                <div style="display:flex; justify-content:space-between; font-weight:700; color:#e5e7eb; font-size:13.5px; margin-bottom:5px;">
+                  <span>${row[0]}</span>
+                  <span style="color:${fTheme.accent};">${row[1]}%</span>
+                </div>
+                <div style="width:100%; height:11px; background:#2a2018; border-radius:6px; overflow:hidden; border:1px solid #444;">
+                  <div style="width:${row[1]}%; height:100%; background:linear-gradient(90deg, ${fTheme.accent}, #10b981);"></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <button onclick="if(window.FestoraRhythm)window.FestoraRhythm.play('${festId}');" style="padding:11px 22px; border-radius:24px; font-weight:700; background:#10b981; color:#fff; border:none; cursor:pointer;">
+              🎶 Play ${g.name} Rhythm
+            </button>
+            <button onclick="R.res=null; draw();" style="padding:11px 22px; border-radius:24px; font-weight:700; background:#333; color:#fff; border:1px solid #555; cursor:pointer;">
+              ✏️ Continue Decorating
+            </button>
+            <button onclick="go('Progress')" style="padding:11px 22px; border-radius:24px; font-weight:700; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; cursor:pointer;">
+              🏆 View Badges &amp; Rewards
+            </button>
+          </div>
         </div>
       </div>
     `;
   }
 
-  const lightingThemes = {
-    daylight: {
-      roomBg: 'radial-gradient(ellipse at 50% 30%, #5a4632 0%, #2b1f1d 75%)',
-      wallColor: '#453225',
-      floorBg: 'linear-gradient(180deg, #3a2618 0%, #1f140c 100%)',
-      sunbeam: 'linear-gradient(135deg, rgba(255,245,210,0.18) 0%, rgba(255,245,210,0) 70%)',
-      glowFilter: 'drop-shadow(0 0 10px rgba(245,158,11,0.5))'
-    },
-    sunset: {
-      roomBg: 'radial-gradient(ellipse at 50% 35%, #4a2d1d 0%, #1a100c 80%)',
-      wallColor: '#361e12',
-      floorBg: 'linear-gradient(180deg, #2e1a0f 0%, #140b06 100%)',
-      sunbeam: 'linear-gradient(135deg, rgba(249,115,22,0.22) 0%, rgba(249,115,22,0) 70%)',
-      glowFilter: 'drop-shadow(0 0 14px rgba(249,115,22,0.7))'
-    },
-    night: {
-      roomBg: 'radial-gradient(ellipse at 50% 40%, #1e131d 0%, #0a060a 85%)',
-      wallColor: '#170d17',
-      floorBg: 'linear-gradient(180deg, #160c16 0%, #080308 100%)',
-      sunbeam: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0) 70%)',
-      glowFilter: 'drop-shadow(0 0 20px rgba(245,158,11,0.95)) drop-shadow(0 0 35px rgba(249,115,22,0.6))'
-    }
-  };
-  const theme = lightingThemes[st.lightingMode] || lightingThemes.sunset;
-  const selectedItem = st.items.find(it => it.uid === st.selectedItemId);
-
   return `
     <div style="max-width:1080px; margin:0 auto; padding-bottom:35px;">
       <!-- Title & Ambiance Controls Header -->
-      <div style="background:linear-gradient(135deg, #1e1a16 0%, #2a221b 100%); border:1px solid rgba(245,158,11,0.25); border-radius:18px; padding:20px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div style="background:linear-gradient(135deg, #1e1a16 0%, #2a221b 100%); border:1px solid ${fTheme.accent}55; border-radius:18px; padding:20px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
         <div>
           <h2 style="margin:0 0 4px; color:#fff; font-size:22px; display:flex; align-items:center; gap:8px;">
-            <span>${g.e}</span> 3D Festive Living Room &amp; Altar Decorator
+            <span>${g.e}</span> ${g.name} · 3D ${fTheme.style}
           </h2>
           <p style="margin:0; color:#d1d5db; font-size:13.5px;">
-            Drag, rotate, and style authentic Indian festive decorations in your realistic living room interior.
+            Drag, rotate, and style authentic ${g.name} decorations in your custom 3D festive home.
           </p>
         </div>
 
@@ -10608,7 +10784,7 @@ window.renderFestivalHome = function() {
         </div>
       </div>
 
-      <!-- Action Toolbar (Undo/Redo/Reset/Save) -->
+      <!-- Action Toolbar -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
         <div style="display:flex; gap:8px;">
           <button onclick="window.undoDecor();" ${st.history.length === 0 ? 'disabled' : ''} style="padding:6px 14px; border-radius:16px; background:#2a2018; color:${st.history.length ? '#fff' : '#666'}; border:1px solid #444; font-size:12.5px; font-weight:700; cursor:pointer;">
@@ -10624,85 +10800,17 @@ window.renderFestivalHome = function() {
 
         <div style="display:flex; gap:8px;">
           <button onclick="window.finishFestivalHome();" style="padding:8px 22px; border-radius:20px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#18181b; border:none; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(245,158,11,0.4);">
-            ✨ Consecrate &amp; Score Altar
+            ✨ Consecrate &amp; Celebrate Home
           </button>
         </div>
       </div>
 
-      <!-- 3D Realistic Living Room Interior Viewport -->
-      <div id="decor-room-canvas" 
-           style="position:relative; width:100%; height:520px; border-radius:22px; overflow:hidden; border:2px solid rgba(245,158,11,0.4); box-shadow:0 14px 45px rgba(0,0,0,0.6); background:${theme.roomBg}; user-select:none;"
-           onclick="if(event.target.id === 'decor-room-canvas') { window.homeDecorState.selectedItemId = null; draw(); }"
-           onmousemove="window.handleDecorDrag(event);"
-           onmouseup="window.endDecorDrag();"
-           ontouchmove="window.handleDecorTouchDrag(event);"
-           ontouchend="window.endDecorDrag();">
-
-        <!-- Left Jharokha Window with Natural Sunbeam -->
-        <div style="position:absolute; top:40px; left:25px; width:110px; height:180px; border:3px solid #6b4423; border-top-left-radius:55px; border-top-right-radius:55px; background:rgba(0,0,0,0.3); box-shadow:inset 0 0 20px rgba(0,0,0,0.8); pointer-events:none;">
-          <div style="width:100%; height:100%; background:repeating-linear-gradient(45deg, rgba(200,150,100,0.2) 0, rgba(200,150,100,0.2) 2px, transparent 0, transparent 14px);"></div>
-        </div>
-        <!-- Projected Angular Sunbeam -->
-        <div style="position:absolute; top:50px; left:60px; width:340px; height:400px; background:${theme.sunbeam}; transform:rotate(28deg); pointer-events:none; filter:blur(10px);"></div>
-
-        <!-- Back Wall Archway (Rajasthani Toran Arch) -->
-        <div style="position:absolute; top:0; left:12%; right:12%; height:90px; border-bottom:4px solid #8b5a2b; border-bottom-left-radius:180px; border-bottom-right-radius:180px; background:linear-gradient(180deg, rgba(139,90,43,0.3) 0%, transparent 100%); pointer-events:none; display:flex; justify-content:space-around; align-items:flex-end; padding-bottom:8px;">
-          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
-          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
-          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
-          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
-          <span style="font-size:1.4rem; filter:drop-shadow(0 2px 4px #000);">🔔</span>
-        </div>
-
-        <!-- Center Mandir Altar Niche -->
-        <div style="position:absolute; top:95px; left:50%; transform:translateX(-50%); width:170px; height:150px; border:3px solid #c9931a; border-top-left-radius:85px; border-top-right-radius:85px; background:radial-gradient(circle at 50% 50%, rgba(245,158,11,0.25) 0%, #150d09 85%); box-shadow:0 0 25px rgba(245,158,11,0.25), inset 0 0 15px #000; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-          <div style="font-size:3.2rem; filter:drop-shadow(0 0 12px rgba(245,158,11,0.8));">${g.e}</div>
-          <small style="color:#f59e0b; font-size:11px; font-weight:700; letter-spacing:0.5px;">${g.name.toUpperCase()}</small>
-        </div>
-
-        <!-- Perspective Parquet Floor Base -->
-        <div style="position:absolute; bottom:0; left:0; width:100%; height:230px; background:${theme.floorBg}; border-top:3px solid #5a381e; box-shadow:inset 0 15px 30px rgba(0,0,0,0.6); pointer-events:none;">
-          <div style="width:100%; height:100%; background:repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 40px, rgba(0,0,0,0.25) 40px, rgba(0,0,0,0.25) 42px);"></div>
-        </div>
-
-        <!-- Traditional Carved Furniture Base (Chowki / Coffee Table in Center) -->
-        <div style="position:absolute; bottom:55px; left:50%; transform:translateX(-50%); width:260px; height:70px; background:linear-gradient(180deg, #4a2c16 0%, #29170a 100%); border-radius:12px; border:2px solid #8b5a2b; box-shadow:0 12px 25px rgba(0,0,0,0.7); pointer-events:none;">
-          <div style="position:absolute; top:4px; left:4px; right:4px; bottom:4px; border:1px dashed rgba(245,158,11,0.3); border-radius:8px;"></div>
-        </div>
-
-        <!-- Placed Interactive Draggable Items in Room -->
-        ${st.items.map(it => {
-          const isSelected = (it.uid === st.selectedItemId);
-          return `
-            <div id="item-${it.uid}"
-                 style="position:absolute; left:${it.x}%; top:${it.y}%; transform:translate(-50%, -50%) rotate(${it.rot || 0}deg) scale(${it.scale || 1}); z-index:${it.zIndex || 10}; cursor:move; transition:box-shadow 0.15s; ${isSelected ? 'outline:2px dashed #f59e0b; outline-offset:6px; filter:drop-shadow(0 0 12px #f59e0b);' : ''}"
-                 onmousedown="window.startDecorDrag(event, '${it.uid}');"
-                 ontouchstart="window.startDecorTouchDrag(event, '${it.uid}');"
-                 title="${it.name}">
-              
-              <div style="font-size:3rem; line-height:1; filter:${theme.glowFilter}; user-select:none;">
-                ${it.icon}
-              </div>
-
-              <!-- Selected Item Floating Control Pills -->
-              ${isSelected ? `
-                <div style="position:absolute; top:-38px; left:50%; transform:translateX(-50%); display:flex; gap:5px; background:rgba(0,0,0,0.85); border:1px solid #f59e0b; padding:3px 8px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:99;">
-                  <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', -15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Left">↺</button>
-                  <button onclick="event.stopPropagation(); window.rotateDecorItem('${it.uid}', 15);" style="border:none; background:none; color:#fff; font-size:12px; cursor:pointer;" title="Rotate Right">↻</button>
-                  <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', 0.15);" style="border:none; background:none; color:#10b981; font-size:13px; font-weight:800; cursor:pointer;" title="Enlarge">➕</button>
-                  <button onclick="event.stopPropagation(); window.scaleDecorItem('${it.uid}', -0.15);" style="border:none; background:none; color:#f59e0b; font-size:13px; font-weight:800; cursor:pointer;" title="Shrink">➖</button>
-                  <button onclick="event.stopPropagation(); window.removeDecorItem('${it.uid}');" style="border:none; background:none; color:#ef4444; font-size:12px; cursor:pointer;" title="Remove">🗑️</button>
-                </div>
-              ` : ''}
-            </div>
-          `;
-        }).join('')}
-      </div>
+      ${render3DViewport(false)}
 
       <!-- Add New Festival Decoration Palette -->
       <div style="margin-top:22px; background:#1e1a16; border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px; box-shadow:0 6px 20px rgba(0,0,0,0.25);">
-        <h3 style="margin:0 0 12px; color:#f59e0b; font-size:16px; display:flex; align-items:center; gap:8px;">
-          <span>📦</span> Available Decorations for ${g.name} (Tap to Place into Living Room)
+        <h3 style="margin:0 0 12px; color:${fTheme.accent}; font-size:16px; display:flex; align-items:center; gap:8px;">
+          <span>📦</span> Available Decorations for ${g.name} (Tap to Place into 3D Room)
         </h3>
         
         <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px;">
@@ -10713,7 +10821,7 @@ window.renderFestivalHome = function() {
                  onmouseleave="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none';">
               <div style="font-size:2.4rem; margin-bottom:6px;">${it.icon}</div>
               <div style="color:#e5e7eb; font-size:12px; font-weight:700; line-height:1.3;">${it.name}</div>
-              <small style="color:#f59e0b; font-size:11px;">＋ Add</small>
+              <small style="color:${fTheme.accent}; font-size:11px;">＋ Add</small>
             </div>
           `).join('')}
         </div>
@@ -10761,12 +10869,9 @@ window.redoDecor = function() {
 
 window.resetDecor = function() {
   if (confirm('Reset living room to default festive arrangement?')) {
-    window.saveDecorHistory();
-    window.homeDecorState.items = [
-      { uid: 'init_1', id: 'urli_brass', name: 'Brass Urli with Floating Candles', icon: '🍲', x: 50, y: 72, rot: 0, scale: 1.2, zIndex: 10 },
-      { uid: 'init_2', id: 'toran_marigold', name: 'Marigold & Mango Leaf Toran', icon: '🌼', x: 50, y: 14, rot: 0, scale: 1.5, zIndex: 5 }
-    ];
-    window.homeDecorState.selectedItemId = null;
+    const curId = window.cur || 'ganesh';
+    if (window.homeDecorStates) delete window.homeDecorStates[curId];
+    window.initHomeDecorState();
     draw();
   }
 };
