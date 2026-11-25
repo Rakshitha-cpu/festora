@@ -447,60 +447,196 @@
     altarLight.position.set(0, 2.6, -2.4);
     scene.add(altarLight);
 
-    // Procedural PBR Room Architecture
+    // ---- UNIQUE FESTIVAL-SPECIFIC 3D ARCHITECTURE & ATMOSPHERE ----
     const disposables = [];
     const floorTex = makeNoiseTex(THREE, data.floorMat, data.palette.floor);
     const wallTex = makeNoiseTex(THREE, data.wallMat, data.palette.wall);
     disposables.push(floorTex, wallTex);
 
+    const archType = (data.arch && data.arch.roof) || 'courtyard';
+    const pillarStyle = (data.arch && data.arch.pillars) || 'stone';
+    const isOpenSky = (archType === 'open_sky' || archType === 'open_courtyard' || pillarStyle === 'sandstone_step');
+    const isGhat = (pillarStyle === 'sandstone_step');
+    const isTent = (archType === 'tent_drape');
+    const isMonastery = (pillarStyle === 'painted_wood');
+    const isTemple = (pillarStyle === 'carved_stone');
+    const isBamboo = (pillarStyle === 'bamboo');
+    const isPalace = (pillarStyle === 'gilded_pillar');
+    const isNalukettu = (pillarStyle === 'teakwood');
+    const isPandal = (pillarStyle === 'bamboo_drape');
+    const isGoan = (pillarStyle === 'laterite_wood');
+
+    // Sky Celestial Elements (Moon / Sun / Stars)
+    if (data.timeOfDay === 'night') {
+      const starGeo = new THREE.BufferGeometry();
+      const sPos = new Float32Array(90 * 3);
+      for (let i = 0; i < 90; i++) {
+        sPos[i * 3] = (Math.random() - 0.5) * 26;
+        sPos[i * 3 + 1] = 3.5 + Math.random() * 8;
+        sPos[i * 3 + 2] = -7 - Math.random() * 10;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+      const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: '#fef9c3', size: 0.09, transparent: true, opacity: 0.85 }));
+      scene.add(stars);
+      if (festId === 'eid' || festId === 'karwachauth' || festId === 'shivaratri' || festId === 'rann') {
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(0.65, 16, 14), new THREE.MeshBasicMaterial({ color: '#fef08a' }));
+        moon.position.set(3.2, 5.4, -9.5);
+        scene.add(moon);
+      }
+    } else if (data.timeOfDay === 'sunrise' || data.timeOfDay === 'dawn') {
+      const sun = new THREE.Mesh(new THREE.SphereGeometry(0.85, 16, 14), new THREE.MeshBasicMaterial({ color: '#fdba74' }));
+      sun.position.set(-2.8, 4.4, -10.5);
+      scene.add(sun);
+    }
+
+    // Floor
     const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(11, 11),
-      new THREE.MeshStandardMaterial({ map: floorTex, bumpMap: floorTex, bumpScale: 0.04, roughness: data.floorMat === 'marble' ? 0.25 : 0.78, metalness: 0.05 })
+      new THREE.PlaneGeometry(11.5, 11.5),
+      new THREE.MeshStandardMaterial({ map: floorTex, bumpMap: floorTex, bumpScale: 0.04, roughness: data.floorMat === 'marble' ? 0.22 : 0.8, metalness: data.floorMat === 'marble' ? 0.1 : 0.04 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
 
+    // Royal crimson carpet for Palace / Pandal / Eid
+    if (isPalace || isPandal || festId === 'eid') {
+      const carpet = new THREE.Mesh(
+        new THREE.BoxGeometry(2.1, 0.025, 6.8),
+        new THREE.MeshStandardMaterial({ color: festId === 'eid' ? '#059669' : '#991b1b', roughness: 0.85 })
+      );
+      carpet.position.set(0, 0.015, 0.1);
+      carpet.receiveShadow = true;
+      scene.add(carpet);
+    }
+
+    // Ghat Water Plane for River Festivals
+    if (isGhat) {
+      const water = new THREE.Mesh(
+        new THREE.PlaneGeometry(24, 12),
+        new THREE.MeshStandardMaterial({ color: '#0369a1', roughness: 0.15, metalness: 0.55 })
+      );
+      water.rotation.x = -Math.PI / 2;
+      water.position.set(0, -0.18, -10);
+      scene.add(water);
+      for (let st = 0; st < 3; st++) {
+        const step = new THREE.Mesh(new THREE.BoxGeometry(11, 0.18, 0.8), new THREE.MeshStandardMaterial({ color: data.palette.wall, roughness: 0.8 }));
+        step.position.set(0, 0.09 + st * 0.16, -4.6 + st * 0.45);
+        scene.add(step);
+      }
+    }
+
+    // Walls (height adapts to open courtyard vs enclosed mandapa/tent/villa)
     const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, bumpMap: wallTex, bumpScale: 0.03, roughness: 0.82 });
-    const backWall = new THREE.Mesh(new THREE.BoxGeometry(10.5, 4.6, 0.35), wallMat);
-    backWall.position.set(0, 2.3, -3.9); backWall.receiveShadow = true;
-    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.6, 9), wallMat);
-    leftWall.position.set(-5.1, 2.3, 0.5); leftWall.receiveShadow = true;
-    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.6, 9), wallMat);
-    rightWall.position.set(5.1, 2.3, 0.5); rightWall.receiveShadow = true;
+    const wallH = isOpenSky ? 1.55 : (isGhat ? 0.9 : 4.5);
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(10.8, wallH, 0.35), wallMat);
+    backWall.position.set(0, wallH / 2, -4.0); backWall.receiveShadow = true;
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, wallH, 9.2), wallMat);
+    leftWall.position.set(-5.2, wallH / 2, 0.4); leftWall.receiveShadow = true;
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, wallH, 9.2), wallMat);
+    rightWall.position.set(5.2, wallH / 2, 0.4); rightWall.receiveShadow = true;
     scene.add(backWall, leftWall, rightWall);
 
-    // Architecture Pillars & Altar Chowki
-    const pillarMat = new THREE.MeshStandardMaterial({ color: data.palette.secondary, roughness: 0.45, metalness: 0.2 });
-    [-3.2, -1.6, 1.6, 3.2].forEach(px => {
-      const pil = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 4.2, 12), pillarMat);
-      pil.position.set(px, 2.1, -3.35);
+    // Distinct Pillars & Overhead Architecture
+    const pillarMat = new THREE.MeshStandardMaterial({
+      color: data.palette.secondary,
+      roughness: isPalace ? 0.25 : (isBamboo ? 0.75 : 0.45),
+      metalness: isPalace ? 0.75 : 0.18
+    });
+    const trimMat = new THREE.MeshStandardMaterial({ color: data.palette.primary, roughness: 0.3, metalness: 0.65 });
+    const pillarX = isTent ? [-3.8, 3.8] : [-3.3, -1.65, 1.65, 3.3];
+    const pilH = isGhat ? 3.2 : 4.2;
+    pillarX.forEach(px => {
+      const pilGeo = (isNalukettu || isTemple)
+        ? new THREE.BoxGeometry(0.34, pilH, 0.34)
+        : (isBamboo ? new THREE.CylinderGeometry(0.1, 0.12, pilH, 8) : new THREE.CylinderGeometry(0.16, 0.21, pilH, 12));
+      const pil = new THREE.Mesh(pilGeo, pillarMat);
+      pil.position.set(px, pilH / 2, -3.35);
       pil.castShadow = true;
       scene.add(pil);
+      if (isPalace || isTemple) {
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.22, 0.48), trimMat);
+        cap.position.set(px, pilH - 0.1, -3.35);
+        scene.add(cap);
+      }
     });
-    const archBar = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.35, 0.5), pillarMat);
-    archBar.position.set(0, 4.05, -3.35);
-    scene.add(archBar);
 
+    const palaceBulbs = [];
+    const prayerFlags = [];
+
+    if (isTent) {
+      // Scalloped Desert Tent Canopy
+      const canopy = new THREE.Mesh(new THREE.ConeGeometry(6.2, 1.8, 8, 1, true), new THREE.MeshStandardMaterial({ color: data.palette.primary, side: THREE.DoubleSide, roughness: 0.75 }));
+      canopy.position.set(0, 4.9, -0.5);
+      scene.add(canopy);
+    } else if (isNalukettu || isBamboo) {
+      // Sloped Terracotta / Thatch Eaves
+      const roofEave = new THREE.Mesh(new THREE.BoxGeometry(9.2, 0.25, 1.6), new THREE.MeshStandardMaterial({ color: isBamboo ? '#a16207' : '#9a3412', roughness: 0.85 }));
+      roofEave.position.set(0, 4.25, -3.2);
+      roofEave.rotation.x = 0.25;
+      scene.add(roofEave);
+    } else if (isTemple) {
+      // Stepped Gopuram / Shikhara Backdrop
+      for (let t = 0; t < 3; t++) {
+        const tier = new THREE.Mesh(new THREE.BoxGeometry(4.4 - t * 1.1, 0.55, 0.6), pillarMat);
+        tier.position.set(0, 4.1 + t * 0.55, -3.55);
+        scene.add(tier);
+      }
+    } else if (isMonastery) {
+      // Tibetan Monastery Beam + Fluttering Prayer Flags
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.35, 0.5), trimMat);
+      beam.position.set(0, 4.05, -3.35);
+      scene.add(beam);
+      const flagColors = ['#2563eb', '#f8fafc', '#dc2626', '#16a34a', '#eab308'];
+      for (let fi = -4; fi <= 4; fi++) {
+        const flg = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.34), new THREE.MeshStandardMaterial({ color: flagColors[(fi + 4) % 5], side: THREE.DoubleSide }));
+        flg.position.set(fi * 0.7, 3.65 - Math.cos(fi * 0.3) * 0.2, -2.9);
+        scene.add(flg);
+        prayerFlags.push(flg);
+      }
+    } else {
+      const archBar = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.34, 0.5), pillarMat);
+      archBar.position.set(0, 4.05, -3.35);
+      scene.add(archBar);
+      if (isPalace || festId === 'hampi' || festId === 'diwali') {
+        for (let bi = -6; bi <= 6; bi++) {
+          const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.065, 8, 8), new THREE.MeshBasicMaterial({ color: '#fde047' }));
+          bulb.position.set(bi * 0.55, 3.84, -3.1);
+          scene.add(bulb);
+          palaceBulbs.push(bulb);
+        }
+      }
+    }
+
+    if (isGoan) {
+      const hearth = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.1, 0.6), new THREE.MeshStandardMaterial({ color: '#7c2d12', roughness: 0.9 }));
+      hearth.position.set(-3.6, 0.55, -3.45);
+      scene.add(hearth);
+    }
+
+    // Center Altar / Chowki Platform
     const altar = new THREE.Mesh(
-      new THREE.BoxGeometry(2.4, 0.9, 1.3),
-      new THREE.MeshStandardMaterial({ color: '#5c2d16', map: floorTex, roughness: 0.55 })
+      new THREE.BoxGeometry(isPalace ? 2.8 : 2.3, isGhat ? 0.55 : 0.88, 1.3),
+      new THREE.MeshStandardMaterial({ color: isTemple ? '#57534e' : (isPalace ? '#78350f' : '#5c2d16'), map: floorTex, roughness: 0.52 })
     );
-    altar.position.set(0, 0.45, -3.15);
+    altar.position.set(0, isGhat ? 0.28 : 0.44, -3.15);
     altar.castShadow = true; altar.receiveShadow = true;
     scene.add(altar);
 
-    // Ambient Particles (petals, sparks, snow, fireworks)
+    // Ambient Particles (petals, sparks, snow, steam/smoke)
     const pCount = isLowEnd ? 35 : 75;
     const pGeo = new THREE.BufferGeometry();
     const pPos = new Float32Array(pCount * 3);
     for (let i = 0; i < pCount; i++) {
-      pPos[i * 3] = (Math.random() - 0.5) * 7.5;
-      pPos[i * 3 + 1] = Math.random() * 4.2;
-      pPos[i * 3 + 2] = (Math.random() - 0.5) * 6;
+      pPos[i * 3] = (Math.random() - 0.5) * 7.8;
+      pPos[i * 3 + 1] = Math.random() * 4.4;
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 6.2;
     }
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    const pMat = new THREE.PointsMaterial({ color: data.palette.primary, size: 0.08, transparent: true, opacity: 0.8 });
+    const effList = Array.isArray(data.ambientEffects) ? data.ambientEffects : [data.ambientEffects || 'petals'];
+    const isSnow = effList.includes('snow');
+    const isRise = effList.includes('smoke') || effList.includes('fireworks') || effList.includes('sparks');
+    const pColor = isSnow ? '#ffffff' : (festId === 'holi' ? '#ec4899' : data.palette.primary);
+    const pMat = new THREE.PointsMaterial({ color: pColor, size: isSnow ? 0.09 : 0.085, transparent: true, opacity: 0.82 });
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
@@ -593,9 +729,12 @@
     };
     window.addEventListener('resize', onResize);
 
-    let rafId = 0, clock = 0;
+    let rafId = 0, clock = 0, tabHidden = false;
+    const onVis = () => { tabHidden = document.hidden; };
+    document.addEventListener('visibilitychange', onVis);
     const animate = () => {
       if (!container.isConnected) { disposeActive(); return; }
+      if (tabHidden) { rafId = requestAnimationFrame(animate); return; }
       clock += 0.016;
       if (revealing) {
         revealTimer += 0.016;
@@ -646,6 +785,14 @@
         window.removeEventListener('pointerup', onPointerUp);
         renderer.domElement.removeEventListener('wheel', onWheel);
         window.removeEventListener('resize', onResize);
+        document.removeEventListener('visibilitychange', onVis);
+        scene.traverse(obj => {
+          if (obj.geometry) try { obj.geometry.dispose(); } catch (e) {}
+          if (obj.material) {
+            const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+            mats.forEach(m => { try { m.dispose(); } catch (e) {} });
+          }
+        });
         scene.traverse(obj => {
           if (obj.geometry) obj.geometry.dispose();
           if (obj.material) {

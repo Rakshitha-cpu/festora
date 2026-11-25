@@ -56,6 +56,7 @@
   $('fg-back').addEventListener('click', FG.exit);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('on')) FG.exit(); });
   document.addEventListener('visibilitychange', function () { paused = document.hidden; });
+  window.addEventListener('popstate', function () { if (root.classList.contains('on')) FG.exit(); });
 
   /* ---- context given to each engine ---- */
   function makeCtx(el, cfg, r, endCb) {
