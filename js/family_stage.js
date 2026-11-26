@@ -1,4 +1,4 @@
-/* ===== FESTORA INTERACTIVE ANIMATED CARTOON FAMILY THEATRE (v2: Native Languages + Gender Voices + Film Raga Tune) ===== */
+/* ===== FESTORA INTERACTIVE ANIMATED CARTOON FAMILY THEATRE (v3: Clean Illustrated SVG Stage + Solid High-Contrast UI) ===== */
 (function () {
   'use strict';
 
@@ -70,7 +70,6 @@
     return 'hi-IN';
   }
 
-  // Pick gender-matched voice from speechSynthesis
   function pickVoice(lang, gender) {
     try {
       const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
@@ -85,15 +84,13 @@
 
       if (gender === 'female') {
         return searchPool.find(v => femHints.test(v.name)) || searchPool.find(v => !maleHints.test(v.name)) || searchPool[0];
-      } else {
-        return searchPool.find(v => maleHints.test(v.name) && !femHints.test(v.name)) || searchPool.find(v => !femHints.test(v.name)) || searchPool[0];
       }
+      return searchPool.find(v => maleHints.test(v.name) && !femHints.test(v.name)) || searchPool.find(v => !femHints.test(v.name)) || searchPool[0];
     } catch (e) {
       return null;
     }
   }
 
-  // Expressive Indian Film-Style Raga Melody (Tanpura drone + Mohanam/Bhupali vocal phrasing + soft rhythm)
   let famAudioCtx = null;
   let activeOscs = [];
 
@@ -109,7 +106,6 @@
       if (famAudioCtx.state === 'suspended') famAudioCtx.resume();
       const now = famAudioCtx.currentTime;
 
-      // Soft warm Tanpura drone (Sa + Pa)
       [130.81, 196.00].forEach(df => {
         const dOsc = famAudioCtx.createOscillator();
         const dGain = famAudioCtx.createGain();
@@ -123,7 +119,6 @@
         activeOscs.push(dOsc);
       });
 
-      // Film-style Mohanam / Bhupali Raga phrase (Sa Re Ga Pa Dha Sa' Dha Pa Ga Re Sa) with smooth phrasing
       const melody = [
         [261.63, 0.00, 0.35], [293.66, 0.35, 0.30], [329.63, 0.65, 0.45],
         [392.00, 1.10, 0.35], [440.00, 1.45, 0.40], [523.25, 1.85, 0.55],
@@ -135,7 +130,6 @@
         const gain = famAudioCtx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, now + offset);
-        // Subtle gamaka / vibrato
         osc.frequency.linearRampToValueAtTime(freq * 1.012, now + offset + dur * 0.5);
         osc.frequency.linearRampToValueAtTime(freq, now + offset + dur);
         gain.gain.setValueAtTime(0.001, now + offset);
@@ -148,15 +142,89 @@
     } catch (e) {}
   }
 
+  function injectStageStyles() {
+    if (document.getElementById('fam-stage-css')) return;
+    const st = document.createElement('style');
+    st.id = 'fam-stage-css';
+    st.textContent = `
+      @keyframes famIdle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+      @keyframes famSpeak { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-7px) scale(1.03)} }
+      @keyframes famSing { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-8px) rotate(2deg)} }
+      @keyframes famMouth { 0%,100%{ry:1.6} 50%{ry:4.6} }
+      @keyframes famWave { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-12deg)} }
+      @keyframes famNote { 0%{opacity:0;transform:translateY(6px) scale(0.8)} 25%{opacity:1} 100%{opacity:0;transform:translateY(-30px) scale(1.1)} }
+      @keyframes famBlink { 0%,92%,100%{transform:scaleY(1)} 96%{transform:scaleY(0.12)} }
+      .fam-char-slot { position:relative; display:flex; flex-direction:column; align-items:center; background:transparent; border:none; padding:6px 4px; cursor:pointer; flex:1 1 130px; max-width:165px; transition:transform .2s ease; }
+      .fam-char-slot:hover { transform:translateY(-2px); }
+      .fam-avatar-wrap { position:relative; width:104px; height:128px; display:flex; align-items:center; justify-content:center; animation:famIdle 3.2s ease-in-out infinite; }
+      .fam-char-slot.is-speaking .fam-avatar-wrap { animation:famSpeak .55s ease-in-out infinite; }
+      .fam-char-slot.is-singing .fam-avatar-wrap { animation:famSing .75s ease-in-out infinite; }
+      .fam-eye-grp { transform-box:fill-box; transform-origin:center; animation:famBlink 4.2s infinite; }
+      .fam-mouth { transition:ry .12s; }
+      .fam-char-slot.is-speaking .fam-mouth,
+      .fam-char-slot.is-singing .fam-mouth { animation:famMouth .28s ease-in-out infinite; }
+      .fam-arm-prop { transform-box:fill-box; transform-origin:10% 30%; }
+      .fam-char-slot.is-speaking .fam-arm-prop,
+      .fam-char-slot.is-singing .fam-arm-prop { animation:famWave .45s ease-in-out infinite; }
+      .fam-notes { position:absolute; top:-6px; right:4px; font-size:18px; pointer-events:none; display:none; }
+      .fam-char-slot.is-singing .fam-notes { display:block; animation:famNote 1.3s ease-out infinite; }
+      .fam-shadow { width:64px; height:10px; border-radius:50%; background:rgba(120,53,15,0.22); margin-top:-6px; transition:all .2s; }
+      .fam-char-slot.is-active .fam-shadow { background:rgba(217,119,6,0.45); width:74px; }
+    `;
+    document.head.appendChild(st);
+  }
+
+  function buildCharSVG(ch) {
+    const propEmoji = ch.prop === 'diya' ? '🪔' : (ch.prop === 'platter' ? '🍛' : (ch.prop === 'flowers' ? '🌺' : '🔔'));
+    const isFem = ch.gender === 'female';
+    const hairBack = isFem
+      ? `<circle cx="50" cy="40" r="23" fill="${ch.hair}"/><circle cx="68" cy="44" r="6" fill="#fef9c3" stroke="#eab308" stroke-width="1"/>`
+      : `<path d="M29,38 C29,17 71,17 71,38 Z" fill="${ch.hair}"/>`;
+
+    const outfitSvg = isFem
+      ? `<path d="M32,62 L68,62 L78,118 L22,118 Z" fill="${ch.outfit}" stroke="${ch.trim}" stroke-width="2.5"/>
+         <path d="M34,62 L66,116 L54,118 L28,68 Z" fill="${ch.trim}" opacity="0.9"/>
+         <line x1="25" y1="112" x2="75" y2="112" stroke="${ch.trim}" stroke-width="3"/>`
+      : `<rect x="30" y="62" width="40" height="54" rx="10" fill="${ch.outfit}" stroke="${ch.trim}" stroke-width="2"/>
+         <path d="M35,62 L44,62 L44,104 L35,104 Z" fill="${ch.trim}" opacity="0.88"/>
+         <line x1="50" y1="62" x2="50" y2="82" stroke="${ch.trim}" stroke-width="2"/>`;
+
+    const faceExtra = ch.id === 'father'
+      ? `<path d="M41,47 Q50,43 59,47" stroke="#1f2937" stroke-width="2.8" fill="none" stroke-linecap="round"/>`
+      : (ch.id === 'mother'
+        ? `<circle cx="50" cy="34" r="2.6" fill="#dc2626"/>`
+        : (ch.id === 'sister' ? `<circle cx="50" cy="34" r="2" fill="#dc2626"/>` : ''));
+
+    return `
+      <svg viewBox="0 0 104 128" width="104" height="128" aria-hidden="true">
+        ${hairBack}
+        ${outfitSvg}
+        <line x1="31" y1="70" x2="17" y2="88" stroke="${ch.skin}" stroke-width="7" stroke-linecap="round"/>
+        <g class="fam-arm-prop">
+          <line x1="69" y1="70" x2="86" y2="84" stroke="${ch.skin}" stroke-width="7" stroke-linecap="round"/>
+          <text x="86" y="84" font-size="20" text-anchor="middle" dominant-baseline="central">${propEmoji}</text>
+        </g>
+        <circle cx="50" cy="40" r="20" fill="${ch.skin}" stroke="#b45309" stroke-width="0.8"/>
+        ${isFem ? `<path d="M30,36 C32,20 68,20 70,36 C62,28 38,28 30,36 Z" fill="${ch.hair}"/>` : `<path d="M30,35 C30,19 70,19 70,35 C61,27 39,27 30,35 Z" fill="${ch.hair}"/>`}
+        <g class="fam-eye-grp">
+          <circle cx="43" cy="39" r="2.6" fill="#111827"/>
+          <circle cx="57" cy="39" r="2.6" fill="#111827"/>
+        </g>
+        ${faceExtra}
+        <ellipse class="fam-mouth" cx="50" cy="50" rx="5" ry="1.8" fill="#7f1d1d"/>
+      </svg>
+    `;
+  }
+
   let activeCleanup = null;
   function stopAllAudio(state) {
     stopFilmMelody();
     try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
     if (state) {
-      state.speakingUntil = 0;
-      state.singing = false;
       state.isPlaying = false;
+      state.singing = false;
       if (state.skitTimer) { clearTimeout(state.skitTimer); state.skitTimer = null; }
+      if (state.endTimer) { clearTimeout(state.endTimer); state.endTimer = null; }
     }
   }
 
@@ -167,6 +235,8 @@
 
   window.renderFestivalFamily = function () {
     stopStage();
+    injectStageStyles();
+
     const fid = window.cur || 'ganesh';
     const g = (window.G$ && window.G$[fid]) || (window.FEST && window.FEST.find(x => x.id === fid)) || { name: 'Festival', state: 'India', e: '🪔' };
     const ritual = (g.rituals && g.rituals[0]) ? (g.rituals[0].title || g.rituals[0][1] || 'Sacred Aarti') : 'Sacred Aarti';
@@ -194,55 +264,109 @@
 
     const state = {
       activeId: 'mother',
-      speakingUntil: 0,
-      singing: false,
       isPlaying: false,
+      singing: false,
       skitTimer: null,
-      petals: Array.from({ length: 18 }, () => ({ x: Math.random() * 760, y: Math.random() * 340, s: 4 + Math.random() * 4, v: 0.5 + Math.random() * 0.8 })),
-      notes: [],
+      endTimer: null,
       chars: [
-        { id: 'father', name: 'Father', role: 'Lamp & Prayers', x: 135, y: 245, skin: '#d99b66', outfit: '#f59e0b', trim: '#7c2d12', hair: '#1f2937', prop: 'diya', gender: 'male' },
-        { id: 'mother', name: 'Mother', role: 'Sings & Serves Feast', x: 295, y: 248, skin: '#e0a978', outfit: '#be185d', trim: '#fbbf24', hair: '#111827', prop: 'platter', gender: 'female', isSinger: true },
-        { id: 'sister', name: 'Sister', role: 'Flowers & Decor', x: 470, y: 256, skin: '#e5b283', outfit: '#10b981', trim: '#fde047', hair: '#1f2937', prop: 'flowers', gender: 'female' },
-        { id: 'brother', name: 'Brother', role: 'Bell & Joy', x: 625, y: 258, skin: '#d99b66', outfit: '#3b82f6', trim: '#fbbf24', hair: '#1f2937', prop: 'bell', gender: 'male' }
+        { id: 'father', name: 'Father', role: 'Lamp & Prayers', skin: '#d99b66', outfit: '#f59e0b', trim: '#991b1b', hair: '#1f2937', prop: 'diya', gender: 'male' },
+        { id: 'mother', name: 'Mother', role: 'Sings & Serves', skin: '#e0a978', outfit: '#be185d', trim: '#fbbf24', hair: '#111827', prop: 'platter', gender: 'female', isSinger: true },
+        { id: 'sister', name: 'Sister', role: 'Flowers & Decor', skin: '#e5b283', outfit: '#059669', trim: '#f59e0b', hair: '#1f2937', prop: 'flowers', gender: 'female' },
+        { id: 'brother', name: 'Brother', role: 'Bell & Joy', skin: '#d99b66', outfit: '#2563eb', trim: '#fbbf24', hair: '#1f2937', prop: 'bell', gender: 'male' }
       ]
     };
 
-    function speakWithGender(text, langCode, gender, pitch) {
-      try {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = langCode;
-        const v = pickVoice(langCode, gender);
-        if (v) u.voice = v;
-        u.rate = gender === 'female' && state.singing ? 0.84 : 0.94;
-        u.pitch = pitch;
-        u.onend = () => {
-          state.speakingUntil = 0;
-          state.singing = false;
-          state.isPlaying = false;
-          updatePlayStopBtn();
-        };
-        window.speechSynthesis.speak(u);
-      } catch (e) {}
+    function syncStageUI() {
+      const done = state.chars.filter(c => window.S.fam[c.id]).length;
+      const pill = document.getElementById('fam-unity-pill');
+      if (pill) pill.textContent = `Unity: ${done}/4`;
+
+      const skitBtn = document.getElementById('fam-skit-btn');
+      if (skitBtn) {
+        const skitRunning = !!(state.isPlaying && state.skitTimer);
+        skitBtn.textContent = skitRunning ? '⏹ Stop Skit' : '▶ Play Family Skit';
+        skitBtn.style.background = skitRunning ? '#dc2626' : '#b45309';
+      }
+
+      const playBtn = document.getElementById('fam-playstop-btn');
+      if (playBtn) {
+        playBtn.textContent = state.isPlaying ? '⏹ Stop' : '▶ Play';
+        playBtn.style.background = state.isPlaying ? '#dc2626' : '#d97706';
+      }
+
+      state.chars.forEach(c => {
+        const slot = document.getElementById('fam-slot-' + c.id);
+        const tag = document.getElementById('fam-tag-' + c.id);
+        const isAct = state.activeId === c.id;
+        const isSpk = isAct && state.isPlaying;
+        const isDone = !!window.S.fam[c.id];
+        if (slot) {
+          slot.classList.toggle('is-active', isAct);
+          slot.classList.toggle('is-speaking', isSpk && !c.isSinger);
+          slot.classList.toggle('is-singing', isSpk && !!c.isSinger);
+        }
+        if (tag) {
+          tag.style.background = isAct ? '#b45309' : '#ffffff';
+          tag.style.color = isAct ? '#ffffff' : '#3b2314';
+          tag.style.borderColor = isAct ? '#92400e' : (isDone ? '#16a34a' : '#d97706');
+          tag.innerHTML = `${c.isSinger ? '🎵 ' : ''}${c.name}${isDone ? ' <span style="color:' + (isAct ? '#fde68a' : '#15803d') + ';">✓</span>' : ''}`;
+        }
+      });
     }
 
-    function updatePlayStopBtn() {
-      const btn = document.getElementById('fam-playstop-btn');
-      if (btn) {
-        btn.textContent = state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue';
-        btn.style.background = state.isPlaying ? '#dc2626' : '#d97706';
-        btn.style.color = '#ffffff';
-      }
+    function speakWithGender(text, langCode, gender, pitch, durationMs) {
+      try {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = langCode;
+          const v = pickVoice(langCode, gender);
+          if (v) u.voice = v;
+          u.rate = gender === 'female' && state.singing ? 0.84 : 0.94;
+          u.pitch = pitch;
+          const finish = () => {
+            if (!state.skitTimer) {
+              state.isPlaying = false;
+              state.singing = false;
+              syncStageUI();
+            }
+          };
+          u.onend = finish;
+          u.onerror = finish;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {}
+      state.endTimer = setTimeout(() => {
+        if (!state.skitTimer) {
+          state.isPlaying = false;
+          state.singing = false;
+          syncStageUI();
+        }
+      }, durationMs);
+    }
+
+    function updateDialogueBox(ch, lineObj, packInfo) {
+      const box = document.getElementById('fam-dialogue-box');
+      if (!box) return;
+      const voiceTag = ch.gender === 'female' ? '👩 Lady Voice' : '👨 Gent Voice';
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-weight:800;font-size:1rem;color:#92400e;">${ch.isSinger ? '🎵 ' : '💬 '}${ch.name}</span>
+            <span style="font-size:0.8rem;font-weight:600;color:#78350f;background:#fef3c7;padding:2px 9px;border-radius:999px;border:1px solid #f59e0b;">${ch.role} · ${packInfo.label} · ${voiceTag}</span>
+          </div>
+          <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:5px 14px;border-radius:999px;border:none;background:${state.isPlaying ? '#dc2626' : '#d97706'};color:#ffffff;font-size:0.82rem;font-weight:800;cursor:pointer;">${state.isPlaying ? '⏹ Stop' : '▶ Play'}</button>
+        </div>
+        <div style="margin-top:10px;font-size:1.08rem;line-height:1.55;font-weight:600;color:#1c1917;">“${lineObj.text}”</div>
+        ${packInfo.langCode !== 'en-IN' ? `<div style="margin-top:6px;font-size:0.86rem;color:#92400e;font-style:italic;">English: ${lineObj.en}</div>` : ''}
+      `;
     }
 
     function triggerCharacter(cid, playAudio, allowToggleStop) {
       const ch = state.chars.find(c => c.id === cid) || state.chars[0];
-      // Click-again to stop if currently playing this character
       if (allowToggleStop && state.isPlaying && state.activeId === ch.id) {
         stopAllAudio(state);
-        updatePlayStopBtn();
+        syncStageUI();
         return;
       }
 
@@ -259,224 +383,13 @@
 
       if (playAudio) {
         state.isPlaying = true;
-        state.speakingUntil = performance.now() + (ch.isSinger ? 4500 : 3800);
         state.singing = !!ch.isSinger;
-        if (ch.isSinger) {
-          for (let i = 0; i < 10; i++) {
-            state.notes.push({ x: ch.x + (Math.random() - 0.5) * 35, y: ch.y - 70, vy: -0.9 - Math.random() * 0.6, life: 1, sym: i % 2 ? '🎵' : '🎶' });
-          }
-          playFilmSongMelody();
-        }
-        speakWithGender(lineObj.text, packInfo.langCode, lineObj.gender, lineObj.pitch);
+        if (ch.isSinger) playFilmSongMelody();
+        speakWithGender(lineObj.text, packInfo.langCode, lineObj.gender, lineObj.pitch, ch.isSinger ? 4600 : 4000);
       }
 
       updateDialogueBox(ch, lineObj, packInfo);
-      updateStatusChips();
-      updatePlayStopBtn();
-    }
-
-    function updateDialogueBox(ch, lineObj, packInfo) {
-      const box = document.getElementById('fam-dialogue-box');
-      if (!box) return;
-      const voiceTag = ch.gender === 'female' ? '👩 Lady Voice' : '👨 Gent Voice';
-      box.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-          <b style="color:#fbbf24;font-size:0.98rem;">${ch.isSinger ? '🎵 ' : '💬 '}${ch.name} <span style="font-weight:500;font-size:0.82rem;color:#e5e7eb;">(${ch.role} · ${packInfo.label} · ${voiceTag})</span></b>
-          <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:5px 14px;border-radius:12px;border:1.5px solid #fbbf24;background:${state.isPlaying ? '#dc2626' : '#d97706'};color:#ffffff;font-size:0.8rem;font-weight:800;cursor:pointer;">${state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue'}</button>
-        </div>
-        <div style="margin-top:6px;font-size:1.05rem;line-height:1.5;color:#fff;">“${lineObj.text}”</div>
-        ${packInfo.langCode !== 'en-IN' ? `<div style="margin-top:4px;font-size:0.84rem;color:#fde68a;font-style:italic;">English: ${lineObj.en}</div>` : ''}
-      `;
-    }
-
-    function updateStatusChips() {
-      const done = state.chars.filter(c => window.S.fam[c.id]).length;
-      const el = document.getElementById('fam-unity-pill');
-      if (el) el.textContent = `Family Unity: ${done}/4`;
-      state.chars.forEach(c => {
-        const b = document.getElementById('fam-btn-' + c.id);
-        if (b) {
-          b.style.borderColor = state.activeId === c.id ? '#fbbf24' : (window.S.fam[c.id] ? '#10b981' : '#6b4c7a');
-          b.style.background = state.activeId === c.id ? '#4a1d2e' : (window.S.fam[c.id] ? '#1a2e25' : '#261830');
-        }
-      });
-    }
-
-    function drawCharacter(ctx, ch, t, isActive, isSpeaking) {
-      const bounce = isSpeaking ? Math.abs(Math.sin(t * 0.01)) * 9 : (isActive ? Math.sin(t * 0.004) * 3 : Math.sin(t * 0.003 + ch.x) * 2);
-      const sway = (isSpeaking && ch.isSinger) ? Math.sin(t * 0.008) * 0.09 : 0;
-      const x = ch.x, y = ch.y - bounce;
-
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(sway);
-
-      ctx.fillStyle = 'rgba(0,0,0,0.35)';
-      ctx.beginPath(); ctx.ellipse(0, 56 + bounce, 26, 7, 0, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = ch.outfit;
-      ctx.beginPath();
-      if (ch.gender === 'female') {
-        ctx.moveTo(-18, -12); ctx.lineTo(18, -12); ctx.lineTo(26, 52); ctx.lineTo(-26, 52);
-      } else {
-        ctx.roundRect ? ctx.roundRect(-18, -12, 36, 58, 10) : ctx.rect(-18, -12, 36, 58);
-      }
-      ctx.closePath(); ctx.fill();
-
-      ctx.strokeStyle = ch.trim; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(-16, 48); ctx.lineTo(16, 48); ctx.stroke();
-
-      const armWave = isSpeaking ? Math.sin(t * 0.016) * 16 : Math.sin(t * 0.003) * 3;
-      ctx.strokeStyle = ch.skin; ctx.lineWidth = 7; ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(-17, -4); ctx.lineTo(-32, 14 - armWave * 0.5);
-      ctx.moveTo(17, -4); ctx.lineTo(32, 10 - armWave);
-      ctx.stroke();
-
-      ctx.save();
-      ctx.translate(34, 12 - armWave);
-      if (isSpeaking) ctx.rotate(Math.sin(t * 0.02) * 0.25);
-      ctx.font = '21px sans-serif'; ctx.textAlign = 'center';
-      const propEmoji = ch.prop === 'diya' ? '🪔' : (ch.prop === 'platter' ? '🍛' : (ch.prop === 'flowers' ? '🌺' : '🔔'));
-      ctx.fillText(propEmoji, 0, 0);
-      ctx.restore();
-
-      ctx.fillStyle = ch.skin;
-      ctx.beginPath(); ctx.arc(0, -34, 21, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = ch.hair;
-      ctx.beginPath(); ctx.arc(0, -38, 21, Math.PI, Math.PI * 2); ctx.fill();
-      if (ch.gender === 'female') {
-        ctx.fillStyle = '#fef9c3';
-        ctx.beginPath(); ctx.arc(16, -34, 5, 0, Math.PI * 2); ctx.fill();
-      }
-
-      const blink = (Math.floor(t / 2800) % 7 === 0 && (t % 2800) < 130);
-      ctx.fillStyle = '#111827';
-      if (blink) {
-        ctx.fillRect(-10, -36, 6, 2); ctx.fillRect(4, -36, 6, 2);
-      } else {
-        ctx.beginPath(); ctx.arc(-7, -36, 2.6, 0, Math.PI * 2); ctx.arc(7, -36, 2.6, 0, Math.PI * 2); ctx.fill();
-      }
-
-      if (ch.id === 'father') {
-        ctx.fillStyle = '#1f2937'; ctx.fillRect(-7, -27, 14, 3);
-      } else if (ch.id === 'mother') {
-        ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.arc(0, -41, 2.5, 0, Math.PI * 2); ctx.fill();
-      }
-
-      ctx.fillStyle = '#7f1d1d';
-      ctx.beginPath();
-      if (isSpeaking) {
-        const open = 2.5 + Math.abs(Math.sin(t * 0.022)) * 4.5;
-        ctx.ellipse(0, -23, 5.2, open, 0, 0, Math.PI * 2);
-      } else {
-        ctx.arc(0, -25, 5, 0.1 * Math.PI, 0.9 * Math.PI);
-      }
-      ctx.fill();
-
-      ctx.fillStyle = isActive ? '#fbbf24' : 'rgba(20,10,30,0.85)';
-      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-34, 60, 68, 20, 10) : ctx.rect(-34, 60, 68, 20); ctx.fill();
-      ctx.fillStyle = isActive ? '#18181b' : '#fef3c7';
-      ctx.font = 'bold 11px Georgia, serif'; ctx.textAlign = 'center';
-      ctx.fillText(ch.name, 0, 74);
-
-      ctx.restore();
-    }
-
-    function mountStage() {
-      const cv = document.getElementById('fam-stage-canvas');
-      if (!cv) return;
-      const ctx = cv.getContext('2d');
-      let raf = 0, dead = false, dragChar = null;
-
-      function getPt(e) {
-        const r = cv.getBoundingClientRect();
-        return { x: (e.clientX - r.left) * (cv.width / r.width), y: (e.clientY - r.top) * (cv.height / r.height) };
-      }
-
-      const onDown = (e) => {
-        const p = getPt(e);
-        for (let i = state.chars.length - 1; i >= 0; i--) {
-          const ch = state.chars[i];
-          if (Math.hypot(p.x - ch.x, p.y - ch.y) < 48) {
-            dragChar = ch;
-            triggerCharacter(ch.id, true, true);
-            break;
-          }
-        }
-      };
-      const onMove = (e) => {
-        if (!dragChar) return;
-        const p = getPt(e);
-        dragChar.x = Math.max(50, Math.min(710, p.x));
-        dragChar.y = Math.max(180, Math.min(280, p.y));
-      };
-      const onUp = () => { dragChar = null; };
-
-      cv.addEventListener('pointerdown', onDown);
-      cv.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp);
-
-      function frame(t) {
-        if (dead || !cv.isConnected) { stopStage(); return; }
-        ctx.clearRect(0, 0, cv.width, cv.height);
-
-        const grad = ctx.createLinearGradient(0, 0, 0, cv.height);
-        grad.addColorStop(0, '#2b133d'); grad.addColorStop(0.65, '#4a1d2e'); grad.addColorStop(1, '#241208');
-        ctx.fillStyle = grad; ctx.fillRect(0, 0, cv.width, cv.height);
-
-        ctx.fillStyle = '#3d1f0d'; ctx.fillRect(0, 265, cv.width, 95);
-
-        for (let i = 0; i <= 14; i++) {
-          const tx = 40 + i * 48, ty = 22 + Math.sin(i * 0.45) * 10;
-          ctx.fillStyle = i % 2 === 0 ? '#16a34a' : '#f59e0b';
-          ctx.beginPath(); ctx.arc(tx, ty, 10, 0, Math.PI * 2); ctx.fill();
-        }
-
-        ctx.fillStyle = '#78350f'; ctx.fillRect(320, 175, 120, 85);
-        ctx.font = '38px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(g.e || '🪔', 380, 165);
-        ctx.font = 'bold 13px Georgia, serif'; ctx.fillStyle = '#fde68a';
-        ctx.fillText(`${g.name} Home Altar`, 380, 200);
-
-        state.petals.forEach(pt => {
-          pt.y += pt.v; pt.x += Math.sin(t * 0.002 + pt.y * 0.02) * 0.5;
-          if (pt.y > cv.height) { pt.y = -10; pt.x = Math.random() * cv.width; }
-          ctx.fillStyle = 'rgba(244, 114, 182, 0.75)';
-          ctx.beginPath(); ctx.ellipse(pt.x, pt.y, pt.s, pt.s * 0.5, pt.y * 0.03, 0, Math.PI * 2); ctx.fill();
-        });
-
-        const now = performance.now();
-        state.chars.forEach(ch => {
-          const isAct = state.activeId === ch.id;
-          const isSpk = isAct && now < state.speakingUntil && state.isPlaying;
-          drawCharacter(ctx, ch, t, isAct, isSpk);
-        });
-
-        state.notes = state.notes.filter(n => n.life > 0);
-        state.notes.forEach(n => {
-          n.y += n.vy; n.life -= 0.007;
-          ctx.globalAlpha = Math.max(0, n.life);
-          ctx.font = '18px sans-serif';
-          ctx.fillText(n.sym, n.x + Math.sin(t * 0.01) * 6, n.y);
-          ctx.globalAlpha = 1;
-        });
-
-        raf = requestAnimationFrame(frame);
-      }
-
-      raf = requestAnimationFrame(frame);
-      triggerCharacter('mother', false, false);
-
-      activeCleanup = () => {
-        dead = true;
-        cancelAnimationFrame(raf);
-        stopAllAudio(state);
-        cv.removeEventListener('pointerdown', onDown);
-        cv.removeEventListener('pointermove', onMove);
-        window.removeEventListener('pointerup', onUp);
-      };
+      syncStageUI();
     }
 
     window._famStage = {
@@ -485,7 +398,7 @@
       togglePlayStop: () => {
         if (state.isPlaying) {
           stopAllAudio(state);
-          updatePlayStopBtn();
+          syncStageUI();
         } else {
           triggerCharacter(state.activeId || 'mother', true, false);
         }
@@ -497,60 +410,81 @@
       playSkit: () => {
         if (state.isPlaying && state.skitTimer) {
           stopAllAudio(state);
-          updatePlayStopBtn();
+          syncStageUI();
           return;
         }
         stopAllAudio(state);
         const order = ['father', 'mother', 'sister', 'brother'];
         let step = 0;
         function next() {
-          if (!document.getElementById('fam-stage-canvas')) return;
+          if (!document.getElementById('fam-stage-wrap')) return;
+          const isLast = step === order.length - 1;
+          if (!isLast) {
+            state.skitTimer = setTimeout(() => {
+              step++;
+              next();
+            }, 4300);
+          } else {
+            state.skitTimer = null;
+          }
           triggerCharacter(order[step], true, false);
-          step++;
-          if (step < order.length) state.skitTimer = setTimeout(next, 4200);
         }
         next();
       }
     };
 
-    setTimeout(mountStage, 20);
+    activeCleanup = () => { stopAllAudio(state); };
+    setTimeout(() => triggerCharacter('mother', false, false), 20);
+
     const doneCount = ['father', 'mother', 'sister', 'brother'].filter(k => window.S.fam[k]).length;
+    const toranDots = Array.from({ length: 17 }, (_, i) =>
+      `<span style="width:12px;height:12px;border-radius:50%;background:${i % 2 === 0 ? '#16a34a' : '#f59e0b'};display:inline-block;box-shadow:0 2px 4px rgba(0,0,0,0.15);"></span>`
+    ).join('');
 
     return `
       <div style="max-width:880px;margin:0 auto;padding-bottom:28px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
           <div>
             <h2 style="margin:0;color:var(--ink);">👨‍👩‍👧‍👦 ${g.name} Family Theatre</h2>
-            <small style="color:var(--mut);">Tap any character to play/stop their dialogue &amp; song, or drag them on stage.</small>
+            <small style="color:var(--mut);">Tap any family member to listen — tap again to stop.</small>
           </div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <select id="fam-lang-sel" aria-label="Family Dialogue Language" onchange="window._famStage.setLang(this.value)" style="background:#261830;color:#ffffff;border:1.5px solid #d97706;border-radius:10px;padding:4px 8px;font-size:0.76rem;font-weight:700;cursor:pointer;">
-              <option value="auto" ${window._famLang==='auto'?'selected':''}>🌐 Native (Auto)</option>
-              <option value="en-IN" ${window._famLang==='en-IN'?'selected':''}>English</option>
-              <option value="kn-IN" ${window._famLang==='kn-IN'?'selected':''}>ಕನ್ನಡ (Kannada)</option>
-              <option value="hi-IN" ${window._famLang==='hi-IN'?'selected':''}>हिन्दी (Hindi)</option>
-              <option value="ta-IN" ${window._famLang==='ta-IN'?'selected':''}>தமிழ் (Tamil)</option>
-              <option value="te-IN" ${window._famLang==='te-IN'?'selected':''}>తెలుగు (Telugu)</option>
-              <option value="ml-IN" ${window._famLang==='ml-IN'?'selected':''}>മലയാളം (Malayalam)</option>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="fam-lang-sel" aria-label="Family Dialogue Language" onchange="window._famStage.setLang(this.value)" style="background:#ffffff;color:#1c1917;border:1.5px solid #d97706;border-radius:10px;padding:6px 10px;font-size:0.8rem;font-weight:700;cursor:pointer;">
+              <option value="auto" ${window._famLang === 'auto' ? 'selected' : ''}>🌐 Native (Auto)</option>
+              <option value="en-IN" ${window._famLang === 'en-IN' ? 'selected' : ''}>English</option>
+              <option value="kn-IN" ${window._famLang === 'kn-IN' ? 'selected' : ''}>ಕನ್ನಡ (Kannada)</option>
+              <option value="hi-IN" ${window._famLang === 'hi-IN' ? 'selected' : ''}>हिन्दी (Hindi)</option>
+              <option value="ta-IN" ${window._famLang === 'ta-IN' ? 'selected' : ''}>தமிழ் (Tamil)</option>
+              <option value="te-IN" ${window._famLang === 'te-IN' ? 'selected' : ''}>తెలుగు (Telugu)</option>
+              <option value="ml-IN" ${window._famLang === 'ml-IN' ? 'selected' : ''}>മലയാളം (Malayalam)</option>
             </select>
-            <span id="fam-unity-pill" style="background:var(--gold);color:#18181b;font-weight:800;padding:4px 10px;border-radius:14px;font-size:0.78rem;">Unity: ${doneCount}/4</span>
-            <button type="button" onclick="window._famStage.playSkit()" style="padding:6px 12px;font-size:0.84rem;">▶ Skit</button>
-            <button type="button" class="alt" onclick="window._famStage.sing()" style="padding:6px 12px;font-size:0.84rem;">🎵 Mother's Song</button>
+            <span id="fam-unity-pill" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;font-weight:800;padding:5px 12px;border-radius:999px;font-size:0.8rem;">Unity: ${doneCount}/4</span>
+            <button type="button" id="fam-skit-btn" onclick="window._famStage.playSkit()" style="padding:7px 14px;border-radius:999px;border:none;background:#b45309;color:#ffffff;font-weight:800;font-size:0.84rem;cursor:pointer;">▶ Play Family Skit</button>
           </div>
         </div>
 
-        <canvas id="fam-stage-canvas" width="760" height="340" style="width:100%;height:auto;border-radius:18px;border:2px solid var(--gold);display:block;touch-action:none;cursor:grab;box-shadow:0 12px 32px rgba(0,0,0,0.45);"></canvas>
-
-        <div id="fam-dialogue-box" class="card" style="margin-top:12px;background:#23132b;color:#ffffff;border:2px solid #d97706;border-radius:16px;padding:14px 16px;"></div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">
-          ${state.chars.map(c => `
-            <button type="button" id="fam-btn-${c.id}" onclick="window._famStage.select('${c.id}')" style="padding:10px 12px;border-radius:12px;border:1.5px solid #6b4c7a;background:#261830;color:#ffffff;text-align:left;cursor:pointer;">
-              <div style="font-weight:800;font-size:0.95rem;">${c.isSinger ? '🎵 ' : (c.gender === 'female' ? '👩 ' : '👨 ')}${c.name}</div>
-              <div style="font-size:0.78rem;color:#fde68a;">${c.role}</div>
-            </button>
-          `).join('')}
+        <div id="fam-stage-wrap" style="position:relative;border-radius:20px;border:2px solid #d97706;background:linear-gradient(180deg,#fffbeb 0%,#fef3c7 58%,#f5d09b 100%);overflow:hidden;box-shadow:0 10px 28px rgba(146,64,14,0.14);padding:12px 12px 18px;">
+          <div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:8px;opacity:0.9;">${toranDots}</div>
+          <div style="text-align:center;margin-bottom:6px;">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#ffffff;color:#92400e;border:1.5px solid #f59e0b;border-radius:999px;padding:3px 14px;font-weight:800;font-size:0.84rem;box-shadow:0 2px 6px rgba(146,64,14,0.1);">${g.e || '🪔'} ${g.name} Home Courtyard</span>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:flex-end;flex-wrap:wrap;gap:8px;position:relative;z-index:2;padding-top:6px;">
+            ${state.chars.map(c => `
+              <button type="button" id="fam-slot-${c.id}" class="fam-char-slot" onclick="window._famStage.select('${c.id}')">
+                <div class="fam-avatar-wrap">
+                  <div class="fam-notes">🎵 🎶</div>
+                  ${buildCharSVG(c)}
+                </div>
+                <div class="fam-shadow"></div>
+                <span id="fam-tag-${c.id}" style="margin-top:8px;padding:3px 12px;border-radius:999px;border:1.5px solid #d97706;background:#ffffff;color:#3b2314;font-weight:800;font-size:0.84rem;box-shadow:0 2px 6px rgba(0,0,0,0.08);">${c.isSinger ? '🎵 ' : ''}${c.name}</span>
+                <span style="margin-top:3px;font-size:0.74rem;font-weight:700;color:#78350f;">${c.role}</span>
+              </button>
+            `).join('')}
+          </div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:66px;background:linear-gradient(180deg,#e6b87d,#cfa062);border-top:2px solid #d97706;z-index:1;"></div>
         </div>
+
+        <div id="fam-dialogue-box" style="margin-top:14px;background:#ffffff;color:#1c1917;border:2px solid #d97706;border-radius:16px;padding:16px 18px;box-shadow:0 6px 20px rgba(146,64,14,0.12);"></div>
       </div>
     `;
   };
