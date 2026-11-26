@@ -154,6 +154,11 @@
       @keyframes famWave { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-12deg)} }
       @keyframes famNote { 0%{opacity:0;transform:translateY(6px) scale(0.8)} 25%{opacity:1} 100%{opacity:0;transform:translateY(-30px) scale(1.1)} }
       @keyframes famBlink { 0%,92%,100%{transform:scaleY(1)} 96%{transform:scaleY(0.12)} }
+      @keyframes famWalkInLeft { 0%{opacity:0;transform:translateX(-90px) translateY(0) scale(0.88)} 25%{opacity:1;transform:translateX(-58px) translateY(-8px) scale(0.93)} 55%{opacity:1;transform:translateX(-26px) translateY(0) scale(0.97)} 80%{opacity:1;transform:translateX(-8px) translateY(-5px) scale(0.99)} 100%{opacity:1;transform:translateX(0) translateY(0) scale(1)} }
+      @keyframes famWalkInRight { 0%{opacity:0;transform:translateX(90px) translateY(0) scale(0.88)} 25%{opacity:1;transform:translateX(58px) translateY(-8px) scale(0.93)} 55%{opacity:1;transform:translateX(26px) translateY(0) scale(0.97)} 80%{opacity:1;transform:translateX(8px) translateY(-5px) scale(0.99)} 100%{opacity:1;transform:translateX(0) translateY(0) scale(1)} }
+      .fam-char-slot.is-hidden { display:none; }
+      .fam-char-slot.is-entering-left { animation:famWalkInLeft .85s ease-out both; }
+      .fam-char-slot.is-entering-right { animation:famWalkInRight .85s ease-out both; }
       .fam-char-slot { position:relative; display:flex; flex-direction:column; align-items:center; background:transparent; border:none; padding:6px 4px; cursor:pointer; flex:1 1 130px; max-width:165px; transition:transform .2s ease; }
       .fam-char-slot:hover { transform:translateY(-2px); }
       .fam-avatar-wrap { position:relative; width:104px; height:128px; display:flex; align-items:center; justify-content:center; animation:famIdle 3.2s ease-in-out infinite; }
@@ -263,11 +268,13 @@
     }
 
     const state = {
-      activeId: 'mother',
+      activeId: 'father',
       isPlaying: false,
       singing: false,
       skitTimer: null,
       endTimer: null,
+      entered: { father: true, mother: false, sister: false, brother: false },
+      justEntered: 'father',
       chars: [
         { id: 'father', name: 'Father', role: 'Lamp & Prayers', skin: '#d99b66', outfit: '#f59e0b', trim: '#991b1b', hair: '#1f2937', prop: 'diya', gender: 'male' },
         { id: 'mother', name: 'Mother', role: 'Sings & Serves', skin: '#e0a978', outfit: '#be185d', trim: '#fbbf24', hair: '#111827', prop: 'platter', gender: 'female', isSinger: true },
@@ -294,16 +301,29 @@
         playBtn.style.background = state.isPlaying ? '#dc2626' : '#d97706';
       }
 
-      state.chars.forEach(c => {
+      state.chars.forEach((c, idx) => {
         const slot = document.getElementById('fam-slot-' + c.id);
         const tag = document.getElementById('fam-tag-' + c.id);
+        const cue = document.getElementById('fam-cue-' + c.id);
         const isAct = state.activeId === c.id;
         const isSpk = isAct && state.isPlaying;
         const isDone = !!window.S.fam[c.id];
+        const isVisible = !!state.entered[c.id];
         if (slot) {
+          slot.classList.toggle('is-hidden', !isVisible);
           slot.classList.toggle('is-active', isAct);
           slot.classList.toggle('is-speaking', isSpk && !c.isSinger);
           slot.classList.toggle('is-singing', isSpk && !!c.isSinger);
+          if (state.justEntered === c.id) {
+            slot.classList.remove('is-entering-left', 'is-entering-right');
+            void slot.offsetWidth;
+            slot.classList.add(idx < 2 ? 'is-entering-left' : 'is-entering-right');
+          }
+        }
+        if (cue) {
+          cue.style.background = isAct ? '#b45309' : (isVisible ? '#fef3c7' : '#ffffff');
+          cue.style.color = isAct ? '#ffffff' : '#78350f';
+          cue.style.borderColor = isAct ? '#92400e' : '#d97706';
         }
         if (tag) {
           tag.style.background = isAct ? '#b45309' : '#ffffff';
@@ -349,13 +369,18 @@
       const box = document.getElementById('fam-dialogue-box');
       if (!box) return;
       const voiceTag = ch.gender === 'female' ? '👩 Lady Voice' : '👨 Gent Voice';
+      const idx = state.chars.findIndex(c => c.id === ch.id);
+      const nextCh = state.chars[(idx + 1) % state.chars.length];
       box.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-weight:800;font-size:1rem;color:#92400e;">${ch.isSinger ? '🎵 ' : '💬 '}${ch.name}</span>
             <span style="font-size:0.8rem;font-weight:600;color:#78350f;background:#fef3c7;padding:2px 9px;border-radius:999px;border:1px solid #f59e0b;">${ch.role} · ${packInfo.label} · ${voiceTag}</span>
           </div>
-          <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:5px 14px;border-radius:999px;border:none;background:${state.isPlaying ? '#dc2626' : '#d97706'};color:#ffffff;font-size:0.82rem;font-weight:800;cursor:pointer;">${state.isPlaying ? '⏹ Stop' : '▶ Play'}</button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:5px 14px;border-radius:999px;border:none;background:${state.isPlaying ? '#dc2626' : '#d97706'};color:#ffffff;font-size:0.82rem;font-weight:800;cursor:pointer;">${state.isPlaying ? '⏹ Stop' : '▶ Play'}</button>
+            <button type="button" onclick="window._famStage.select('${nextCh.id}')" style="padding:5px 12px;border-radius:999px;border:1.5px solid #d97706;background:#fffbeb;color:#92400e;font-size:0.8rem;font-weight:800;cursor:pointer;">Next: ${nextCh.name} →</button>
+          </div>
         </div>
         <div style="margin-top:10px;font-size:1.08rem;line-height:1.55;font-weight:600;color:#1c1917;">“${lineObj.text}”</div>
         ${packInfo.langCode !== 'en-IN' ? `<div style="margin-top:6px;font-size:0.86rem;color:#92400e;font-style:italic;">English: ${lineObj.en}</div>` : ''}
@@ -372,6 +397,8 @@
 
       stopAllAudio(state);
       state.activeId = ch.id;
+      state.justEntered = !state.entered[ch.id] ? ch.id : null;
+      state.entered[ch.id] = true;
       const packInfo = getPackAndLines();
       const lineObj = packInfo.lines[ch.id];
 
@@ -390,6 +417,7 @@
 
       updateDialogueBox(ch, lineObj, packInfo);
       syncStageUI();
+      state.justEntered = null;
     }
 
     window._famStage = {
@@ -414,6 +442,8 @@
           return;
         }
         stopAllAudio(state);
+        state.entered = { father: false, mother: false, sister: false, brother: false };
+        syncStageUI();
         const order = ['father', 'mother', 'sister', 'brother'];
         let step = 0;
         function next() {
@@ -434,7 +464,7 @@
     };
 
     activeCleanup = () => { stopAllAudio(state); };
-    setTimeout(() => triggerCharacter('mother', false, false), 20);
+    setTimeout(() => { state.entered.father = false; triggerCharacter('father', false, false); }, 20);
 
     const doneCount = ['father', 'mother', 'sister', 'brother'].filter(k => window.S.fam[k]).length;
     const toranDots = Array.from({ length: 17 }, (_, i) =>
@@ -470,7 +500,7 @@
           </div>
           <div style="display:flex;justify-content:space-around;align-items:flex-end;flex-wrap:wrap;gap:8px;position:relative;z-index:2;padding-top:6px;">
             ${state.chars.map(c => `
-              <button type="button" id="fam-slot-${c.id}" class="fam-char-slot" onclick="window._famStage.select('${c.id}')">
+              <button type="button" id="fam-slot-${c.id}" class="fam-char-slot ${c.id === 'father' ? '' : 'is-hidden'}" onclick="window._famStage.select('${c.id}')">
                 <div class="fam-avatar-wrap">
                   <div class="fam-notes">🎵 🎶</div>
                   ${buildCharSVG(c)}
@@ -482,6 +512,11 @@
             `).join('')}
           </div>
           <div style="position:absolute;left:0;right:0;bottom:0;height:66px;background:linear-gradient(180deg,#e6b87d,#cfa062);border-top:2px solid #d97706;z-index:1;"></div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:10px;">
+          <span style="font-size:0.78rem;font-weight:700;color:#78350f;">Summon:</span>
+          ${state.chars.map(c => `<button type="button" id="fam-cue-${c.id}" onclick="window._famStage.select('${c.id}')" style="padding:4px 11px;border-radius:999px;border:1.5px solid #d97706;background:#ffffff;color:#78350f;font-size:0.78rem;font-weight:800;cursor:pointer;">${c.isSinger ? '🎵 ' : (c.gender === 'female' ? '👩 ' : '👨 ')}${c.name}</button>`).join('')}
         </div>
 
         <div id="fam-dialogue-box" style="margin-top:14px;background:#ffffff;color:#1c1917;border:2px solid #d97706;border-radius:16px;padding:16px 18px;box-shadow:0 6px 20px rgba(146,64,14,0.12);"></div>
