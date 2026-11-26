@@ -230,7 +230,11 @@
 
     function updatePlayStopBtn() {
       const btn = document.getElementById('fam-playstop-btn');
-      if (btn) btn.textContent = state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue';
+      if (btn) {
+        btn.textContent = state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue';
+        btn.style.background = state.isPlaying ? '#dc2626' : '#d97706';
+        btn.style.color = '#ffffff';
+      }
     }
 
     function triggerCharacter(cid, playAudio, allowToggleStop) {
@@ -277,8 +281,8 @@
       const voiceTag = ch.gender === 'female' ? '👩 Lady Voice' : '👨 Gent Voice';
       box.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-          <b style="color:#fbbf24;font-size:0.98rem;">${ch.isSinger ? '🎵 ' : '💬 '}${ch.name} <span style="font-weight:400;font-size:0.82rem;color:#d6c7b2;">(${ch.role} · ${packInfo.label} · ${voiceTag})</span></b>
-          <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:4px 12px;border-radius:12px;border:1px solid var(--gold);background:rgba(251,191,36,0.18);color:#fde68a;font-size:0.78rem;font-weight:700;cursor:pointer;">${state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue'}</button>
+          <b style="color:#fbbf24;font-size:0.98rem;">${ch.isSinger ? '🎵 ' : '💬 '}${ch.name} <span style="font-weight:500;font-size:0.82rem;color:#e5e7eb;">(${ch.role} · ${packInfo.label} · ${voiceTag})</span></b>
+          <button type="button" id="fam-playstop-btn" onclick="window._famStage.togglePlayStop()" style="padding:5px 14px;border-radius:12px;border:1.5px solid #fbbf24;background:${state.isPlaying ? '#dc2626' : '#d97706'};color:#ffffff;font-size:0.8rem;font-weight:800;cursor:pointer;">${state.isPlaying ? '⏹ Stop Voice/Song' : '▶ Play Dialogue'}</button>
         </div>
         <div style="margin-top:6px;font-size:1.05rem;line-height:1.5;color:#fff;">“${lineObj.text}”</div>
         ${packInfo.langCode !== 'en-IN' ? `<div style="margin-top:4px;font-size:0.84rem;color:#fde68a;font-style:italic;">English: ${lineObj.en}</div>` : ''}
@@ -292,8 +296,8 @@
       state.chars.forEach(c => {
         const b = document.getElementById('fam-btn-' + c.id);
         if (b) {
-          b.style.borderColor = state.activeId === c.id ? '#fbbf24' : (window.S.fam[c.id] ? '#10b981' : 'rgba(255,255,255,0.2)');
-          b.style.background = state.activeId === c.id ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.06)';
+          b.style.borderColor = state.activeId === c.id ? '#fbbf24' : (window.S.fam[c.id] ? '#10b981' : '#6b4c7a');
+          b.style.background = state.activeId === c.id ? '#4a1d2e' : (window.S.fam[c.id] ? '#1a2e25' : '#261830');
         }
       });
     }
@@ -520,7 +524,7 @@
             <small style="color:var(--mut);">Tap any character to play/stop their dialogue &amp; song, or drag them on stage.</small>
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <select id="fam-lang-sel" aria-label="Family Dialogue Language" onchange="window._famStage.setLang(this.value)" style="background:rgba(255,255,255,0.08);color:var(--ink);border:1px solid rgba(251,191,36,0.4);border-radius:10px;padding:4px 8px;font-size:0.76rem;cursor:pointer;">
+            <select id="fam-lang-sel" aria-label="Family Dialogue Language" onchange="window._famStage.setLang(this.value)" style="background:#261830;color:#ffffff;border:1.5px solid #d97706;border-radius:10px;padding:4px 8px;font-size:0.76rem;font-weight:700;cursor:pointer;">
               <option value="auto" ${window._famLang==='auto'?'selected':''}>🌐 Native (Auto)</option>
               <option value="en-IN" ${window._famLang==='en-IN'?'selected':''}>English</option>
               <option value="kn-IN" ${window._famLang==='kn-IN'?'selected':''}>ಕನ್ನಡ (Kannada)</option>
@@ -537,11 +541,11 @@
 
         <canvas id="fam-stage-canvas" width="760" height="340" style="width:100%;height:auto;border-radius:18px;border:2px solid var(--gold);display:block;touch-action:none;cursor:grab;box-shadow:0 12px 32px rgba(0,0,0,0.45);"></canvas>
 
-        <div id="fam-dialogue-box" class="card" style="margin-top:12px;border:1.5px solid var(--gold);padding:14px 16px;"></div>
+        <div id="fam-dialogue-box" class="card" style="margin-top:12px;background:#23132b;color:#ffffff;border:2px solid #d97706;border-radius:16px;padding:14px 16px;"></div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">
           ${state.chars.map(c => `
-            <button type="button" id="fam-btn-${c.id}" onclick="window._famStage.select('${c.id}')" style="padding:10px 12px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;text-align:left;cursor:pointer;">
+            <button type="button" id="fam-btn-${c.id}" onclick="window._famStage.select('${c.id}')" style="padding:10px 12px;border-radius:12px;border:1.5px solid #6b4c7a;background:#261830;color:#ffffff;text-align:left;cursor:pointer;">
               <div style="font-weight:800;font-size:0.95rem;">${c.isSinger ? '🎵 ' : (c.gender === 'female' ? '👩 ' : '👨 ')}${c.name}</div>
               <div style="font-size:0.78rem;color:#fde68a;">${c.role}</div>
             </button>
