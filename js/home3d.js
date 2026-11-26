@@ -508,11 +508,13 @@
     if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     container.innerHTML = '';
+    container.style.position = 'relative';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = h + 'px';
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.borderRadius = '18px';
     renderer.domElement.style.touchAction = 'none';
+    renderer.domElement.style.cursor = 'grab';
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -523,6 +525,11 @@
     let camTheta = 0, camPhi = 1.15, camRadius = 7.4;
     let targetTheta = 0, targetPhi = 1.15, targetRadius = 7.4;
     let revealing = false, revealTimer = 0;
+    let autoRotate = !reducedMotion;
+    let autoDir = 1; // 1 = rotate right, -1 = rotate left
+    let autoSpeed = 0.0022;
+    let holdThetaDir = 0;
+    let holdPhiDir = 0;
 
     // Lighting
     const hemi = new THREE.HemisphereLight(data.palette.primary, data.palette.wall, data.timeOfDay === 'night' ? 0.55 : 1.05);
@@ -768,17 +775,19 @@
     let downX = 0, downY = 0, dragging = false;
 
     const onPointerDown = (e) => {
-      dragging = true; downX = e.clientX; downY = e.clientY;
+      dragging = true; revealing = false; downX = e.clientX; downY = e.clientY;
+      renderer.domElement.style.cursor = 'grabbing';
     };
     const onPointerMove = (e) => {
       if (!dragging) return;
       targetTheta -= (e.clientX - downX) * 0.006;
-      targetPhi = Math.max(0.55, Math.min(1.42, targetPhi - (e.clientY - downY) * 0.004));
+      targetPhi = Math.max(0.5, Math.min(1.42, targetPhi - (e.clientY - downY) * 0.004));
       downX = e.clientX; downY = e.clientY;
     };
     const onPointerUp = (e) => {
       const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
       dragging = false;
+      renderer.domElement.style.cursor = 'grab';
       if (moved > 8) return;
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -820,6 +829,75 @@
     };
     window.addEventListener('resize', onResize);
 
+    // Floating 3D Camera Control Bar (Stop/Move, Left/Right, Tilt, Zoom, Reset)
+    const hud = document.createElement('div');
+    hud.id = 'h3d-controls-hud';
+    hud.style.cssText = 'position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;max-width:95%;padding:6px 10px;border-radius:999px;background:rgba(18,13,10,0.78);backdrop-filter:blur(8px);border:1px solid rgba(251,191,36,0.38);box-shadow:0 4px 16px rgba(0,0,0,0.45);z-index:6;user-select:none;';
+    const btnCss = 'background:rgba(255,255,255,0.09);color:#fef3c7;border:1px solid rgba(251,191,36,0.28);border-radius:999px;padding:5px 10px;font-size:0.78rem;font-weight:700;cursor:pointer;line-height:1.2;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;';
+    hud.innerHTML = `
+      <button type="button" data-act="left" title="Rotate Left (hold to spin)" style="${btnCss}">⟲ Left</button>
+      <button type="button" data-act="toggle" title="Stop or Start 3D movement" style="${btnCss}background:${autoRotate ? 'rgba(245,158,11,0.28)' : 'rgba(16,185,129,0.28)'};border-color:#fbbf24;">${autoRotate ? '⏸ Stop' : '▶ Move'}</button>
+      <button type="button" data-act="right" title="Rotate Right (hold to spin)" style="${btnCss}">Right ⟳</button>
+      <button type="button" data-act="up" title="Tilt Up" style="${btnCss}">▲</button>
+      <button type="button" data-act="down" title="Tilt Down" style="${btnCss}">▼</button>
+      <button type="button" data-act="zin" title="Zoom In" style="${btnCss}">＋</button>
+      <button type="button" data-act="zout" title="Zoom Out" style="${btnCss}">－</button>
+      <button type="button" data-act="reset" title="Reset 3D View" style="${btnCss}">🎯 Reset</button>
+    `;
+    container.appendChild(hud);
+
+    const toggleBtn = hud.querySelector('[data-act="toggle"]');
+    function syncToggleBtn() {
+      if (!toggleBtn) return;
+      toggleBtn.textContent = autoRotate ? '⏸ Stop' : '▶ Move';
+      toggleBtn.style.background = autoRotate ? 'rgba(245,158,11,0.28)' : 'rgba(16,185,129,0.28)';
+    }
+
+    let holdStart = 0;
+    const stopHold = () => { holdThetaDir = 0; holdPhiDir = 0; };
+    hud.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const act = btn.getAttribute('data-act');
+      holdStart = Date.now();
+      revealing = false;
+      if (act === 'left') { holdThetaDir = -1; autoDir = -1; }
+      else if (act === 'right') { holdThetaDir = 1; autoDir = 1; }
+      else if (act === 'up') { holdPhiDir = -1; }
+      else if (act === 'down') { holdPhiDir = 1; }
+    });
+    hud.addEventListener('pointerup', (e) => {
+      e.stopPropagation();
+      const heldMs = Date.now() - holdStart;
+      const btn = e.target.closest('button[data-act]');
+      stopHold();
+      if (!btn) return;
+      const act = btn.getAttribute('data-act');
+      if (act === 'toggle') {
+        autoRotate = !autoRotate;
+        syncToggleBtn();
+      } else if (act === 'left' && heldMs < 200) {
+        targetTheta -= 0.45;
+        autoDir = -1;
+      } else if (act === 'right' && heldMs < 200) {
+        targetTheta += 0.45;
+        autoDir = 1;
+      } else if (act === 'up' && heldMs < 200) {
+        targetPhi = Math.max(0.5, targetPhi - 0.14);
+      } else if (act === 'down' && heldMs < 200) {
+        targetPhi = Math.min(1.42, targetPhi + 0.14);
+      } else if (act === 'zin') {
+        targetRadius = Math.max(4.2, targetRadius - 0.8);
+      } else if (act === 'zout') {
+        targetRadius = Math.min(10.5, targetRadius + 0.8);
+      } else if (act === 'reset') {
+        targetTheta = 0; targetPhi = 1.15; targetRadius = 7.4; autoDir = 1;
+      }
+    });
+    hud.addEventListener('pointerleave', stopHold);
+    hud.addEventListener('pointercancel', stopHold);
+
     let rafId = 0, clock = 0, tabHidden = false;
     const onVis = () => { tabHidden = document.hidden; };
     document.addEventListener('visibilitychange', onVis);
@@ -827,12 +905,16 @@
       if (!container.isConnected) { disposeActive(); return; }
       if (tabHidden) { rafId = requestAnimationFrame(animate); return; }
       clock += 0.016;
-      if (revealing) {
+      if (holdThetaDir !== 0) {
+        targetTheta += holdThetaDir * 0.032;
+      } else if (holdPhiDir !== 0) {
+        targetPhi = Math.max(0.5, Math.min(1.42, targetPhi + holdPhiDir * 0.016));
+      } else if (revealing) {
         revealTimer += 0.016;
-        targetTheta += 0.018;
+        targetTheta += 0.018 * autoDir;
         if (revealTimer > 3.2) revealing = false;
-      } else if (!dragging && !reducedMotion) {
-        targetTheta += 0.0018;
+      } else if (autoRotate && !dragging) {
+        targetTheta += autoSpeed * autoDir;
       }
       camTheta += (targetTheta - camTheta) * 0.08;
       camPhi += (targetPhi - camPhi) * 0.08;
@@ -1014,7 +1096,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
           <div>
             <h2 style="margin:0;">${g.e} ${g.name} · ${data.arch.roomType} (3D)</h2>
-            <small style="color:var(--mut);">Drag to orbit · Scroll/Pinch to zoom · Buy missing items &amp; tap glowing spots (or click Shop buttons)</small>
+            <small style="color:var(--mut);">Drag or use 3D controls (Left/Right, Stop/Move, Zoom) · Tap glowing spots or Shop buttons to decorate</small>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span id="h3d-prog" style="background:#f59e0b;color:#18181b;font-weight:800;padding:6px 14px;border-radius:16px;font-size:0.86rem;">Decorated ${store.placed.length}/8</span>
