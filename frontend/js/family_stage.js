@@ -70,22 +70,41 @@
     return 'hi-IN';
   }
 
-  function pickVoice(lang, gender) {
+  // Pre-warm speechSynthesis voices (Chrome/Edge load voices asynchronously)
+  try {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      if (typeof window.speechSynthesis.addEventListener === 'function') {
+        window.speechSynthesis.addEventListener('voiceschanged', function () {
+          try { window.speechSynthesis.getVoices(); } catch (e) {}
+        });
+      }
+    }
+  } catch (e) {}
+
+  function getVoicesForLang(lang) {
     try {
       const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-      if (!voices || !voices.length) return null;
+      if (!voices || !voices.length) return { all: [], matched: [] };
+      const langBase = (lang || 'en-IN').split('-')[0].toLowerCase();
+      const matched = voices.filter(v => v.lang && v.lang.toLowerCase().split(/[-_]/)[0] === langBase);
+      return { all: voices, matched };
+    } catch (e) {
+      return { all: [], matched: [] };
+    }
+  }
+
+  function pickVoice(lang, gender) {
+    try {
+      const { matched } = getVoicesForLang(lang);
+      if (!matched.length) return null;
       const femHints = /female|woman|veena|lekha|neerja|swara|heera|priya|kalpana|kanya|zira|samantha|victoria|karen|susan|aria|jenny|vani|shruti|sapna|meera|aditi|raveena/i;
       const maleHints = /male|man|rishi|prabhat|madhur|hemant|ravi|david|daniel|alex|mark|guy|george|arjun|vikram|kiran|rohan|amit/i;
-      const langBase = (lang || 'en-IN').split('-')[0].toLowerCase();
-
-      const matchingLang = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(langBase));
-      const pool = matchingLang.length ? matchingLang : voices.filter(v => v.lang && v.lang.toLowerCase().includes('in'));
-      const searchPool = pool.length ? pool : voices;
 
       if (gender === 'female') {
-        return searchPool.find(v => femHints.test(v.name)) || searchPool.find(v => !maleHints.test(v.name)) || searchPool[0];
+        return matched.find(v => femHints.test(v.name)) || matched.find(v => !maleHints.test(v.name)) || matched[0];
       }
-      return searchPool.find(v => maleHints.test(v.name) && !femHints.test(v.name)) || searchPool.find(v => !femHints.test(v.name)) || searchPool[0];
+      return matched.find(v => maleHints.test(v.name) && !femHints.test(v.name)) || matched.find(v => !femHints.test(v.name)) || matched[0];
     } catch (e) {
       return null;
     }
@@ -334,13 +353,24 @@
       });
     }
 
-    function speakWithGender(text, langCode, gender, pitch, durationMs) {
+    function speakWithGender(text, enFallback, label, langCode, gender, pitch, durationMs) {
       try {
         if (window.speechSynthesis) {
           window.speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = langCode;
-          const v = pickVoice(langCode, gender);
+          const { all, matched } = getVoicesForLang(langCode);
+          const useFallback = (langCode !== 'en-IN' && all.length > 0 && matched.length === 0);
+          const speakLang = useFallback ? 'en-IN' : langCode;
+          const speakText = useFallback ? (enFallback || text) : text;
+
+          const noteEl = document.getElementById('fam-voice-note');
+          if (noteEl) {
+            noteEl.textContent = useFallback ? `ℹ️ Your browser has no ${label} TTS voice installed — playing English audio.` : '';
+            noteEl.style.display = useFallback ? 'block' : 'none';
+          }
+
+          const u = new SpeechSynthesisUtterance(speakText);
+          u.lang = speakLang;
+          const v = pickVoice(speakLang, gender);
           if (v) u.voice = v;
           u.rate = gender === 'female' && state.singing ? 0.84 : 0.94;
           u.pitch = pitch;
@@ -352,7 +382,13 @@
             }
           };
           u.onend = finish;
-          u.onerror = finish;
+          u.onerror = () => {
+            if (!useFallback && enFallback && langCode !== 'en-IN') {
+              speakWithGender(enFallback, enFallback, label, 'en-IN', gender, pitch, durationMs);
+            } else {
+              finish();
+            }
+          };
           window.speechSynthesis.speak(u);
         }
       } catch (e) {}
@@ -384,6 +420,7 @@
         </div>
         <div style="margin-top:10px;font-size:1.08rem;line-height:1.55;font-weight:600;color:#1c1917;">“${lineObj.text}”</div>
         ${packInfo.langCode !== 'en-IN' ? `<div style="margin-top:6px;font-size:0.86rem;color:#92400e;font-style:italic;">English: ${lineObj.en}</div>` : ''}
+        <div id="fam-voice-note" style="display:none;margin-top:4px;font-size:0.76rem;color:#b45309;font-weight:600;"></div>
       `;
     }
 
@@ -412,7 +449,7 @@
         state.isPlaying = true;
         state.singing = !!ch.isSinger;
         if (ch.isSinger) playFilmSongMelody();
-        speakWithGender(lineObj.text, packInfo.langCode, lineObj.gender, lineObj.pitch, ch.isSinger ? 4600 : 4000);
+        speakWithGender(lineObj.text, lineObj.en, packInfo.label, packInfo.langCode, lineObj.gender, lineObj.pitch, ch.isSinger ? 4600 : 4000);
       }
 
       updateDialogueBox(ch, lineObj, packInfo);
