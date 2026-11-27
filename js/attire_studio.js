@@ -182,84 +182,47 @@
     document.head.appendChild(s);
   }
 
+  function getModelPhoto(gender, item) {
+    if (gender === 'boy') {
+      return (item.style === 'dhoti') ? 'photos/attire_boy_panche.jpg?v=1' : 'photos/attire_boy_kurta.jpg?v=1';
+    }
+    return (item.style === 'lehenga') ? 'photos/attire_girl_lehenga.jpg?v=1' : 'photos/attire_girl_saree.jpg?v=1';
+  }
+
+  function getOutfitFilter(item) {
+    const c = (item.main || '').toLowerCase();
+    if (c === '#065f46' || c === '#047857' || c === '#0f766e') return 'hue-rotate(155deg) saturate(1.12)';
+    if (c === '#b91c1c' || c === '#991b1b' || c === '#be123c' || c === '#7f1d1d') return 'hue-rotate(48deg) saturate(1.15)';
+    if (c === '#3730a3' || c === '#4338ca' || c === '#1d4ed8' || c === '#1e3a8a') return 'hue-rotate(-45deg) saturate(1.15)';
+    if (c === '#fffbeb' || c === '#fef3c7') return 'saturate(0.45) brightness(1.12)';
+    if (c === '#d97706' || c === '#b45309') return 'hue-rotate(78deg) saturate(1.2)';
+    return 'none';
+  }
+
   function miniThumbSvg(item) {
-    return `<svg viewBox="0 0 64 72" width="60" height="68" style="display:block;margin:0 auto 4px;border-radius:10px;background:linear-gradient(180deg,#fef3c7,#fde68a);" aria-hidden="true">
-      ${item.style === 'saree' || item.style === 'lehenga'
-        ? `<path d="M18,12 L46,12 L52,66 L12,66 Z" fill="${item.main}" stroke="${item.accent}" stroke-width="2.2"/>
-           <path d="M20,12 L47,64 L36,66 L16,20 Z" fill="${item.accent}" opacity="0.92"/>
-           <line x1="13" y1="58" x2="51" y2="58" stroke="${item.trim}" stroke-width="4"/>
-           <path d="M18,28 Q32,36 46,28" fill="none" stroke="#fbbf24" stroke-width="2.5"/>`
-        : `<rect x="16" y="10" width="32" height="30" rx="6" fill="${item.main}" stroke="${item.accent}" stroke-width="2.2"/>
-           <path d="M18,38 L46,38 L50,66 L14,66 Z" fill="#fffbeb" stroke="${item.accent}" stroke-width="2"/>
-           <path d="M20,10 L27,10 L27,40 L20,40 Z" fill="${item.accent}" opacity="0.9"/>
-           <line x1="16" y1="60" x2="48" y2="60" stroke="${item.accent}" stroke-width="3"/>`}
-    </svg>`;
+    const who = (item.style === 'dhoti' || item.style === 'kurta') ? 'boy' : 'girl';
+    const src = getModelPhoto(who, item);
+    const flt = getOutfitFilter(item);
+    return `<div style="width:62px;height:74px;margin:0 auto 4px;border-radius:10px;overflow:hidden;border:1.5px solid #fbbf24;background:#2a0814;">
+      <img src="${src}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;object-position:top center;filter:${flt};">
+    </div>`;
   }
 
   function buildFashionModelSVG(gender, item, pose) {
-    const isGirl = gender === 'girl';
-    const skin = isGirl ? '#e5aa7a' : '#d89866';
-    const hair = '#181412';
-    const poseNamaste = pose === 'namaste';
-
-    const jewel = item.jewel === 'temple'
-      ? `<path d="M97,114 Q120,140 143,114" fill="none" stroke="#fbbf24" stroke-width="4.5"/><circle cx="120" cy="131" r="4.5" fill="#dc2626" stroke="#fde047" stroke-width="1.6"/>
-         <path d="M92,162 Q120,168 148,162" fill="none" stroke="#fbbf24" stroke-width="5.5"/><circle cx="120" cy="166" r="4" fill="#dc2626" stroke="#fef08a" stroke-width="1.2"/>`
-      : (item.jewel === 'pearl'
-        ? `<path d="M97,114 Q120,136 143,114" fill="none" stroke="#f8fafc" stroke-width="4" stroke-dasharray="1 5" stroke-linecap="round"/>`
+    const src = getModelPhoto(gender, item);
+    const flt = getOutfitFilter(item);
+    const badge = pose === 'namaste'
+      ? '<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(255,251,235,0.92);color:#92400e;border:1.5px solid #fbbf24;border-radius:999px;padding:2px 10px;font-size:0.78rem;font-weight:800;white-space:nowrap;">🙏 Namaste</div>'
+      : (pose === 'celeb'
+        ? '<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:1.25rem;pointer-events:none;">✨🌸✨</div>'
         : '');
-
-    const head = isGirl
-      ? (item.head === 'gajra'
-        ? `<circle cx="145" cy="76" r="10" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/><circle cx="148" cy="68" r="6" fill="#fffbeb"/>`
-        : (item.head === 'dupatta' ? `<path d="M92,70 Q120,38 148,70 L158,124 L142,124 Q120,66 98,124 L82,124 Z" fill="${item.accent}" opacity="0.45"/>` : ''))
-      : (item.head === 'peta' || item.head === 'safa'
-        ? `<path d="M88,58 Q120,24 154,58 L148,70 Q120,56 92,70 Z" fill="${item.head === 'safa' ? '#dc2626' : item.accent}" stroke="#fde047" stroke-width="2.2"/><circle cx="120" cy="48" r="5" fill="#fef08a"/>`
-        : '');
-
-    const dress = isGirl
-      ? (item.style === 'lehenga'
-        ? `<path d="M96,118 L144,118 L142,162 L98,162 Z" fill="${item.main}" stroke="${item.accent}" stroke-width="2.2"/>
-           <path d="M96,162 L144,162 L186,274 L54,274 Z" fill="${item.main}" stroke="${item.accent}" stroke-width="2.8"/>
-           <path d="M98,120 L164,258 L144,264 L88,130 Z" fill="${item.accent}" opacity="0.88"/>
-           <line x1="58" y1="260" x2="182" y2="260" stroke="${item.trim}" stroke-width="5.5"/>`
-        : `<path d="M90,118 L150,118 L174,274 L66,274 Z" fill="${item.main}" stroke="${item.accent}" stroke-width="2.8"/>
-           <path d="M92,118 L160,268 L134,274 L82,132 Z" fill="${item.accent}" opacity="0.92"/>
-           <line x1="68" y1="258" x2="172" y2="258" stroke="${item.trim}" stroke-width="5.5"/>
-           <line x1="70" y1="266" x2="170" y2="266" stroke="${item.accent}" stroke-width="2.5"/>`)
-      : (item.style === 'dhoti'
-        ? `<rect x="86" y="118" width="68" height="96" rx="12" fill="${item.main}" stroke="${item.accent}" stroke-width="2.4"/>
-           <path d="M88,208 L152,208 L162,274 L78,274 Z" fill="#fffbeb" stroke="${item.accent}" stroke-width="2.4"/>
-           <line x1="80" y1="260" x2="160" y2="260" stroke="${item.accent}" stroke-width="4.5"/>
-           <path d="M94,118 L108,118 L108,212 L94,212 Z" fill="${item.accent}" opacity="0.92"/>`
-        : `<rect x="84" y="118" width="72" height="114" rx="14" fill="${item.main}" stroke="${item.accent}" stroke-width="2.6"/>
-           <rect x="92" y="226" width="24" height="48" rx="6" fill="#fffbeb" stroke="${item.accent}" stroke-width="1.8"/>
-           <rect x="124" y="226" width="24" height="48" rx="6" fill="#fffbeb" stroke="${item.accent}" stroke-width="1.8"/>
-           <line x1="120" y1="120" x2="120" y2="174" stroke="${item.trim}" stroke-width="3"/>`);
-
-    const arms = poseNamaste
-      ? `<path d="M88,134 Q96,170 117,152" fill="none" stroke="${skin}" stroke-width="10" stroke-linecap="round"/>
-         <path d="M152,134 Q144,170 123,152" fill="none" stroke="${skin}" stroke-width="10" stroke-linecap="round"/>
-         <text x="120" y="150" font-size="22" text-anchor="middle" dominant-baseline="central">🙏</text>`
-      : `<line x1="88" y1="134" x2="64" y2="188" stroke="${skin}" stroke-width="10" stroke-linecap="round"/>
-         <line x1="152" y1="134" x2="176" y2="188" stroke="${skin}" stroke-width="10" stroke-linecap="round"/>`;
-
     return `
-      <svg id="att-svg-${gender}" viewBox="0 0 240 296" width="205" height="252" style="max-width:100%;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 12px 18px rgba(0,0,0,0.48));">
-        <ellipse cx="120" cy="280" rx="54" ry="9" fill="rgba(0,0,0,0.38)"/>
-        ${isGirl ? `<path d="M86,74 C82,116 88,150 96,162 L144,162 C152,150 158,116 154,74 Z" fill="${hair}"/>` : ''}
-        ${dress}
-        ${arms}
-        <rect x="111" y="98" width="18" height="22" rx="6" fill="${skin}"/>
-        <circle cx="120" cy="74" r="24" fill="${skin}" stroke="#b45309" stroke-width="0.9"/>
-        <path d="M95,70 C97,46 143,46 145,70 C134,58 106,58 95,70 Z" fill="${hair}"/>
-        ${head}
-        <circle cx="110" cy="73" r="2.7" fill="#111827"/>
-        <circle cx="130" cy="73" r="2.7" fill="#111827"/>
-        ${isGirl ? `<circle cx="120" cy="65" r="2.8" fill="#dc2626"/>` : `<path d="M108,84 Q120,79 132,84" stroke="#1f2937" stroke-width="2.6" fill="none" stroke-linecap="round"/>`}
-        <path d="M113,90 Q120,96 127,90" stroke="#7f1d1d" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-        ${jewel}
-      </svg>
+      <div style="position:relative;width:190px;height:295px;margin:0 auto;border-radius:20px;overflow:hidden;border:2.5px solid rgba(251,191,36,0.85);box-shadow:0 16px 32px rgba(0,0,0,0.52);background:#2a0814;">
+        <img src="${src}" alt="${item.name}" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:top center;filter:${flt};transition:filter .35s ease;pointer-events:none;">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 72%,rgba(24,5,12,0.72) 100%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:6px;left:8px;right:8px;text-align:center;color:#fde68a;font-size:0.72rem;font-weight:800;text-shadow:0 1px 4px #000;pointer-events:none;">${item.name}</div>
+        ${badge}
+      </div>
     `;
   }
 
