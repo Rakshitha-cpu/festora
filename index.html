@@ -488,7 +488,7 @@ D.gal=[['PANDALS','🏮','Ganesh Chaturthi at Hanuman Nagar, Saptari, Nepal','A 
 ['VISARJAN','🌊','Visarjan (immersion)','Visarjan is the farewell: idols are immersed in water; many places promote eco-friendly immersion.',IL]];
 D.src=[['Sahapedia – Ganesh Chaturthi','https://sahapedia.org/ganesh-chaturthi'],['Pluralism Project – Ganesha Chaturthi','https://pluralism.org/ganesha-chaturthi.md'],['Cook with Kushi – Ganesh Chaturthi recipes','https://www.cookwithkushi.com/recipes-for-ganesh-chaturthi/'],['Outlook India – festive recipes','https://www.outlookindia.com/brand-studio/ganesh-chaturthi-recipes-modak-puran-poli-and-other-traditional-offerings']];
 window.go = typeof go !== 'undefined' ? go : window.go;
-const PAGES=['Festivals','Overview','Story','Attire','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
+const PAGES=['Festivals','Overview','Story','Graph','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
 const SECS=[['intro','Introduction'],['traditions','Traditions'],['food','Food'],['puja','Puja'],['gallery','Gallery & videos'],['quiz','Quiz'],['g1','Game 1'],['g2','Game 2'],['g3','Game 3 (Memory)'],['shop','Shop'],['house','House decoration']];
 const ACH=[['first','🏆 First Decoration','Save your first decorated home (+25)',25],['ready','🏆 Puja Ready','Idol + diya + flowers + thali (+50)',50],['master','🏆 Festival Master','Learn, quiz, both games, house (+100)',100],['explorer','🎖️ Festival Explorer','100% progress']];
 let S=load(),page='Overview',R={};
@@ -721,7 +721,7 @@ draw=function(){const nav=document.getElementById('nav'),hd=document.querySelect
 
  const currentFest = (typeof G$ !== 'undefined' && G$[cur]) || (window.FEST && window.FEST.find(x => x.id === cur)) || { name: (cur == 'diwali' ? 'Diwali' : 'Festival') };
  hd.textContent='🍑 Festora · ' + currentFest.name;document.getElementById('coins').textContent='🪙 '+S.coins+' Festora Coins';document.getElementById('pb').style.width=pct2()+'%';
- nav.innerHTML=['Festivals','Overview','Story','Attire','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':(p=='Attire'?'👗 Attire':p)}</button>`).join('');
+ nav.innerHTML=['Festivals','Overview','Story','Graph','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'].map(p=>`<button class="${p==page||(p=='Games'&&/^G\d$/.test(page))?'on':''}" onclick="go('${p}')">${p=='Festivals'?'🎪 Festivals':(p=='Graph'?'🕸️ Graph':p)}</button>`).join('');
 
  let viewFn;
  if (page === 'Gallery') {
@@ -730,8 +730,8 @@ draw=function(){const nav=document.getElementById('nav'),hd=document.querySelect
    viewFn = window.V.Watch;
  } else if (page === 'Quiz' && typeof window.renderFestivalQuiz === 'function') {
    viewFn = window.renderFestivalQuiz;
- } else if (page === 'Attire' && typeof window.renderFestivalAttire === 'function') {
-   viewFn = window.renderFestivalAttire;
+ } else if (page === 'Graph' && typeof window.renderFestivalGraph === 'function') {
+   viewFn = window.renderFestivalGraph;
  } else if (page === 'Puja' && typeof window.renderFestivalPuja === 'function') {
    viewFn = window.renderFestivalPuja;
  } else if (cur === 'ganesh' && window.V && window.V[page]) {
@@ -12228,9 +12228,9 @@ window.draw = function() {
   if (pb) pb.style.width = pctScore + '%';
 
   // Navigation Bar
-  const allPages = ['Festivals','Overview','Story','Attire','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
+  const allPages = ['Festivals','Overview','Story','Graph','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
   if (nav) {
-    nav.innerHTML = allPages.map(p => '<button class="' + (p === page || (p === 'Games' && /^G\d$/.test(page)) ? 'on' : '') + '" onclick="go(\'' + p + '\')">' + (p === 'Festivals' ? '🎪 Festivals' : (p === 'Attire' ? '👗 Attire' : p)) + '</button>').join('');
+    nav.innerHTML = allPages.map(p => '<button class="' + (p === page || (p === 'Games' && /^G\d$/.test(page)) ? 'on' : '') + '" onclick="go(\'' + p + '\')">' + (p === 'Festivals' ? '🎪 Festivals' : (p === 'Graph' ? '🕸️ Graph' : p)) + '</button>').join('');
   }
 
   // Universal Back & Return Navigation Bar on Every Page
@@ -12260,8 +12260,8 @@ window.draw = function() {
     viewHtml = window.renderFestivalOverview ? window.renderFestivalOverview() : '';
   } else if (page === 'Story') {
     viewHtml = (typeof GP !== 'undefined' && GP.Story) ? GP.Story() : (window.renderFestivalStory ? window.renderFestivalStory() : '');
-  } else if (page === 'Attire') {
-    viewHtml = window.renderFestivalAttire ? window.renderFestivalAttire() : '';
+  } else if (page === 'Graph') {
+    viewHtml = window.renderFestivalGraph ? window.renderFestivalGraph() : '';
   } else if (page === 'Watch') {
     viewHtml = (window.V && window.V.Watch) ? window.V.Watch() : (GP.Watch ? GP.Watch() : '');
   } else if (page === 'Gallery') {
@@ -12295,7 +12295,7 @@ window.draw = function() {
   }
 
   // Connected Journey Footer Bar on Every Subpage
-  const journey = ['Overview','Story','Attire','Celebrate','Puja','Food','Gallery','Watch','Learn','Quiz','Games','Shop','My Home','Progress'];
+  const journey = ['Overview','Story','Graph','Celebrate','Puja','Food','Gallery','Watch','Learn','Quiz','Games','Shop','My Home','Progress'];
   const jIdx = journey.indexOf(page);
   const prevP = jIdx > 0 ? journey[jIdx - 1] : null;
   const nextP = (jIdx >= 0 && jIdx < journey.length - 1) ? journey[jIdx + 1] : null;
@@ -13174,7 +13174,7 @@ window.pick = function(id) {
 <script src="js/deepam_game.js"></script>
 <script src="js/thaipusam_game.js"></script>
 <script src="js/home3d.js"></script>
-<script src="js/attire_studio.js"></script>
+<script src="js/knowledge_graph.js"></script>
 <script>
 window.renderUniversalG1 = function() { setTimeout(function(){ if(window.FG) window.FG.start(window.cur || 'ganesh', 1); }, 0); return window.renderFestivalGames ? window.renderFestivalGames() : ''; };
 window.renderUniversalG2 = function() { setTimeout(function(){ if(window.FG) window.FG.start(window.cur || 'ganesh', 2); }, 0); return window.renderFestivalGames ? window.renderFestivalGames() : ''; };
