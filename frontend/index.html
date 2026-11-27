@@ -12228,9 +12228,9 @@ window.draw = function() {
   if (pb) pb.style.width = pctScore + '%';
 
   // Navigation Bar
-  const allPages = ['Festivals','Overview','Story','Family','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
+  const allPages = ['Festivals','Overview','Story','Attire','Watch','Gallery','Celebrate','Food','Puja','Learn','Quiz','Games','Shop','My Home','Progress'];
   if (nav) {
-    nav.innerHTML = allPages.map(p => '<button class="' + (p === page || (p === 'Games' && /^G\d$/.test(page)) ? 'on' : '') + '" onclick="go(\'' + p + '\')">' + (p === 'Festivals' ? '🎪 Festivals' : p) + '</button>').join('');
+    nav.innerHTML = allPages.map(p => '<button class="' + (p === page || (p === 'Games' && /^G\d$/.test(page)) ? 'on' : '') + '" onclick="go(\'' + p + '\')">' + (p === 'Festivals' ? '🎪 Festivals' : (p === 'Attire' ? '👗 Attire' : p)) + '</button>').join('');
   }
 
   // Universal Back & Return Navigation Bar on Every Page
@@ -12260,8 +12260,8 @@ window.draw = function() {
     viewHtml = window.renderFestivalOverview ? window.renderFestivalOverview() : '';
   } else if (page === 'Story') {
     viewHtml = (typeof GP !== 'undefined' && GP.Story) ? GP.Story() : (window.renderFestivalStory ? window.renderFestivalStory() : '');
-  } else if (page === 'Family') {
-    viewHtml = window.renderFestivalFamily ? window.renderFestivalFamily() : '';
+  } else if (page === 'Attire') {
+    viewHtml = window.renderFestivalAttire ? window.renderFestivalAttire() : '';
   } else if (page === 'Watch') {
     viewHtml = (window.V && window.V.Watch) ? window.V.Watch() : (GP.Watch ? GP.Watch() : '');
   } else if (page === 'Gallery') {
@@ -12295,7 +12295,7 @@ window.draw = function() {
   }
 
   // Connected Journey Footer Bar on Every Subpage
-  const journey = ['Overview','Story','Family','Celebrate','Puja','Food','Gallery','Watch','Learn','Quiz','Games','Shop','My Home','Progress'];
+  const journey = ['Overview','Story','Attire','Celebrate','Puja','Food','Gallery','Watch','Learn','Quiz','Games','Shop','My Home','Progress'];
   const jIdx = journey.indexOf(page);
   const prevP = jIdx > 0 ? journey[jIdx - 1] : null;
   const nextP = (jIdx >= 0 && jIdx < journey.length - 1) ? journey[jIdx + 1] : null;
