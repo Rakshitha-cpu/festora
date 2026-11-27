@@ -189,38 +189,24 @@
     return (item.style === 'lehenga') ? 'photos/attire_girl_lehenga.jpg?v=1' : 'photos/attire_girl_saree.jpg?v=1';
   }
 
-  function getOutfitFilter(item) {
-    const c = (item.main || '').toLowerCase();
-    if (c === '#065f46' || c === '#047857' || c === '#0f766e') return 'hue-rotate(155deg) saturate(1.12)';
-    if (c === '#b91c1c' || c === '#991b1b' || c === '#be123c' || c === '#7f1d1d') return 'hue-rotate(48deg) saturate(1.15)';
-    if (c === '#3730a3' || c === '#4338ca' || c === '#1d4ed8' || c === '#1e3a8a') return 'hue-rotate(-45deg) saturate(1.15)';
-    if (c === '#fffbeb' || c === '#fef3c7') return 'saturate(0.45) brightness(1.12)';
-    if (c === '#d97706' || c === '#b45309') return 'hue-rotate(78deg) saturate(1.2)';
-    return 'none';
-  }
-
   function miniThumbSvg(item) {
     const who = (item.style === 'dhoti' || item.style === 'kurta') ? 'boy' : 'girl';
     const src = getModelPhoto(who, item);
-    const flt = getOutfitFilter(item);
-    return `<div style="width:62px;height:74px;margin:0 auto 4px;border-radius:10px;overflow:hidden;border:1.5px solid #fbbf24;background:#2a0814;">
-      <img src="${src}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;object-position:top center;filter:${flt};">
+    return `<div style="width:64px;height:78px;margin:0 auto 5px;border-radius:10px;overflow:hidden;border:1.5px solid #fbbf24;background:#2a0814;">
+      <img src="${src}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;object-position:top center;">
     </div>`;
   }
 
   function buildFashionModelSVG(gender, item, pose) {
     const src = getModelPhoto(gender, item);
-    const flt = getOutfitFilter(item);
     const badge = pose === 'namaste'
-      ? '<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(255,251,235,0.92);color:#92400e;border:1.5px solid #fbbf24;border-radius:999px;padding:2px 10px;font-size:0.78rem;font-weight:800;white-space:nowrap;">🙏 Namaste</div>'
+      ? '<div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(255,251,235,0.94);color:#92400e;border:1.5px solid #fbbf24;border-radius:999px;padding:3px 12px;font-size:0.8rem;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.35);">🙏 Namaste</div>'
       : (pose === 'celeb'
-        ? '<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:1.25rem;pointer-events:none;">✨🌸✨</div>'
+        ? '<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:1.35rem;pointer-events:none;">✨🌸✨</div>'
         : '');
     return `
-      <div style="position:relative;width:190px;height:295px;margin:0 auto;border-radius:20px;overflow:hidden;border:2.5px solid rgba(251,191,36,0.85);box-shadow:0 16px 32px rgba(0,0,0,0.52);background:#2a0814;">
-        <img src="${src}" alt="${item.name}" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:top center;filter:${flt};transition:filter .35s ease;pointer-events:none;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 72%,rgba(24,5,12,0.72) 100%);pointer-events:none;"></div>
-        <div style="position:absolute;bottom:6px;left:8px;right:8px;text-align:center;color:#fde68a;font-size:0.72rem;font-weight:800;text-shadow:0 1px 4px #000;pointer-events:none;">${item.name}</div>
+      <div style="position:relative;width:210px;height:390px;margin:0 auto;overflow:hidden;border-radius:24px;-webkit-mask-image:radial-gradient(ellipse 88% 92% at 50% 48%,#000 68%,transparent 100%);mask-image:radial-gradient(ellipse 88% 92% at 50% 48%,#000 68%,transparent 100%);">
+        <img src="${src}" alt="${item.name}" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:top center;pointer-events:none;">
         ${badge}
       </div>
     `;
@@ -257,12 +243,12 @@
       const poseCls = st.pose === 'twirl' ? 'att-pose-twirl' : (st.pose === 'walk' ? 'att-pose-walk' : (st.pose === 'celeb' ? 'att-pose-celeb' : 'att-pose-breathe'));
       let modelsHtml = '';
       if (st.mode === 'girl' || st.mode === 'both') {
-        modelsHtml += `<div class="${poseCls}" style="flex:0 1 190px;">${buildFashionModelSVG('girl', st.girlItem, st.pose)}</div>`;
+        modelsHtml += `<div class="${poseCls}" style="flex:0 1 205px;">${buildFashionModelSVG('girl', st.girlItem, st.pose)}</div>`;
       }
       if (st.mode === 'boy' || st.mode === 'both') {
-        modelsHtml += `<div class="${poseCls}" style="flex:0 1 190px;">${buildFashionModelSVG('boy', st.boyItem, st.pose)}</div>`;
+        modelsHtml += `<div class="${poseCls}" style="flex:0 1 205px;">${buildFashionModelSVG('boy', st.boyItem, st.pose)}</div>`;
       }
-      stage.innerHTML = `<div id="att-drag-grp" class="att-model-box" style="display:flex;justify-content:center;align-items:flex-end;gap:2px;transform:translate(${st.offX}px,${st.offY}px) scale(${st.scale});">${modelsHtml}</div>`;
+      stage.innerHTML = `<div id="att-drag-grp" class="att-model-box" style="display:flex;justify-content:center;align-items:flex-end;gap:0px;transform:translate(${st.offX}px,${st.offY}px) scale(${st.scale});">${modelsHtml}</div>`;
       attachDrag();
     }
 
@@ -309,11 +295,11 @@
           </div>
           <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f59e0b;">
             <div style="font-size:0.72rem;font-weight:800;color:#92400e;margin-bottom:5px;">Shop This Attire Online:</div>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;">
-              <a href="https://www.amazon.in/s?k=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#1c1917;border:1px solid #d97706;text-decoration:none;padding:4px 9px;border-radius:999px;font-size:0.72rem;font-weight:800;">🛒 Amazon</a>
-              <a href="https://www.myntra.com/${encodeURIComponent(mainItem.query.toLowerCase().replace(/\s+/g, '-'))}" target="_blank" rel="noopener" style="background:#ffffff;color:#db2777;border:1px solid #db2777;text-decoration:none;padding:4px 9px;border-radius:999px;font-size:0.72rem;font-weight:800;">👗 Myntra</a>
-              <a href="https://www.ajio.com/search/?text=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#1e293b;border:1px solid #64748b;text-decoration:none;padding:4px 9px;border-radius:999px;font-size:0.72rem;font-weight:800;">✨ Ajio</a>
-              <a href="https://www.craftsvilla.com/catalogsearch/result/?q=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;text-decoration:none;padding:4px 9px;border-radius:999px;font-size:0.72rem;font-weight:800;">🪷 Craftsvilla</a>
+            <div style="display:flex;gap:4px;flex-wrap:nowrap;">
+              <a href="https://www.amazon.in/s?k=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#1c1917;border:1px solid #d97706;text-decoration:none;padding:4px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;white-space:nowrap;">🛒 Amazon</a>
+              <a href="https://www.myntra.com/${encodeURIComponent(mainItem.query.toLowerCase().replace(/\s+/g, '-'))}" target="_blank" rel="noopener" style="background:#ffffff;color:#db2777;border:1px solid #db2777;text-decoration:none;padding:4px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;white-space:nowrap;">👗 Myntra</a>
+              <a href="https://www.ajio.com/search/?text=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#1e293b;border:1px solid #64748b;text-decoration:none;padding:4px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;white-space:nowrap;">✨ Ajio</a>
+              <a href="https://www.craftsvilla.com/catalogsearch/result/?q=${q}" target="_blank" rel="noopener" style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;text-decoration:none;padding:4px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;white-space:nowrap;">🪷 Craftsvilla</a>
             </div>
           </div>
         `;
@@ -375,21 +361,18 @@
             </div>
 
             <div class="att-stage-col">
-              <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-                <div style="background:rgba(24,5,12,0.7);border:1px solid rgba(251,191,36,0.5);border-radius:999px;padding:4px 12px;font-size:0.78rem;font-weight:800;color:#fde68a;">🪷 ${g.name} · Dress · Play · Celebrate</div>
-                <div style="display:flex;gap:4px;">
-                  <button type="button" onclick="window._coco.setMode('both')" style="background:rgba(255,255,255,0.9);color:#450a0a;border:none;border-radius:999px;padding:4px 9px;font-size:0.72rem;font-weight:800;cursor:pointer;">👫 Both</button>
-                  <button type="button" onclick="window._coco.setMode('girl')" style="background:rgba(255,255,255,0.9);color:#450a0a;border:none;border-radius:999px;padding:4px 9px;font-size:0.72rem;font-weight:800;cursor:pointer;">👩 Girl</button>
-                  <button type="button" onclick="window._coco.setMode('boy')" style="background:rgba(255,255,255,0.9);color:#450a0a;border:none;border-radius:999px;padding:4px 9px;font-size:0.72rem;font-weight:800;cursor:pointer;">👨 Boy</button>
-                </div>
-              </div>
-              <div id="att-runway-stage" style="width:100%;display:flex;align-items:flex-end;justify-content:center;padding-top:34px;"></div>
+              <div id="att-runway-stage" style="width:100%;display:flex;align-items:flex-end;justify-content:center;"></div>
             </div>
 
             <div class="att-wardrobe-panel">
-              <div style="text-align:center;border-bottom:1px solid rgba(251,191,36,0.35);padding-bottom:6px;">
+              <div style="text-align:center;border-bottom:1px solid rgba(251,191,36,0.35);padding-bottom:8px;">
                 <div style="font-weight:900;font-size:1rem;color:#fde047;">🪷 Festival Wardrobe</div>
-                <div style="font-size:0.78rem;color:#fef3c7;">${g.name}</div>
+                <div style="font-size:0.78rem;color:#fef3c7;margin-bottom:6px;">${g.name}</div>
+                <div style="display:flex;gap:4px;justify-content:center;">
+                  <button type="button" onclick="window._coco.setMode('both')" style="background:rgba(255,255,255,0.92);color:#450a0a;border:none;border-radius:999px;padding:3px 10px;font-size:0.72rem;font-weight:800;cursor:pointer;">👫 Both</button>
+                  <button type="button" onclick="window._coco.setMode('girl')" style="background:rgba(255,255,255,0.92);color:#450a0a;border:none;border-radius:999px;padding:3px 10px;font-size:0.72rem;font-weight:800;cursor:pointer;">👩 Girl</button>
+                  <button type="button" onclick="window._coco.setMode('boy')" style="background:rgba(255,255,255,0.92);color:#450a0a;border:none;border-radius:999px;padding:3px 10px;font-size:0.72rem;font-weight:800;cursor:pointer;">👨 Boy</button>
+                </div>
               </div>
               <div id="att-wgrid" class="att-wgrid"></div>
               <button type="button" class="att-save-cta" onclick="window._coco.saveLook()">✨ Complete &amp; Save Look</button>
